@@ -15,6 +15,10 @@ import Docs from './pages/Docs';
 import Settings from './pages/Settings';
 import Reports from './pages/Reports';
 import ReportDetail from './pages/ReportDetail';
+import ApiMarket from './pages/ApiMarket';
+import ApiKeyDetail from './pages/ApiKeyDetail';
+import UserDetail from './pages/UserDetail';
+import BudgetManagement from './pages/BudgetManagement';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 
@@ -38,6 +42,10 @@ function App() {
           <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>} />
           <Route path="/reports/:id" element={<ProtectedRoute><Layout><ReportDetail /></Layout></ProtectedRoute>} />
+          <Route path="/api-market" element={<ProtectedRoute><Layout><ApiMarket /></Layout></ProtectedRoute>} />
+          <Route path="/api-keys/:id" element={<ProtectedRoute requireAdmin><Layout><ApiKeyDetail /></Layout></ProtectedRoute>} />
+          <Route path="/users/:id" element={<ProtectedRoute><Layout><UserDetail /></Layout></ProtectedRoute>} />
+          <Route path="/budget" element={<ProtectedRoute requireAdmin><Layout><BudgetManagement /></Layout></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

@@ -192,7 +192,7 @@ export default function Reports() {
     <div className="p-6 space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">AI 报告</h1>
+          <h1 className="text-xl font-bold text-surface-900">分析报告</h1>
           <p className="text-sm text-surface-500 mt-1">智能分析使用数据，生成洞察报告</p>
         </div>
         <button onClick={() => setShowCreateModal(true)} className="btn-primary flex items-center gap-2">

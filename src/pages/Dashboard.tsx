@@ -22,6 +22,8 @@ interface DashboardData {
   last_month_cost: number;
   cost_change_pct: number | string;
   month_savings: number;
+  month_budget: number;
+  month_budget_used_pct: number;
   month_tokens: number;
   request_count: number;
   cache_hit_rate: number | string;
@@ -33,7 +35,15 @@ interface DashboardData {
   top_api_keys: TopApiKey[];
   top_users: TopUser[];
   daily_spend: DailySpend[];
+  daily_savings: DailySavings[];
   model_distribution: ModelDistribution[];
+}
+
+interface DailySavings {
+  date: string;
+  savings: number;
+  routing_savings: number;
+  cache_savings: number;
 }
 
 interface TopProject {
@@ -74,7 +84,17 @@ interface ModelDistribution {
   count: number;
 }
 
-type CustomTooltipProps = TooltipProps<number, string>;
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value?: number;
+    name?: string;
+    payload?: {
+      count?: number;
+    };
+  }>;
+  label?: string;
+}
 
 const PIE_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#10b981'];
 
@@ -147,10 +167,26 @@ export default function Dashboard() {
   // 自定义 Tooltip
   const SpendTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (!active || !payload?.length) return null;
+    const costItem = payload.find(p => p.name === '花费');
+    const savingsItem = payload.find(p => p.name === '节省');
     return (
       <div className="bg-white border border-surface-200 rounded-lg shadow-lg p-3 text-xs">
         <p className="font-medium text-surface-800 mb-1">{label}</p>
-        <p className="text-blue-600">花费: ${payload[0].value?.toFixed(2)}</p>
+        {costItem && <p className="text-blue-600">花费: ${costItem.value?.toFixed(2)}</p>}
+        {savingsItem && <p className="text-emerald-600">节省: ${savingsItem.value?.toFixed(2)}</p>}
+      </div>
+    );
+  };
+
+  const SavingsTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (!active || !payload?.length) return null;
+    const routingItem = payload.find(p => p.name === '路由节省');
+    const cacheItem = payload.find(p => p.name === '缓存节省');
+    return (
+      <div className="bg-white border border-surface-200 rounded-lg shadow-lg p-3 text-xs">
+        <p className="font-medium text-surface-800 mb-1">{label}</p>
+        {routingItem && <p className="text-violet-600">路由节省: ${routingItem.value?.toFixed(2)}</p>}
+        {cacheItem && <p className="text-cyan-600">缓存节省: ${cacheItem.value?.toFixed(2)}</p>}
       </div>
     );
   };
@@ -297,7 +333,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI 卡片 */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         {/* 余额 */}
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -307,6 +343,27 @@ export default function Dashboard() {
           <p className="text-2xl font-bold text-surface-900">{fmt(data.balance)}</p>
           <p className="text-[11px] text-surface-400 mt-1">
             阈值 {fmt(data.balance_threshold)}
+          </p>
+        </div>
+
+        {/* 本月预算 */}
+        <div className="card p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Wallet className="w-4 h-4 text-indigo-600" />
+            <span className="text-xs font-medium text-surface-500">本月预算</span>
+          </div>
+          <p className="text-2xl font-bold text-surface-900">{fmt(data.month_budget)}</p>
+          <div className="w-full h-1.5 bg-surface-100 rounded-full overflow-hidden mt-2">
+            <div
+              className={`h-full rounded-full transition-all ${
+                data.month_budget_used_pct > 90 ? 'bg-red-500' :
+                data.month_budget_used_pct > 70 ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+              style={{ width: `${Math.min(data.month_budget_used_pct, 100)}%` }}
+            />
+          </div>
+          <p className="text-[11px] text-surface-400 mt-1">
+            已用 {data.month_budget_used_pct.toFixed(1)}%
           </p>
         </div>
 
@@ -368,11 +425,11 @@ export default function Dashboard() {
       </div>
 
       {/* 图表区域 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        {/* 30 天花费趋势 */}
-        <div className="card lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        {/* 30 天花费与节省趋势 */}
+        <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800">30 天花费趋势</h3>
+            <h3 className="text-sm font-semibold text-surface-800">30 天花费与节省趋势</h3>
             <span className="text-xs text-surface-400">
               本月累计 {fmt(data.month_cost)}
             </span>
@@ -399,6 +456,15 @@ export default function Dashboard() {
                       activeDot={{ r: 4 }}
                       name="花费"
                     />
+                    <Line
+                      type="monotone"
+                      dataKey="savings"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                      name="节省"
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
@@ -406,6 +472,17 @@ export default function Dashboard() {
                   暂无花费数据
                 </div>
               )}
+            </div>
+            {/* 图例 */}
+            <div className="flex items-center justify-center gap-6 mt-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                <span className="text-[11px] text-surface-600">花费</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span className="text-[11px] text-surface-600">节省</span>
+              </div>
             </div>
           </div>
         </div>
@@ -536,7 +613,8 @@ export default function Dashboard() {
                   {data.top_api_keys.map((key, index) => (
                     <tr
                       key={key.id}
-                      className="border-b border-surface-100 hover:bg-surface-50 transition-colors"
+                      className="border-b border-surface-100 hover:bg-surface-50 cursor-pointer transition-colors"
+                      onClick={() => navigate(`/api-keys/${key.id}`)}
                     >
                       <td className="px-3 py-2">
                         <span className={`text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center ${
@@ -589,7 +667,8 @@ export default function Dashboard() {
                   {data.top_users.map((user, index) => (
                     <tr
                       key={user.id}
-                      className="border-b border-surface-100 hover:bg-surface-50 transition-colors"
+                      className="border-b border-surface-100 hover:bg-surface-50 cursor-pointer transition-colors"
+                      onClick={() => navigate(`/users/${user.id}`)}
                     >
                       <td className="px-3 py-2">
                         <span className={`text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center ${

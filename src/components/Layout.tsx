@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, CreditCard, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText
+  FileText, Store, PieChart, Wallet, Shield, Globe
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,18 +18,46 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadAlerts, setUnreadAlerts] = useState(0);
 
-  const navItems = [
-    { path: '/dashboard', label: '总览', icon: LayoutDashboard },
-    { path: '/projects', label: '项目', icon: Building2 },
-    { path: '/members', label: '成员', icon: Users, adminOnly: true },
-    { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
-    { path: '/usage', label: '使用统计', icon: BarChart3 },
-    { path: '/reports', label: 'AI 报告', icon: FileText },
-    { path: '/routing', label: '路由优化', icon: Zap, adminOnly: true },
-    { path: '/billing', label: '充值账单', icon: CreditCard, adminOnly: true },
-    { path: '/alerts', label: '告警', icon: AlertTriangle },
-    { path: '/docs', label: '接入指南', icon: BookOpen },
-    { path: '/settings', label: '设置', icon: Settings },
+  // 导航分组配置
+  const navGroups = [
+    {
+      title: '概览',
+      items: [
+        { path: '/dashboard', label: '总览', icon: LayoutDashboard },
+      ]
+    },
+    {
+      title: 'API 管理',
+      items: [
+        { path: '/api-market', label: 'API 市场', icon: Store },
+        { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
+      ]
+    },
+    {
+      title: '成本中心',
+      items: [
+        { path: '/projects', label: '项目管理', icon: Building2 },
+        { path: '/members', label: '成员管理', icon: Users, adminOnly: true },
+        { path: '/budget', label: '预算管理', icon: Wallet, adminOnly: true },
+        { path: '/routing', label: '路由优化', icon: Zap, adminOnly: true },
+        { path: '/billing', label: '充值管理', icon: CreditCard, adminOnly: true },
+      ]
+    },
+    {
+      title: '数据分析',
+      items: [
+        { path: '/usage', label: '使用统计', icon: BarChart3 },
+        { path: '/reports', label: '分析报告', icon: FileText },
+        { path: '/alerts', label: '消息通知', icon: AlertTriangle },
+      ]
+    },
+    {
+      title: '支持',
+      items: [
+        { path: '/docs', label: '接入指南', icon: BookOpen },
+        { path: '/settings', label: '系统设置', icon: Settings },
+      ]
+    },
   ];
 
   useEffect(() => {
@@ -45,8 +73,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     logout();
     navigate('/login');
   };
-
-  const filteredNav = navItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <div className="flex h-screen bg-surface-50">
@@ -65,23 +91,38 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
-          {filteredNav.map((item) => {
-            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-            const Icon = item.icon;
+        <nav className="flex-1 px-2 py-2 space-y-4 overflow-y-auto">
+          {navGroups.map((group) => {
+            // 过滤该组中用户有权限访问的项目
+            const filteredItems = group.items.filter(item => !item.adminOnly || isAdmin);
+            if (filteredItems.length === 0) return null;
+
             return (
-              <NavLink key={item.path} to={item.path}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive ? 'bg-brand-50 text-brand-700 font-medium' : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
-                }`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{item.label}</span>
-                {item.path === '/alerts' && unreadAlerts > 0 && (
-                  <span className="ml-auto text-[10px] font-bold bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">{unreadAlerts}</span>
-                )}
-              </NavLink>
+              <div key={group.title}>
+                <h3 className="px-3 py-1 text-[10px] font-semibold text-surface-400 uppercase tracking-wider">
+                  {group.title}
+                </h3>
+                <div className="space-y-0.5 mt-1">
+                  {filteredItems.map((item) => {
+                    const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+                    const Icon = item.icon;
+                    return (
+                      <NavLink key={item.path} to={item.path}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                          isActive ? 'bg-brand-50 text-brand-700 font-medium' : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
+                        }`}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <span>{item.label}</span>
+                        {item.path === '/alerts' && unreadAlerts > 0 && (
+                          <span className="ml-auto text-[10px] font-bold bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">{unreadAlerts}</span>
+                        )}
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </nav>

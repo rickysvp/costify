@@ -176,7 +176,7 @@ export default function Alerts() {
       {/* 标题栏 */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">告警中心</h1>
+          <h1 className="text-xl font-bold text-surface-900">消息通知</h1>
           <p className="text-sm text-surface-500 mt-1">
             共 {alerts.length} 条告警，{unreadCount} 条未读
           </p>

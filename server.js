@@ -2021,6 +2021,7 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const where = { org_id: req.user.org_id, created_at: { [Op.gte]: startOfMonth } };
     const lastMonthWhere = { org_id: req.user.org_id, created_at: { [Op.gte]: lastMonth, [Op.lt]: startOfMonth } };
     const monthCost = await Usage.sum('cost', { where }) || 0;
@@ -2130,6 +2131,36 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
       group: ['model'],
       raw: true
     });
+    // 计算预算信息
+    const monthBudget = org.monthly_budget || 5000;
+    const budgetUsedPct = monthBudget > 0 ? (monthCost / monthBudget) * 100 : 0;
+
+    // 30天每日节省数据
+    const dailySavings = await Savings.findAll({
+      where: {
+        org_id: req.user.org_id,
+        created_at: { [Op.gte]: thirtyDaysAgo }
+      },
+      attributes: [
+        [Sequelize.fn('DATE', Sequelize.col('created_at')), 'date'],
+        [Sequelize.fn('SUM', Sequelize.col('saved_cost')), 'savings'],
+        [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'routing' THEN saved_cost ELSE 0 END")), 'routing_savings'],
+        [Sequelize.fn('SUM', Sequelize.literal("CASE WHEN type = 'cache' THEN saved_cost ELSE 0 END")), 'cache_savings'],
+      ],
+      group: [Sequelize.fn('DATE', Sequelize.col('created_at'))],
+      order: [[Sequelize.fn('DATE', Sequelize.col('created_at')), 'ASC']],
+      raw: true
+    });
+
+    // 合并花费和节省数据
+    const dailySpendWithSavings = dailySpend.map(d => {
+      const savingsRecord = dailySavings.find(s => s.date === d.date);
+      return {
+        ...d,
+        savings: parseFloat(savingsRecord?.savings || 0)
+      };
+    });
+
     res.json({
       balance: parseFloat(org.balance),
       balance_threshold: parseFloat(org.balance_threshold),
@@ -2137,6 +2168,8 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
       last_month_cost: parseFloat(lastMonthCost),
       cost_change_pct: lastMonthCost > 0 ? ((monthCost - lastMonthCost) / lastMonthCost * 100).toFixed(1) : 0,
       month_savings: parseFloat(monthSavings),
+      month_budget: parseFloat(monthBudget),
+      month_budget_used_pct: budgetUsedPct,
       month_tokens: monthTokens,
       request_count: requestCount,
       cache_hit_rate: requestCount > 0 ? (cacheHits / requestCount * 100).toFixed(1) : 0,
@@ -2147,8 +2180,380 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
       top_projects: topProjectsWithInfo,
       top_api_keys: topApiKeysWithInfo,
       top_users: topUsersWithInfo,
-      daily_spend: dailySpend,
+      daily_spend: dailySpendWithSavings,
+      daily_savings: dailySavings.map(d => ({
+        date: d.date,
+        savings: parseFloat(d.savings || 0),
+        routing_savings: parseFloat(d.routing_savings || 0),
+        cache_savings: parseFloat(d.cache_savings || 0),
+      })),
       model_distribution: modelDistribution
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==================== API Key 详情 API ====================
+
+app.get('/api/api-keys/:id/detail', authMiddleware, requireOrgAdmin, async (req, res) => {
+  try {
+    const apiKey = await ApiKey.findOne({
+      where: { id: req.params.id, org_id: req.user.org_id },
+      include: [
+        { model: Project, as: 'Project', attributes: ['id', 'name'] },
+        { model: User, as: 'User', attributes: ['id', 'name'] }
+      ]
+    });
+    if (!apiKey) return res.status(404).json({ error: 'API Key 不存在' });
+
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const where = { org_id: req.user.org_id, api_key_id: apiKey.id };
+
+    // 统计数据
+    const totalSpend = await Usage.sum('cost', { where }) || 0;
+    const totalTokens = await Usage.sum('total_tokens', { where }) || 0;
+    const totalRequests = await Usage.count({ where });
+
+    // 最后使用时间
+    const lastUsage = await Usage.findOne({
+      where,
+      order: [['created_at', 'DESC']]
+    });
+
+    // 30 天每日使用数据
+    const dailyWhere = {
+      ...where,
+      created_at: { [Op.gte]: thirtyDaysAgo }
+    };
+    const dailyUsage = await Usage.findAll({
+      where: dailyWhere,
+      attributes: [
+        [Sequelize.fn('DATE', Sequelize.col('created_at')), 'date'],
+        [Sequelize.fn('SUM', Sequelize.col('cost')), 'cost'],
+        [Sequelize.fn('SUM', Sequelize.col('total_tokens')), 'tokens'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'requests']
+      ],
+      group: [Sequelize.fn('DATE', Sequelize.col('created_at'))],
+      order: [[Sequelize.fn('DATE', Sequelize.col('created_at')), 'ASC']],
+      raw: true
+    });
+
+    // 模型分布
+    const modelDistribution = await Usage.findAll({
+      where,
+      attributes: [
+        'model',
+        [Sequelize.fn('SUM', Sequelize.col('cost')), 'cost'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+      ],
+      group: ['model'],
+      order: [[Sequelize.fn('SUM', Sequelize.col('cost')), 'DESC']],
+      raw: true
+    });
+
+    res.json({
+      id: apiKey.id,
+      name: apiKey.name,
+      key_preview: apiKey.key ? apiKey.key.substring(0, 12) + '...' : '---',
+      project_id: apiKey.project_id,
+      project_name: apiKey.Project?.name || '未知项目',
+      user_id: apiKey.user_id,
+      user_name: apiKey.User?.name || null,
+      spend: parseFloat(totalSpend),
+      tokens: parseInt(totalTokens),
+      requests: parseInt(totalRequests),
+      created_at: apiKey.created_at,
+      last_used_at: lastUsage?.created_at || null,
+      status: apiKey.status,
+      daily_usage: dailyUsage.map(d => ({
+        date: d.date,
+        cost: parseFloat(d.cost),
+        tokens: parseInt(d.tokens),
+        requests: parseInt(d.requests)
+      })),
+      model_distribution: modelDistribution.map(m => ({
+        model: m.model,
+        cost: parseFloat(m.cost),
+        count: parseInt(m.count)
+      }))
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==================== 成员详情 API ====================
+
+app.get('/api/users/:id/detail', authMiddleware, async (req, res) => {
+  try {
+    // 检查权限：管理员可以查看所有成员，成员只能查看自己
+    const isAdmin = req.user.role === 'org_admin' || req.user.role === 'platform_admin';
+    if (!isAdmin && req.user.id !== parseInt(req.params.id)) {
+      return res.status(403).json({ error: '权限不足' });
+    }
+
+    const user = await User.findOne({
+      where: { id: req.params.id, org_id: req.user.org_id }
+    });
+    if (!user) return res.status(404).json({ error: '成员不存在' });
+
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const where = { org_id: req.user.org_id, user_id: user.id };
+
+    // 统计数据
+    const totalSpend = await Usage.sum('cost', { where }) || 0;
+    const totalTokens = await Usage.sum('total_tokens', { where }) || 0;
+    const totalRequests = await Usage.count({ where });
+
+    // 最后活跃时间
+    const lastUsage = await Usage.findOne({
+      where,
+      order: [['created_at', 'DESC']]
+    });
+
+    // 参与的项目
+    const projectMemberships = await Membership.findAll({
+      where: { user_id: user.id },
+      include: [{ model: Project, as: 'Project', attributes: ['id', 'name'] }]
+    });
+
+    const projectsWithSpend = await Promise.all(
+      projectMemberships.map(async (pm) => {
+        const spend = await Usage.sum('cost', {
+          where: { org_id: req.user.org_id, user_id: user.id, project_id: pm.project_id }
+        }) || 0;
+        return {
+          id: pm.Project.id,
+          name: pm.Project.name,
+          spend: parseFloat(spend),
+          role: pm.role
+        };
+      })
+    );
+
+    // 用户的 API Keys
+    const apiKeys = await ApiKey.findAll({
+      where: { user_id: user.id, org_id: req.user.org_id }
+    });
+
+    const apiKeysWithSpend = await Promise.all(
+      apiKeys.map(async (key) => {
+        const spend = await Usage.sum('cost', {
+          where: { org_id: req.user.org_id, api_key_id: key.id }
+        }) || 0;
+        return {
+          id: key.id,
+          name: key.name,
+          key_preview: key.key ? key.key.substring(0, 12) + '...' : '---',
+          spend: parseFloat(spend)
+        };
+      })
+    );
+
+    // 30 天每日使用数据
+    const dailyWhere = {
+      ...where,
+      created_at: { [Op.gte]: thirtyDaysAgo }
+    };
+    const dailyUsage = await Usage.findAll({
+      where: dailyWhere,
+      attributes: [
+        [Sequelize.fn('DATE', Sequelize.col('created_at')), 'date'],
+        [Sequelize.fn('SUM', Sequelize.col('cost')), 'cost'],
+        [Sequelize.fn('SUM', Sequelize.col('total_tokens')), 'tokens'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'requests']
+      ],
+      group: [Sequelize.fn('DATE', Sequelize.col('created_at'))],
+      order: [[Sequelize.fn('DATE', Sequelize.col('created_at')), 'ASC']],
+      raw: true
+    });
+
+    // 模型分布
+    const modelDistribution = await Usage.findAll({
+      where,
+      attributes: [
+        'model',
+        [Sequelize.fn('SUM', Sequelize.col('cost')), 'cost'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'count']
+      ],
+      group: ['model'],
+      order: [[Sequelize.fn('SUM', Sequelize.col('cost')), 'DESC']],
+      raw: true
+    });
+
+    // 最近使用记录（最近50条）
+    const recentUsage = await Usage.findAll({
+      where,
+      include: [
+        { model: Project, as: 'Project', attributes: ['name'] },
+        { model: ApiKey, as: 'ApiKey', attributes: ['name'] }
+      ],
+      order: [['created_at', 'DESC']],
+      limit: 50
+    });
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      spend: parseFloat(totalSpend),
+      tokens: parseInt(totalTokens),
+      requests: parseInt(totalRequests),
+      created_at: user.created_at,
+      last_active_at: lastUsage?.created_at || null,
+      projects: projectsWithSpend,
+      api_keys: apiKeysWithSpend,
+      daily_usage: dailyUsage.map(d => ({
+        date: d.date,
+        cost: parseFloat(d.cost),
+        tokens: parseInt(d.tokens),
+        requests: parseInt(d.requests)
+      })),
+      model_distribution: modelDistribution.map(m => ({
+        model: m.model,
+        cost: parseFloat(m.cost),
+        count: parseInt(m.count)
+      })),
+      recent_usage: recentUsage.map(u => ({
+        id: u.id,
+        created_at: u.created_at,
+        model: u.model,
+        cost: parseFloat(u.cost),
+        total_tokens: u.total_tokens,
+        project_name: u.Project?.name || '未知项目',
+        api_key_name: u.ApiKey?.name || '未知 Key'
+      }))
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==================== 预算管理 API ====================
+
+app.get('/api/budget', authMiddleware, requireOrgAdmin, async (req, res) => {
+  try {
+    const org = await Org.findByPk(req.user.org_id);
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const where = { org_id: req.user.org_id, created_at: { [Op.gte]: startOfMonth } };
+
+    // 企业预算信息
+    const monthCost = await Usage.sum('cost', { where }) || 0;
+    const monthBudget = org.monthly_budget || 5000; // 默认预算 $5000
+    const usedPercentage = monthBudget > 0 ? (monthCost / monthBudget) * 100 : 0;
+
+    const orgBudget = {
+      monthly_budget: parseFloat(monthBudget),
+      used_amount: parseFloat(monthCost),
+      remaining: Math.max(0, parseFloat(monthBudget) - parseFloat(monthCost)),
+      used_percentage: usedPercentage,
+      alert_threshold: org.budget_alert_threshold || 80,
+      alert_enabled: org.budget_alert_enabled !== false,
+    };
+
+    // 项目预算列表
+    const projects = await Project.findAll({
+      where: { org_id: req.user.org_id, status: 'active' },
+    });
+
+    const projectBudgets = await Promise.all(
+      projects.map(async (proj) => {
+        const projectCost = await Usage.sum('cost', {
+          where: { ...where, project_id: proj.id },
+        }) || 0;
+        const projectBudget = proj.monthly_budget || 1000;
+        const projectUsedPct = projectBudget > 0 ? (projectCost / projectBudget) * 100 : 0;
+
+        let status = 'normal';
+        if (projectUsedPct >= 100) status = 'exceeded';
+        else if (projectUsedPct >= (proj.budget_alert_threshold || 80)) status = 'warning';
+
+        return {
+          id: proj.id,
+          name: proj.name,
+          monthly_budget: parseFloat(projectBudget),
+          used_amount: parseFloat(projectCost),
+          remaining: Math.max(0, parseFloat(projectBudget) - parseFloat(projectCost)),
+          used_percentage: projectUsedPct,
+          alert_threshold: proj.budget_alert_threshold || 80,
+          status,
+        };
+      })
+    );
+
+    // 预算历史（最近6个月）
+    const budgetHistory = [];
+    for (let i = 5; i >= 0; i--) {
+      const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+      const monthWhere = {
+        org_id: req.user.org_id,
+        created_at: { [Op.gte]: month, [Op.lt]: monthEnd },
+      };
+
+      const actual = await Usage.sum('cost', { where: monthWhere }) || 0;
+      const savings = await Usage.sum('savings', { where: monthWhere }) || 0;
+
+      budgetHistory.push({
+        month: month.toLocaleString('zh-CN', { month: 'short' }),
+        budget: parseFloat(monthBudget),
+        actual: parseFloat(actual),
+        savings: parseFloat(savings),
+      });
+    }
+
+    // 预算告警
+    const budgetAlerts = await Alert.findAll({
+      where: {
+        org_id: req.user.org_id,
+        type: { [Op.in]: ['budget', 'project_budget'] },
+      },
+      order: [['created_at', 'DESC']],
+      limit: 20,
+    });
+
+    const formattedAlerts = budgetAlerts.map((alert) => ({
+      id: alert.id,
+      type: alert.severity === 'critical' ? 'budget_exceeded' : 'budget_threshold',
+      message: alert.message,
+      project_name: alert.project_id ? projects.find((p) => p.id === alert.project_id)?.name : undefined,
+      threshold: alert.severity === 'critical' ? 100 : 80,
+      actual: usedPercentage,
+      created_at: alert.created_at,
+      status: alert.status,
+    }));
+
+    // 节省统计
+    const totalSavings = await Usage.sum('savings', { where }) || 0;
+    const routingSavings = await Savings.sum('saved_cost', {
+      where: { ...where, type: 'routing' },
+    }) || 0;
+    const cacheSavings = await Savings.sum('saved_cost', {
+      where: { ...where, type: 'cache' },
+    }) || 0;
+    const downgradeSavings = await Savings.sum('saved_cost', {
+      where: { ...where, type: 'model_downgrade' },
+    }) || 0;
+
+    const savingsStats = {
+      total_savings: parseFloat(totalSavings),
+      routing_savings: parseFloat(routingSavings),
+      cache_savings: parseFloat(cacheSavings),
+      model_downgrade_savings: parseFloat(downgradeSavings),
+      savings_rate: monthCost > 0 ? (totalSavings / (monthCost + totalSavings)) * 100 : 0,
+    };
+
+    res.json({
+      org_budget: orgBudget,
+      project_budgets: projectBudgets,
+      budget_history: budgetHistory,
+      budget_alerts: formattedAlerts,
+      savings_stats: savingsStats,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -179,7 +179,7 @@ export default function Billing() {
       {/* 页面标题 */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">充值账单</h1>
+          <h1 className="text-xl font-bold text-surface-900">充值管理</h1>
           <p className="text-sm text-surface-500 mt-1">管理账户余额与充值记录</p>
         </div>
         <div className="flex items-center gap-2">
