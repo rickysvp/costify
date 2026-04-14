@@ -1,0 +1,48 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
+import ProjectDetail from './pages/ProjectDetail';
+import Members from './pages/Members';
+import ApiKeys from './pages/ApiKeys';
+import UsagePage from './pages/UsagePage';
+import Routing from './pages/Routing';
+import Billing from './pages/Billing';
+import Alerts from './pages/Alerts';
+import Docs from './pages/Docs';
+import Settings from './pages/Settings';
+import Reports from './pages/Reports';
+import ReportDetail from './pages/ReportDetail';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+          <Route path="/projects" element={<ProtectedRoute><Layout><Projects /></Layout></ProtectedRoute>} />
+          <Route path="/projects/:id" element={<ProtectedRoute><Layout><ProjectDetail /></Layout></ProtectedRoute>} />
+          <Route path="/members" element={<ProtectedRoute requireAdmin><Layout><Members /></Layout></ProtectedRoute>} />
+          <Route path="/api-keys" element={<ProtectedRoute requireAdmin><Layout><ApiKeys /></Layout></ProtectedRoute>} />
+          <Route path="/usage" element={<ProtectedRoute><Layout><UsagePage /></Layout></ProtectedRoute>} />
+          <Route path="/routing" element={<ProtectedRoute requireAdmin><Layout><Routing /></Layout></ProtectedRoute>} />
+          <Route path="/billing" element={<ProtectedRoute requireAdmin><Layout><Billing /></Layout></ProtectedRoute>} />
+          <Route path="/alerts" element={<ProtectedRoute><Layout><Alerts /></Layout></ProtectedRoute>} />
+          <Route path="/docs" element={<ProtectedRoute><Layout><Docs /></Layout></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>} />
+          <Route path="/reports/:id" element={<ProtectedRoute><Layout><ReportDetail /></Layout></ProtectedRoute>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
