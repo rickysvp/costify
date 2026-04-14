@@ -29,8 +29,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     {
       title: 'API 管理',
       items: [
-        { path: '/api-market', label: 'API 市场', icon: Store },
         { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
+        { path: '/api-market', label: 'API 市场', icon: Store },
+        { path: '/billing', label: '充值管理', icon: CreditCard, adminOnly: true },
       ]
     },
     {
@@ -40,7 +41,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         { path: '/members', label: '成员管理', icon: Users, adminOnly: true },
         { path: '/budget', label: '预算管理', icon: Wallet, adminOnly: true },
         { path: '/routing', label: '路由优化', icon: Zap, adminOnly: true },
-        { path: '/billing', label: '充值管理', icon: CreditCard, adminOnly: true },
       ]
     },
     {

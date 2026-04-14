@@ -5,6 +5,12 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.1] - 2026-04-14
+
+### Changed
+- 充值管理从成本中心移到 API 管理分类
+- API 管理分类顺序调整为：API Keys、API 市场、充值管理
+
 ## [1.1.0] - 2026-04-14
 
 ### Added
