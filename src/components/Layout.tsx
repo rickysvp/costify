@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, CreditCard, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText, Store, PieChart, Wallet, Shield, Globe
+  FileText, Store, Wallet
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -75,48 +75,56 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen bg-surface-50">
+    <div className="flex h-screen bg-gray-50">
       <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
 
-      <aside className={`sidebar w-60 bg-white border-r border-surface-200 flex flex-col flex-shrink-0 ${sidebarOpen ? 'open' : ''}`}>
-        <div className="px-4 py-3 border-b border-surface-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+      {/* Sidebar */}
+      <aside className={`sidebar w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 ${sidebarOpen ? 'open' : ''}`}>
+        {/* Logo */}
+        <div className="px-4 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <CreditCard className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-surface-900 tracking-tight">Costify</h1>
-              <p className="text-[10px] text-surface-400">AI 成本管理</p>
+              <h1 className="text-sm font-semibold text-gray-900 tracking-tight">Costify</h1>
+              <p className="text-xs text-gray-500">AI 成本管理</p>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 px-2 py-2 space-y-4 overflow-y-auto">
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
           {navGroups.map((group) => {
-            // 过滤该组中用户有权限访问的项目
             const filteredItems = group.items.filter(item => !item.adminOnly || isAdmin);
             if (filteredItems.length === 0) return null;
 
             return (
               <div key={group.title}>
-                <h3 className="px-3 py-1 text-[10px] font-semibold text-surface-400 uppercase tracking-wider">
+                <h3 className="px-3 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   {group.title}
                 </h3>
-                <div className="space-y-0.5 mt-1">
+                <div className="space-y-1 mt-2">
                   {filteredItems.map((item) => {
                     const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
                     const Icon = item.icon;
                     return (
-                      <NavLink key={item.path} to={item.path}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                          isActive ? 'bg-brand-50 text-brand-700 font-medium' : 'text-surface-600 hover:bg-surface-50 hover:text-surface-900'
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                          isActive
+                            ? 'bg-primary-50 text-primary-700'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                         onClick={() => setSidebarOpen(false)}
                       >
                         <Icon className="w-4 h-4 flex-shrink-0" />
                         <span>{item.label}</span>
                         {item.path === '/alerts' && unreadAlerts > 0 && (
-                          <span className="ml-auto text-[10px] font-bold bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">{unreadAlerts}</span>
+                          <span className="ml-auto text-xs font-semibold bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                            {unreadAlerts}
+                          </span>
                         )}
                       </NavLink>
                     );
@@ -127,52 +135,72 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="px-3 py-3 border-t border-surface-100">
-          <div className="flex items-center gap-2 px-2 py-1.5">
-            <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-xs font-semibold text-brand-700">
+        {/* User Profile */}
+        <div className="px-3 py-3 border-t border-gray-100">
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center text-sm font-semibold text-primary-700">
               {user?.name?.[0] || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-surface-800 truncate">{user?.name}</p>
-              <p className="text-[10px] text-surface-400">{user?.role === 'org_admin' ? '企业管理员' : '成员'}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+              <p className="text-xs text-gray-500">{user?.role === 'org_admin' ? '企业管理员' : '成员'}</p>
             </div>
-            <button onClick={handleLogout} className="p-1 rounded hover:bg-surface-100" title="退出登录">
-              <LogOut className="w-3.5 h-3.5 text-surface-400" />
+            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors" title="退出登录">
+              <LogOut className="w-4 h-4 text-gray-400" />
             </button>
           </div>
         </div>
       </aside>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-12 bg-white border-b border-surface-200 flex items-center justify-between px-4 flex-shrink-0">
+        {/* Header */}
+        <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <button className="md:hidden p-1.5 rounded-lg hover:bg-surface-100" onClick={() => setSidebarOpen(!sidebarOpen)}>
-              <Menu className="w-5 h-5 text-surface-700" />
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="relative p-1.5 rounded-lg hover:bg-surface-100" onClick={() => navigate('/alerts')}>
-              <Bell className="w-4 h-4 text-surface-500" />
-              {unreadAlerts > 0 && <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-red-500 rounded-full"></span>}
+          <div className="flex items-center gap-3">
+            <button
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => navigate('/alerts')}
+            >
+              <Bell className="w-5 h-5 text-gray-500" />
+              {unreadAlerts > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
             </button>
-            <div className="w-px h-5 bg-surface-200"></div>
+            <div className="w-px h-6 bg-gray-200"></div>
             <div className="relative">
-              <button className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-surface-100" onClick={() => setShowUserMenu(!showUserMenu)}>
-                <div className="w-6 h-6 rounded-full bg-brand-100 flex items-center justify-center text-[10px] font-semibold text-brand-700">
+              <button
+                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <div className="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center text-xs font-semibold text-primary-700">
                   {user?.name?.[0] || 'U'}
                 </div>
-                <ChevronDown className="w-3 h-3 text-surface-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-surface-200 py-1 z-50">
-                  <div className="px-3 py-2 border-b border-surface-100">
-                    <p className="text-sm font-medium text-surface-800">{user?.name}</p>
-                    <p className="text-xs text-surface-500">{user?.email}</p>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-md border border-gray-100 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
-                  <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-700 hover:bg-surface-50" onClick={() => { setShowUserMenu(false); navigate('/settings'); }}>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={() => { setShowUserMenu(false); navigate('/settings'); }}
+                  >
                     <User className="w-4 h-4" /> 个人设置
                   </button>
-                  <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50" onClick={handleLogout}>
+                  <button
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="w-4 h-4" /> 退出登录
                   </button>
                 </div>
@@ -180,7 +208,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto">{children}</main>
+
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

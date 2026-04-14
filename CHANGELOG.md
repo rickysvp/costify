@@ -5,6 +5,16 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.2] - 2026-04-14
+
+### Changed
+- 使用 Dashboard Layout 仪表盘布局设计系统重构 UI
+- 更新主色调为 Indigo (#6366f1)
+- 更新卡片样式：bg-white rounded-xl shadow-sm border border-gray-100
+- 更新按钮样式：rounded-lg font-medium transition-colors
+- 更新输入框样式：focus:ring-primary-500/20 focus:border-primary-500
+- 统一使用 gray 色系替代 surface 色系
+
 ## [1.1.1] - 2026-04-14
 
 ### Changed
