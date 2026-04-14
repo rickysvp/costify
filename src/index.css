@@ -18,8 +18,8 @@
   }
 
   body {
-    background-color: #f9fafb;
-    color: #111827;
+    background-color: #F8FAFC;
+    color: #0F172A;
     min-height: 100vh;
   }
 
@@ -29,7 +29,7 @@
 }
 
 @layer components {
-  /* Sidebar Items */
+  /* Sidebar Items - 深邃青风格 */
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 cursor-pointer;
   }
@@ -39,20 +39,20 @@
   }
 
   .sidebar-item-inactive {
-    @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900;
+    @apply text-slate-600 hover:bg-slate-100 hover:text-slate-900;
   }
 
-  /* Cards - Dashboard Layout Style */
+  /* Cards - 深邃青风格 */
   .card {
-    @apply bg-white rounded-xl border border-gray-100 shadow-sm transition-all duration-200;
+    @apply bg-white rounded-xl border border-slate-200 shadow-sm transition-all duration-200;
   }
 
   .card:hover {
-    @apply shadow-md;
+    @apply shadow-md border-slate-300;
   }
 
   .card-header {
-    @apply px-5 py-4 border-b border-gray-100;
+    @apply px-5 py-4 border-b border-slate-100;
   }
 
   .card-body {
@@ -63,7 +63,7 @@
     @apply card p-5;
   }
 
-  /* Badges */
+  /* Badges - 深邃青风格 */
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium;
   }
@@ -73,7 +73,7 @@
   }
 
   .badge-blue {
-    @apply badge bg-blue-50 text-blue-700 border border-blue-100;
+    @apply badge bg-primary-50 text-primary-700 border border-primary-100;
   }
 
   .badge-orange {
@@ -81,14 +81,14 @@
   }
 
   .badge-red {
-    @apply badge bg-red-50 text-red-700 border border-red-100;
+    @apply badge bg-rose-50 text-rose-700 border border-rose-100;
   }
 
   .badge-gray {
-    @apply badge bg-gray-100 text-gray-600 border border-gray-200;
+    @apply badge bg-slate-100 text-slate-600 border border-slate-200;
   }
 
-  /* Buttons - Dashboard Layout Style */
+  /* Buttons - 深邃青风格 */
   .btn-primary {
     @apply px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium
            transition-colors duration-200
@@ -97,36 +97,36 @@
   }
 
   .btn-secondary {
-    @apply px-4 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-lg text-sm font-medium
+    @apply px-4 py-2.5 bg-white text-slate-700 border border-slate-200 rounded-lg text-sm font-medium
            transition-colors duration-200
-           hover:bg-gray-50 hover:border-gray-300;
+           hover:bg-slate-50 hover:border-slate-300;
   }
 
   .btn-ghost {
-    @apply px-3 py-2 text-gray-600 rounded-lg text-sm font-medium
+    @apply px-3 py-2 text-slate-600 rounded-lg text-sm font-medium
            transition-colors duration-200
-           hover:text-gray-900 hover:bg-gray-100;
+           hover:text-slate-900 hover:bg-slate-100;
   }
 
-  /* Input Fields */
+  /* Input Fields - 深邃青风格 */
   .input-field {
-    @apply bg-gray-50 border border-gray-200 rounded-lg text-sm
+    @apply bg-white border border-slate-200 rounded-lg text-sm
            focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500
            transition-all px-3 py-2;
   }
 
-  /* Table styles */
+  /* Table styles - 深邃青风格 */
   .table-header {
-    @apply px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50 border-b border-gray-200;
+    @apply px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200;
   }
 
   .table-cell {
-    @apply px-4 py-3 text-sm text-gray-700 border-b border-gray-100;
+    @apply px-4 py-3 text-sm text-slate-700 border-b border-slate-100;
   }
 
-  /* Progress bars */
+  /* Progress bars - 深邃青风格 */
   .progress-bar {
-    @apply h-2 bg-gray-100 rounded-full overflow-hidden;
+    @apply h-2 bg-slate-100 rounded-full overflow-hidden;
   }
 
   .progress-fill {
@@ -135,23 +135,23 @@
 
   /* Typography utilities */
   .heading-hero {
-    @apply text-2xl md:text-3xl font-semibold tracking-tight text-gray-900;
+    @apply text-2xl md:text-3xl font-semibold tracking-tight text-slate-900;
   }
 
   .heading-section {
-    @apply text-xl md:text-2xl font-semibold tracking-tight text-gray-900;
+    @apply text-xl md:text-2xl font-semibold tracking-tight text-slate-900;
   }
 
   .heading-card {
-    @apply text-sm md:text-base font-semibold text-gray-900;
+    @apply text-sm md:text-base font-semibold text-slate-900;
   }
 
   .body-text {
-    @apply text-sm text-gray-600;
+    @apply text-sm text-slate-600;
   }
 
   .mono-label {
-    @apply text-xs font-medium uppercase tracking-wider text-gray-500;
+    @apply text-xs font-medium uppercase tracking-wider text-slate-500;
   }
 
   /* Animation utilities */
@@ -164,11 +164,11 @@
   }
 
   .loading-spinner {
-    @apply w-5 h-5 border-2 border-gray-200 border-t-primary-600 rounded-full animate-spin;
+    @apply w-5 h-5 border-2 border-slate-200 border-t-primary-600 rounded-full animate-spin;
   }
 
   .skeleton {
-    @apply bg-gray-100 animate-pulse rounded-lg;
+    @apply bg-slate-100 animate-pulse rounded-lg;
   }
 }
 
@@ -212,7 +212,7 @@
   }
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - 深邃青风格 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -223,12 +223,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #CBD5E1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #94A3B8;
 }
 
 /* Responsive styles */
@@ -256,52 +256,4 @@
   }
 
   .w-80 {
-    @apply w-64;
-  }
-}
-
-@media (max-width: 640px) {
-  .p-6 {
-    @apply p-4;
-  }
-
-  .card-header {
-    @apply px-4 py-3;
-  }
-
-  .card-body {
-    @apply px-4 py-3;
-  }
-
-  .text-xl {
-    @apply text-lg;
-  }
-
-  .w-64 {
-    @apply w-full;
-  }
-}
-
-/* Sidebar styles */
-.sidebar {
-  @apply transform transition-transform duration-300 ease-in-out;
-}
-
-.sidebar-overlay {
-  @apply fixed inset-0 z-40 bg-black/50 opacity-0 invisible transition-all duration-300 ease-in-out;
-}
-
-.sidebar-overlay.open {
-  @apply opacity-100 visible;
-}
-
-/* Mobile sidebar */
-@media (max-width: 768px) {
-  .sidebar {
-    @apply fixed inset-y-0 left-0 z-50 w-64 -translate-x-full;
-  }
-
-  .sidebar.open {
-    @apply translate-x-0;
-  }
-}
+    @

@@ -5,6 +5,15 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.3] - 2026-04-14
+
+### Changed
+- 重新设计配色风格 - 深邃青 (Teal) 主题
+- 更新主色调为 #0D9488 (深邃青)
+- 使用 slate 灰色系替代 gray，更加中性专业
+- 更新功能色：success (emerald)、warning (amber)、danger (rose)
+- 优化整体视觉层次和可读性
+
 ## [1.1.2] - 2026-04-14
 
 ### Changed

@@ -44,7 +44,7 @@ export default function Login() {
     <div className="min-h-screen bg-surface-50 flex">
       <div className="hidden lg:flex lg:w-1/2 bg-brand-600 items-center justify-center p-12">
         <div className="max-w-md text-white">
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex items-center gap-3 mb-8 cursor-pointer" onClick={() => navigate('/dashboard')}>
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
               <CreditCard className="w-6 h-6 text-white" />
             </div>
