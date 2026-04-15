@@ -18,13 +18,12 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps,
   PieChart,
   Pie,
   Cell,
   Legend,
 } from 'recharts';
-import { useAuth } from '../contexts/AuthContext';
+
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -103,7 +102,6 @@ const PIE_COLORS = ['#3b82f6', '#10b981'];
 
 // ---------- 组件 ----------
 export default function Routing() {
-  const { isAdmin } = useAuth();
 
   const [summary, setSummary] = useState<SavingsSummary | null>(null);
   const [dailySavings, setDailySavings] = useState<DailySavings[]>([]);
@@ -238,7 +236,7 @@ export default function Routing() {
                           paddingAngle={4}
                           dataKey="value"
                           label={({ name, percent }) =>
-                            `${name} ${(percent * 100).toFixed(0)}%`
+                            `${name} ${((percent || 0) * 100).toFixed(0)}%`
                           }
                         >
                           {pieData.map((_, index) => (
@@ -249,7 +247,7 @@ export default function Routing() {
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value: number) => [formatCurrency(value), '金额']}
+                          formatter={(value) => [formatCurrency(Number(value)), '金额']}
                         />
                         <Legend />
                       </PieChart>
@@ -348,16 +346,16 @@ export default function Routing() {
                       />
                       <YAxis tick={{ fontSize: 12 }} />
                       <Tooltip
-                        formatter={(value: number, name: string) => [
-                          formatCurrency(value),
+                        formatter={(value, name) => [
+                          formatCurrency(Number(value)),
                           name === 'routing_savings'
                             ? '路由节省'
                             : name === 'cache_savings'
                               ? '缓存节省'
                               : '总节省',
                         ]}
-                        labelFormatter={(label: string) =>
-                          new Date(label).toLocaleDateString()
+                        labelFormatter={(label) =>
+                          new Date(String(label)).toLocaleDateString()
                         }
                       />
                       <Area

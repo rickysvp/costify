@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  User,
   Mail,
   RefreshCw,
   AlertCircle,
@@ -13,7 +12,6 @@ import {
   Building2,
   Key,
   TrendingUp,
-  PieChart,
 } from 'lucide-react';
 import {
   LineChart,
@@ -293,7 +291,7 @@ export default function UserDetail() {
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(0)}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}
-                      formatter={(value: number) => [`$${value.toFixed(2)}`, '花费']}
+                      formatter={(value) => [`$${Number(value).toFixed(2)}`, '花费']}
                     />
                     <Line
                       type="monotone"

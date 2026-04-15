@@ -35,20 +35,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       ]
     },
     {
+      title: '数据分析',
+      items: [
+        { path: '/usage', label: '使用统计', icon: BarChart3 },
+        { path: '/reports', label: '分析报告', icon: FileText },
+        { path: '/alerts', label: '消息通知', icon: AlertTriangle },
+      ]
+    },
+    {
       title: '成本中心',
       items: [
         { path: '/projects', label: '项目管理', icon: Building2 },
         { path: '/members', label: '成员管理', icon: Users, adminOnly: true },
         { path: '/budget', label: '预算管理', icon: Wallet, adminOnly: true },
         { path: '/routing', label: '路由优化', icon: Zap, adminOnly: true },
-      ]
-    },
-    {
-      title: '数据分析',
-      items: [
-        { path: '/usage', label: '使用统计', icon: BarChart3 },
-        { path: '/reports', label: '分析报告', icon: FileText },
-        { path: '/alerts', label: '消息通知', icon: AlertTriangle },
       ]
     },
     {

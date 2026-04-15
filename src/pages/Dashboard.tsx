@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Wallet, TrendingUp, TrendingDown, PiggyBank, Activity,
-  Zap, ArrowRight, Plus, Users, Key, Building2, AlertCircle,
+  Zap, ArrowRight, Plus, Building2, AlertCircle,
   RefreshCw
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, TooltipProps
+  ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import { useAuth } from '../contexts/AuthContext';
+
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -111,7 +111,6 @@ const MODEL_DISPLAY: Record<string, string> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -174,19 +173,6 @@ export default function Dashboard() {
         <p className="font-medium text-surface-800 mb-1">{label}</p>
         {costItem && <p className="text-blue-600">花费: ${costItem.value?.toFixed(2)}</p>}
         {savingsItem && <p className="text-emerald-600">节省: ${savingsItem.value?.toFixed(2)}</p>}
-      </div>
-    );
-  };
-
-  const SavingsTooltip = ({ active, payload, label }: CustomTooltipProps) => {
-    if (!active || !payload?.length) return null;
-    const routingItem = payload.find(p => p.name === '路由节省');
-    const cacheItem = payload.find(p => p.name === '缓存节省');
-    return (
-      <div className="bg-white border border-surface-200 rounded-lg shadow-lg p-3 text-xs">
-        <p className="font-medium text-surface-800 mb-1">{label}</p>
-        {routingItem && <p className="text-violet-600">路由节省: ${routingItem.value?.toFixed(2)}</p>}
-        {cacheItem && <p className="text-cyan-600">缓存节省: ${cacheItem.value?.toFixed(2)}</p>}
       </div>
     );
   };

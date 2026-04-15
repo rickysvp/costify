@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   Search,
   Copy,
-  Key,
   ChevronDown,
   Loader2,
 } from 'lucide-react';

@@ -6,11 +6,9 @@ import {
   Plus,
   X,
   CheckCircle,
-  Clock,
   RefreshCw,
   Wallet,
   History,
-  Shield,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 

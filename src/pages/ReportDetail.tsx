@@ -51,7 +51,7 @@ const STATUS_CONFIG = {
   error: { label: '错误', color: 'bg-red-100 text-red-700', icon: AlertCircle },
 };
 
-const TYPE_CONFIG = {
+const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   custom: { label: '自定义', color: 'bg-violet-100 text-violet-700' },
   weekly: { label: '周报', color: 'bg-blue-100 text-blue-700' },
   monthly: { label: '月报', color: 'bg-emerald-100 text-emerald-700' },

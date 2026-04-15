@@ -8,16 +8,12 @@ import {
   Building2,
   DollarSign,
   Percent,
-  Calendar,
   Bell,
   Settings,
   ArrowRight,
-  Plus,
   Edit3,
-  Trash2,
   RefreshCw,
   PieChart as PieChartIcon,
-  BarChart3,
   Target,
   Shield,
 } from 'lucide-react';
@@ -29,11 +25,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
 } from 'recharts';
 
 const API_BASE = 'http://localhost:3001/api';
@@ -92,16 +83,12 @@ interface SavingsStats {
   savings_rate: number;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
 export default function BudgetManagement() {
   const navigate = useNavigate();
   const [data, setData] = useState<BudgetData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'projects' | 'alerts' | 'settings'>('overview');
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [editingProject, setEditingProject] = useState<ProjectBudget | null>(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -333,7 +320,7 @@ export default function BudgetManagement() {
                       <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(0)}`} />
                       <Tooltip
                         contentStyle={{ backgroundColor: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}
-                        formatter={(value: number, name: string) => [`$${value.toFixed(2)}`, name]}
+                        formatter={(value, name) => [`$${Number(value).toFixed(2)}`, name]}
                       />
                       <Bar dataKey="budget" fill="#3b82f6" name="预算" radius={[4, 4, 0, 0]} />
                       <Bar dataKey="actual" fill="#ef4444" name="实际" radius={[4, 4, 0, 0]} />
@@ -380,8 +367,7 @@ export default function BudgetManagement() {
                     </div>
                     <button
                       onClick={() => {
-                        setEditingProject(project);
-                        setShowBudgetModal(true);
+                        // TODO: 实现编辑预算功能
                       }}
                       className="p-1.5 hover:bg-surface-100 rounded-lg transition-colors"
                     >

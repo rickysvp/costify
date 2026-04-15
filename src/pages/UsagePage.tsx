@@ -5,7 +5,6 @@ import {
   Hash,
   Activity,
   Database,
-  Filter,
   BarChart3,
   RefreshCw,
   AlertTriangle,
@@ -16,10 +15,8 @@ import {
   Users,
   Key,
   Building2,
-  ChevronDown,
   Download,
   Layers,
-  User,
 } from 'lucide-react';
 import {
   LineChart,
@@ -36,7 +33,7 @@ import {
   Bar,
   Legend,
 } from 'recharts';
-import { useAuth } from '../contexts/AuthContext';
+
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -138,7 +135,6 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 // ---------- 组件 ----------
 export default function UsagePage() {
-  const { isAdmin } = useAuth();
 
   // 筛选状态
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
@@ -705,7 +701,7 @@ export default function UsagePage() {
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                             <Legend 
                               verticalAlign="bottom" 
                               height={80}
@@ -745,7 +741,7 @@ export default function UsagePage() {
                             tick={{ fontSize: 10 }}
                             tickFormatter={(v: string) => v.length > 12 ? v.substring(0, 12) + '...' : v}
                           />
-                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                           <Bar dataKey="cost" fill="#3b82f6" radius={[0, 4, 4, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
@@ -789,7 +785,7 @@ export default function UsagePage() {
                           tick={{ fontSize: 11 }}
                           tickFormatter={(v: number) => `$${v.toFixed(0)}`}
                         />
-                        <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                         <Legend />
                         <Line
                           type="monotone"

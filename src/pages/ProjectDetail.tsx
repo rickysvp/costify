@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2, Plus, Copy, Key, Users, AlertTriangle, Check, X, Pause, Play, RotateCw, DollarSign, BarChart3, MoreHorizontal } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Plus, Copy, Key, Users, AlertTriangle, Check, X, Pause, Play, RotateCw, DollarSign, BarChart3 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 
