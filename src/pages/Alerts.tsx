@@ -33,17 +33,17 @@ function getToken(): string | null {
   return localStorage.getItem('costio_token');
 }
 
-function formatTime(iso: string): string {
+function formatTime(iso: string, t: any): string {
   const d = new Date(iso);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return '刚刚';
-  if (diffMin < 60) return `${diffMin} 分钟前`;
+  if (diffMin < 1) return t.alerts?.justNow || '刚刚';
+  if (diffMin < 60) return t.alerts?.minutesAgo?.replace('{count}', diffMin.toString()) || `${diffMin} 分钟前`;
   const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return `${diffH} 小时前`;
+  if (diffH < 24) return t.alerts?.hoursAgo?.replace('{count}', diffH.toString()) || `${diffH} 小时前`;
   const diffD = Math.floor(diffH / 24);
-  if (diffD < 30) return `${diffD} 天前`;
+  if (diffD < 30) return t.alerts?.daysAgo?.replace('{count}', diffD.toString()) || `${diffD} 天前`;
   return d.toLocaleDateString('zh-CN');
 }
 
@@ -127,13 +127,13 @@ export default function Alerts() {
 
   // 获取类型标签
   const getTypeLabel = (type: Alert['type']) => {
-    switch (type) {
-      case 'balance': return '余额';
-      case 'budget': return '预算';
-      case 'usage': return '用量';
-      case 'security': return '安全';
-      default: return type;
-    }
+    const labels: Record<string, string> = {
+      balance: t.alerts?.typeBalance || '余额',
+      budget: t.alerts?.typeBudget || '预算',
+      usage: t.alerts?.typeUsage || '用量',
+      security: t.alerts?.typeSecurity || '安全',
+    };
+    return labels[type] || type;
   };
 
   // 获取严重程度样式
@@ -158,12 +158,12 @@ export default function Alerts() {
 
   // 获取严重程度标签
   const getSeverityLabel = (severity: Alert['severity']) => {
-    switch (severity) {
-      case 'info': return '信息';
-      case 'warning': return '警告';
-      case 'critical': return '严重';
-      default: return severity;
-    }
+    const labels: Record<string, string> = {
+      info: t.alerts?.severityInfo || '信息',
+      warning: t.alerts?.severityWarning || '警告',
+      critical: t.alerts?.severityCritical || '严重',
+    };
+    return labels[severity] || severity;
   };
 
   return (
@@ -171,9 +171,11 @@ export default function Alerts() {
       {/* 标题栏 */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">{t.layout?.alerts || '消息通知'}</h1>
+          <h1 className="text-xl font-bold text-surface-900">{t.alerts?.title || '消息通知'}</h1>
           <p className="text-sm text-surface-500 mt-1">
-            共 {alerts.length} 条告警，{unreadCount} 条未读
+            {(t.alerts?.totalAlerts?.replace('{count}', alerts.length.toString()) || `共 ${alerts.length} 条告警`)}
+            ，
+            {(t.alerts?.unreadAlerts?.replace('{count}', unreadCount.toString()) || `${unreadCount} 条未读`)}
           </p>
         </div>
         <button
@@ -191,7 +193,7 @@ export default function Alerts() {
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-1.5 text-xs text-surface-500">
             <Filter className="w-3.5 h-3.5" />
-            <span>筛选</span>
+            <span>{t.alerts?.filter || '筛选'}</span>
           </div>
 
           {/* 类型筛选 */}
@@ -202,7 +204,7 @@ export default function Alerts() {
               }`}
               onClick={() => setTypeFilter('all')}
             >
-              全部类型
+              {t.alerts?.allTypes || '全部类型'}
             </button>
             {(['balance', 'budget', 'usage', 'security'] as const).map(type => {
               const Icon = getTypeIcon(type);
@@ -231,7 +233,7 @@ export default function Alerts() {
               }`}
               onClick={() => setSeverityFilter('all')}
             >
-              全部级别
+              {t.alerts?.allSeverities || '全部级别'}
             </button>
             {(['info', 'warning', 'critical'] as const).map(s => (
               <button
@@ -256,7 +258,7 @@ export default function Alerts() {
             <Search className="absolute left-2.5 top-2 w-3.5 h-3.5 text-surface-400" />
             <input
               type="text"
-              placeholder="搜索告警消息或项目..."
+              placeholder={t.alerts?.searchPlaceholder || '搜索告警消息或项目...'}
               className="w-full text-xs border border-surface-200 rounded-lg pl-8 pr-8 py-1.5 bg-white text-surface-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
@@ -294,9 +296,12 @@ export default function Alerts() {
           <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
             <CheckCheck className="w-8 h-8 text-emerald-500" />
           </div>
-          <p className="text-base font-medium text-surface-800">暂无告警，一切正常</p>
+          <p className="text-base font-medium text-surface-800">{t.alerts?.noAlerts || '暂无告警，一切正常'}</p>
           <p className="text-sm text-surface-400 mt-1">
-            {alerts.length > 0 ? '当前筛选条件下没有匹配的告警' : '系统运行良好，没有需要关注的告警'}
+            {alerts.length > 0 
+              ? (t.alerts?.noAlertsFiltered || '当前筛选条件下没有匹配的告警')
+              : (t.alerts?.systemNormal || '系统运行良好，没有需要关注的告警')
+            }
           </p>
         </div>
       )}
@@ -344,7 +349,7 @@ export default function Alerts() {
                           {alert.project}
                         </span>
                       )}
-                      <span>{formatTime(alert.created_at)}</span>
+                      <span>{formatTime(alert.created_at, t)}</span>
                     </div>
                   </div>
 
@@ -354,7 +359,7 @@ export default function Alerts() {
                       className="flex-shrink-0 p-2 rounded-lg hover:bg-surface-50 transition-colors"
                       onClick={() => markRead(alert.id)}
                       disabled={markingId === alert.id}
-                      title="标记已读"
+                      title={t.alerts?.markAsRead || '标记已读'}
                     >
                       {markingId === alert.id ? (
                         <div className="w-4 h-4 border-2 border-surface-300 border-t-brand-600 rounded-full animate-spin" />
@@ -374,12 +379,16 @@ export default function Alerts() {
       {!isLoading && !error && alerts.length > 0 && (
         <div className="flex items-center justify-between text-xs text-surface-400">
           <span>
-            显示 {filtered.length} 条，共 {alerts.length} 条告警
+            {t.alerts?.showingAlerts
+              ?.replace('{filtered}', filtered.length.toString())
+              ?.replace('{total}', alerts.length.toString()) 
+              || `显示 ${filtered.length} 条，共 ${alerts.length} 条告警`
+            }
           </span>
           <span>
-            {alerts.filter(a => a.severity === 'critical').length} 严重 /{' '}
-            {alerts.filter(a => a.severity === 'warning').length} 警告 /{' '}
-            {alerts.filter(a => a.severity === 'info').length} 信息
+            {alerts.filter(a => a.severity === 'critical').length} {t.alerts?.statsCritical || '严重'} /{' '}
+            {alerts.filter(a => a.severity === 'warning').length} {t.alerts?.statsWarning || '警告'} /{' '}
+            {alerts.filter(a => a.severity === 'info').length} {t.alerts?.statsInfo || '信息'}
           </span>
         </div>
       )}
