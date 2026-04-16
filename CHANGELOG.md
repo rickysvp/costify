@@ -5,6 +5,15 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.7] - 2026-04-16
+
+### Added
+- 创建 seed.js 数据库初始化脚本
+- 添加演示用户和组织数据
+- 添加演示项目和 API Keys
+- 添加 30 天演示 API 使用数据
+- 添加 `npm run seed` 命令
+
 ## [1.1.6] - 2026-04-16
 
 ### Changed
