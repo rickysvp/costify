@@ -70,6 +70,53 @@ const MODEL_DISPLAY: Record<string, string> = {
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#10b981'];
 
+// 生成虚拟数据
+const generateMockData = (id: string): ApiKeyDetail => {
+  const today = new Date();
+  const daily_usage: DailyUsage[] = [];
+  
+  // 生成最近30天的数据
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    daily_usage.push({
+      date: date.toISOString().split('T')[0],
+      cost: Math.random() * 50 + 10,
+      tokens: Math.floor(Math.random() * 100000) + 10000,
+      requests: Math.floor(Math.random() * 1000) + 100,
+    });
+  }
+
+  const model_distribution: ModelDistribution[] = [
+    { model: 'gpt-4o', cost: 523.45, count: 1250 },
+    { model: 'gpt-4o-mini', cost: 234.12, count: 3200 },
+    { model: 'claude-3-sonnet', cost: 189.67, count: 890 },
+    { model: 'gpt-3.5-turbo', cost: 98.34, count: 2100 },
+  ];
+
+  const totalSpend = model_distribution.reduce((sum, m) => sum + m.cost, 0);
+  const totalTokens = daily_usage.reduce((sum, d) => sum + d.tokens, 0);
+  const totalRequests = daily_usage.reduce((sum, d) => sum + d.requests, 0);
+
+  return {
+    id: parseInt(id),
+    name: 'Production API Key',
+    key_preview: 'sk-...' + Math.random().toString(36).substring(2, 10),
+    project_id: 1,
+    project_name: 'Production Project',
+    user_id: 1,
+    user_name: 'Admin User',
+    spend: totalSpend,
+    tokens: totalTokens,
+    requests: totalRequests,
+    created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+    last_used_at: new Date().toISOString(),
+    status: 'active',
+    daily_usage,
+    model_distribution,
+  };
+};
+
 export default function ApiKeyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -78,6 +125,7 @@ export default function ApiKeyDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
 
   const fetchDetail = async () => {
     setIsLoading(true);
@@ -93,8 +141,12 @@ export default function ApiKeyDetail() {
       }
       const json = await res.json();
       setData(json);
+      setUseMockData(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取数据失败');
+      // API 失败时使用虚拟数据
+      console.log('API failed, using mock data');
+      setData(generateMockData(id || '1'));
+      setUseMockData(true);
     } finally {
       setIsLoading(false);
     }
@@ -172,13 +224,20 @@ export default function ApiKeyDetail() {
             <p className="text-sm text-surface-500">{t.apiKeys.subtitle}</p>
           </div>
         </div>
-        <button
-          onClick={fetchDetail}
-          className="btn-ghost inline-flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          {t.dashboard.refresh}
-        </button>
+        <div className="flex items-center gap-3">
+          {useMockData && (
+            <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">
+              {lang === 'zh' ? '演示数据' : 'Demo Data'}
+            </span>
+          )}
+          <button
+            onClick={fetchDetail}
+            className="btn-ghost inline-flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            {t.dashboard.refresh}
+          </button>
+        </div>
       </div>
 
       {/* Key 信息卡片 */}
