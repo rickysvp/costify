@@ -45,7 +45,7 @@ export default function Login() {
       {/* 左侧品牌区域 - 黑白色系 */}
       <div className="hidden lg:flex lg:w-1/2 bg-black items-center justify-center p-12">
         <div className="max-w-md text-white">
-          <div className="flex items-center gap-3 mb-12 cursor-pointer" onClick={() => navigate('/dashboard')}>
+          <div className="flex items-center gap-3 mb-12 cursor-pointer" onClick={() => navigate('/')}>
             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
               <Hexagon className="w-8 h-8 text-black" strokeWidth={2.5} />
             </div>

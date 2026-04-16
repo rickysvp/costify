@@ -3,68 +3,80 @@ import { Link } from 'react-router-dom';
 import {
   Hexagon,
   Globe,
-  ChevronDown,
   ArrowRight,
   Shield,
+  TrendingDown,
+  PieChart,
   Zap,
-  BarChart3,
-  Layers,
-  Database,
-  Lock,
+  Building2,
   Check,
   Menu,
   X,
   Sparkles,
-  TrendingUp,
-  Clock,
-  Server,
+  BarChart3,
+  Lock,
+  Users,
+  ArrowUpRight,
+  Wallet,
+  LineChart,
+  Target,
+  BadgeCheck,
+  ChevronRight,
+  Play,
 } from 'lucide-react';
 import { getTranslation, type Language } from '../i18n';
 
-// Logo Cloud Component
-const LogoCloud = () => {
-  const logos = [
-    { name: 'OpenAI', color: '#10A37F' },
-    { name: 'Anthropic', color: '#D4A574' },
-    { name: 'Google', color: '#4285F4' },
-    { name: 'Meta', color: '#0668E1' },
-    { name: 'Microsoft', color: '#00A4EF' },
-    { name: 'Amazon', color: '#FF9900' },
-  ];
+// Enterprise Badge Component
+const EnterpriseBadge = () => (
+  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
+    <BadgeCheck className="w-4 h-4 text-emerald-600" />
+    <span className="text-sm font-medium text-emerald-700">Enterprise-Grade</span>
+  </div>
+);
 
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-60">
-      {logos.map((logo) => (
-        <div
-          key={logo.name}
-          className="text-lg md:text-xl font-bold text-neutral-400 hover:text-neutral-600 transition-colors"
-          style={{ color: logo.color }}
-        >
-          {logo.name}
-        </div>
-      ))}
-    </div>
-  );
-};
+// Stats Card Component
+const StatsCard = ({ value, label, trend }: { value: string; label: string; trend?: string }) => (
+  <div className="p-6 rounded-2xl bg-white border border-neutral-200 shadow-sm">
+    <div className="text-3xl md:text-4xl font-bold text-black mb-1">{value}</div>
+    <div className="text-sm text-neutral-500 mb-2">{label}</div>
+    {trend && (
+      <div className="flex items-center gap-1 text-sm text-emerald-600">
+        <TrendingDown className="w-4 h-4" />
+        <span>{trend}</span>
+      </div>
+    )}
+  </div>
+);
 
 // Feature Card Component
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  delay?: number;
+  metric?: string;
 }
 
-const FeatureCard = ({ icon, title, description, delay = 0 }: FeatureCardProps) => (
-  <div
-    className="group relative p-6 md:p-8 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all duration-300"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center mb-4 group-hover:bg-black group-hover:text-white transition-colors">
+const FeatureCard = ({ icon, title, description, metric }: FeatureCardProps) => (
+  <div className="group relative p-8 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 hover:shadow-xl transition-all duration-300">
+    <div className="w-14 h-14 rounded-xl bg-neutral-100 flex items-center justify-center mb-5 group-hover:bg-black group-hover:text-white transition-colors">
       {icon}
     </div>
-    <h3 className="text-lg font-semibold text-black mb-2">{title}</h3>
-    <p className="text-sm text-neutral-600 leading-relaxed">{description}</p>
+    <h3 className="text-xl font-semibold text-black mb-3">{title}</h3>
+    <p className="text-neutral-600 leading-relaxed mb-4">{description}</p>
+    {metric && (
+      <div className="flex items-center gap-2 text-sm font-medium text-emerald-600">
+        <ArrowUpRight className="w-4 h-4" />
+        <span>{metric}</span>
+      </div>
+    )}
+  </div>
+);
+
+// Trust Badge Component
+const TrustBadge = ({ text }: { text: string }) => (
+  <div className="flex items-center gap-2 text-sm text-neutral-600">
+    <Check className="w-4 h-4 text-emerald-500" />
+    <span>{text}</span>
   </div>
 );
 
@@ -77,20 +89,19 @@ interface PricingCardProps {
   features: string[];
   cta: string;
   popular?: boolean;
-  isYearly: boolean;
 }
 
-const PricingCard = ({ name, price, period, description, features, cta, popular, isYearly }: PricingCardProps) => (
-  <div className={`relative p-6 md:p-8 rounded-2xl border ${popular ? 'border-black shadow-xl' : 'border-neutral-200'} bg-white`}>
+const PricingCard = ({ name, price, period, description, features, cta, popular }: PricingCardProps) => (
+  <div className={`relative p-8 rounded-2xl border ${popular ? 'border-black shadow-2xl' : 'border-neutral-200'} bg-white`}>
     {popular && (
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-        <span className="bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
-          Most Popular
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+        <span className="bg-black text-white text-xs font-semibold px-4 py-1.5 rounded-full">
+          最受欢迎
         </span>
       </div>
     )}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-black mb-1">{name}</h3>
+      <h3 className="text-lg font-semibold text-black mb-2">{name}</h3>
       <p className="text-sm text-neutral-500">{description}</p>
     </div>
     <div className="mb-6">
@@ -105,7 +116,7 @@ const PricingCard = ({ name, price, period, description, features, cta, popular,
         </li>
       ))}
     </ul>
-    <button className={`w-full py-3 rounded-lg font-medium transition-colors ${
+    <button className={`w-full py-3.5 rounded-xl font-semibold transition-colors ${
       popular
         ? 'bg-black text-white hover:bg-neutral-800'
         : 'border border-neutral-200 text-black hover:bg-neutral-50'
@@ -116,28 +127,27 @@ const PricingCard = ({ name, price, period, description, features, cta, popular,
 );
 
 // Testimonial Card Component
-interface TestimonialCardProps {
-  quote: string;
-  author: string;
-  role: string;
-  company: string;
-}
-
-const TestimonialCard = ({ quote, author, role, company }: TestimonialCardProps) => (
-  <div className="p-6 md:p-8 rounded-2xl bg-neutral-50 border border-neutral-100">
-    <div className="flex gap-1 mb-4">
+const TestimonialCard = ({ quote, author, role, company, metric }: { quote: string; author: string; role: string; company: string; metric: string }) => (
+  <div className="p-8 rounded-2xl bg-neutral-50 border border-neutral-100">
+    <div className="flex items-center gap-1 mb-4">
       {[...Array(5)].map((_, i) => (
         <Sparkles key={i} className="w-4 h-4 text-black fill-black" />
       ))}
     </div>
-    <p className="text-neutral-700 mb-6 leading-relaxed">&ldquo;{quote}&rdquo;</p>
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-semibold text-black">
-        {author[0]}
+    <p className="text-lg text-neutral-700 mb-6 leading-relaxed">&ldquo;{quote}&rdquo;</p>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-bold text-black">
+          {author[0]}
+        </div>
+        <div>
+          <p className="font-semibold text-black">{author}</p>
+          <p className="text-sm text-neutral-500">{role} · {company}</p>
+        </div>
       </div>
-      <div>
-        <p className="font-medium text-black text-sm">{author}</p>
-        <p className="text-xs text-neutral-500">{role} · {company}</p>
+      <div className="text-right">
+        <p className="text-2xl font-bold text-emerald-600">{metric}</p>
+        <p className="text-xs text-neutral-500">成本节省</p>
       </div>
     </div>
   </div>
@@ -147,9 +157,6 @@ export default function LandingPage() {
   const [lang, setLang] = useState<Language>('zh');
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isYearly, setIsYearly] = useState(false);
-
-  const t = getTranslation(lang);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -159,62 +166,80 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: <Layers className="w-6 h-6" />,
-      title: t.features.items[0].title,
-      description: t.features.items[0].description,
+      icon: <PieChart className="w-7 h-7" />,
+      title: '智能成本分析',
+      description: 'AI驱动的成本洞察，自动识别浪费点，提供优化建议。支持多维度成本归因分析。',
+      metric: '平均降低 35% 成本',
     },
     {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: t.features.items[1].title,
-      description: t.features.items[1].description,
+      icon: <Target className="w-7 h-7" />,
+      title: '精准预算管控',
+      description: '企业级预算分配与监控，实时预警机制，防止预算超支。支持项目级、团队级、个人级预算。',
+      metric: '预算偏差 < 5%',
     },
     {
-      icon: <Database className="w-6 h-6" />,
-      title: t.features.items[2].title,
-      description: t.features.items[2].description,
+      icon: <Zap className="w-7 h-7" />,
+      title: '智能模型路由',
+      description: '基于成本、延迟、质量的智能路由，自动选择最优模型。支持自定义路由策略。',
+      metric: '响应速度提升 40%',
     },
     {
-      icon: <Zap className="w-6 h-6" />,
-      title: t.features.items[3].title,
-      description: t.features.items[3].description,
+      icon: <Shield className="w-7 h-7" />,
+      title: '企业级安全合规',
+      description: 'SOC2、GDPR、ISO27001 认证。端到端加密，细粒度权限控制，完整审计日志。',
+      metric: '99.99% 安全可用',
     },
     {
-      icon: <Server className="w-6 h-6" />,
-      title: t.features.items[4].title,
-      description: t.features.items[4].description,
+      icon: <BarChart3 className="w-7 h-7" />,
+      title: '实时成本监控',
+      description: '毫秒级成本追踪，实时仪表盘，自定义报表。支持Webhook、Slack、邮件告警。',
+      metric: '延迟 < 100ms',
     },
     {
-      icon: <Lock className="w-6 h-6" />,
-      title: t.features.items[5].title,
-      description: t.features.items[5].description,
+      icon: <Users className="w-7 h-7" />,
+      title: '团队协作管理',
+      description: '多租户架构，RBAC权限管理，SSO单点登录。支持LDAP、SAML、OIDC。',
+      metric: '支持 1000+ 成员',
     },
   ];
 
   const testimonials = [
     {
       quote: lang === 'zh'
-        ? 'AnyTokn 帮助我们将 AI 成本降低了 35%，同时提供了清晰的成本分析和预算控制。'
-        : 'AnyTokn helped us reduce AI costs by 35% while providing clear cost analysis and budget control.',
-      author: lang === 'zh' ? '张明' : 'John Smith',
+        ? 'AnyTokn 帮助我们在3个月内将 AI 成本降低了 42%，同时保持了服务质量。ROI 非常显著。'
+        : 'AnyTokn helped us reduce AI costs by 42% in 3 months while maintaining service quality. The ROI is remarkable.',
+      author: lang === 'zh' ? '张明' : 'Michael Zhang',
       role: 'CTO',
       company: 'TechFlow AI',
+      metric: '-42%',
     },
     {
       quote: lang === 'zh'
-        ? '统一 API 网关让我们的开发效率提升了 50%，不再需要维护多个模型的接口。'
-        : 'The unified API gateway improved our development efficiency by 50%, no need to maintain multiple model interfaces.',
-      author: lang === 'zh' ? '李华' : 'Sarah Chen',
+        ? '预算管控功能非常强大，我们现在可以精确控制每个团队的 AI 支出，再也不会出现意外账单。'
+        : 'The budget control is incredibly powerful. We can now precisely control AI spending per team with no surprise bills.',
+      author: lang === 'zh' ? '李华' : 'Sarah Li',
       role: 'VP Engineering',
       company: 'DataMind',
+      metric: '-38%',
     },
     {
       quote: lang === 'zh'
-        ? '语义缓存功能非常强大，我们的重复请求减少了 60%，节省了大量成本。'
-        : 'The semantic caching is incredibly powerful, reducing our duplicate requests by 60% and saving significant costs.',
-      author: lang === 'zh' ? '王芳' : 'Michael Wang',
+        ? '智能路由让我们的响应速度提升了 50%，同时成本降低了 30%。这是我们用过最好的 AI 成本管理工具。'
+        : 'Smart routing improved our response time by 50% while reducing costs by 30%. Best AI cost management tool we have used.',
+      author: lang === 'zh' ? '王芳' : 'David Wang',
       role: 'Tech Lead',
       company: 'CloudScale',
+      metric: '-30%',
     },
+  ];
+
+  const enterpriseFeatures = [
+    'SOC 2 Type II 认证',
+    'GDPR 合规',
+    'ISO 27001 认证',
+    '99.99% SLA 保障',
+    '专属客户成功经理',
+    '7x24 技术支持',
   ];
 
   return (
@@ -225,7 +250,6 @@ export default function LandingPage() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                 <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
@@ -233,22 +257,19 @@ export default function LandingPage() {
               <span className="text-xl font-bold text-black">AnyTokn</span>
             </Link>
 
-            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                {t.nav.features}
+                {lang === 'zh' ? '核心功能' : 'Features'}
+              </a>
+              <a href="#enterprise" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+                {lang === 'zh' ? '企业级' : 'Enterprise'}
               </a>
               <a href="#pricing" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                {t.nav.pricing}
-              </a>
-              <a href="#docs" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                {t.nav.docs}
+                {lang === 'zh' ? '价格' : 'Pricing'}
               </a>
             </nav>
 
-            {/* Right Side */}
             <div className="flex items-center gap-4">
-              {/* Language Switcher */}
               <button
                 onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
                 className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-black transition-colors"
@@ -257,38 +278,31 @@ export default function LandingPage() {
                 <span>{lang === 'zh' ? 'EN' : '中文'}</span>
               </button>
 
-              {/* Auth Buttons */}
               <div className="hidden md:flex items-center gap-3">
                 <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                  {t.nav.login}
+                  {lang === 'zh' ? '登录' : 'Login'}
                 </Link>
                 <Link
                   to="/login"
                   className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
                 >
-                  {t.nav.signup}
+                  {lang === 'zh' ? '免费试用' : 'Start Free'}
                 </Link>
               </div>
 
-              {/* Mobile Menu Button */}
-              <button
-                className="md:hidden p-2"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
+              <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {mobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-neutral-100">
               <nav className="flex flex-col gap-4">
-                <a href="#features" className="text-sm font-medium text-neutral-600">{t.nav.features}</a>
-                <a href="#pricing" className="text-sm font-medium text-neutral-600">{t.nav.pricing}</a>
-                <a href="#docs" className="text-sm font-medium text-neutral-600">{t.nav.docs}</a>
-                <Link to="/login" className="text-sm font-medium text-neutral-600">{t.nav.login}</Link>
-                <Link to="/login" className="text-sm font-medium text-black">{t.nav.signup}</Link>
+                <a href="#features" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '核心功能' : 'Features'}</a>
+                <a href="#enterprise" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '企业级' : 'Enterprise'}</a>
+                <a href="#pricing" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '价格' : 'Pricing'}</a>
+                <Link to="/login" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '登录' : 'Login'}</Link>
               </nav>
             </div>
           )}
@@ -296,70 +310,68 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 md:pt-40 pb-20 md:pb-32 bg-gradient-to-b from-neutral-50 to-white">
+      <section className="pt-32 md:pt-40 pb-20 md:pb-32 bg-gradient-to-b from-neutral-50 via-white to-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 border border-neutral-200 mb-8">
-              <Sparkles className="w-4 h-4 text-black" />
-              <span className="text-sm font-medium text-neutral-700">{t.hero.badge}</span>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-black leading-tight mb-6">
-              {t.hero.title}
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <EnterpriseBadge />
+            
+            <h1 className="mt-8 text-4xl md:text-6xl lg:text-7xl font-bold text-black leading-tight mb-6">
+              {lang === 'zh' ? '企业级 AI 成本' : 'Enterprise AI Cost'}
               <br />
-              <span className="text-neutral-400">{t.hero.titleHighlight}</span>
+              <span className="text-emerald-600">{lang === 'zh' ? '控制与优化系统' : 'Control & Optimization'}</span>
             </h1>
 
-            {/* Description */}
             <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-10">
-              {t.hero.description}
+              {lang === 'zh'
+                ? '为大型企业打造的 AI 资源管理平台。智能分析、精准预算、自动优化，帮助您降低 30-50% 的 AI 成本。'
+                : 'AI resource management platform built for large enterprises. Smart analytics, precise budgeting, automatic optimization to reduce AI costs by 30-50%.'}
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 to="/login"
-                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-medium rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-semibold rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
               >
-                {t.hero.ctaPrimary}
+                {lang === 'zh' ? '免费试用 14 天' : 'Start 14-Day Free Trial'}
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="#docs"
-                className="w-full sm:w-auto px-8 py-4 border border-neutral-200 text-black font-medium rounded-xl hover:bg-neutral-50 transition-colors"
+                href="#demo"
+                className="w-full sm:w-auto px-8 py-4 border border-neutral-200 text-black font-semibold rounded-xl hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
               >
-                {t.hero.ctaSecondary}
+                <Play className="w-4 h-4" />
+                {lang === 'zh' ? '观看演示' : 'Watch Demo'}
               </a>
             </div>
 
-            {/* Stats */}
-            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-black">500+</div>
-                <div className="text-sm text-neutral-500">{t.hero.stats.companies}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-black">99.9%</div>
-                <div className="text-sm text-neutral-500">{t.hero.stats.uptime}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-black">50+</div>
-                <div className="text-sm text-neutral-500">{t.hero.stats.models}</div>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-500">
+              <TrustBadge text={lang === 'zh' ? '无需信用卡' : 'No credit card required'} />
+              <TrustBadge text={lang === 'zh' ? '免费技术支持' : 'Free technical support'} />
+              <TrustBadge text={lang === 'zh' ? '随时取消' : 'Cancel anytime'} />
             </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
+            <StatsCard value="35%" label={lang === 'zh' ? '平均成本降低' : 'Avg Cost Reduction'} trend={lang === 'zh' ? '最高达 50%' : 'Up to 50%'} />
+            <StatsCard value="500+" label={lang === 'zh' ? '企业客户' : 'Enterprise Clients'} />
+            <StatsCard value="$50M+" label={lang === 'zh' ? '为客户节省' : 'Saved for Clients'} />
+            <StatsCard value="99.99%" label={lang === 'zh' ? 'SLA 保障' : 'SLA Uptime'} />
           </div>
         </div>
       </section>
 
       {/* Logo Cloud */}
-      <section className="py-12 border-y border-neutral-100">
+      <section className="py-12 border-y border-neutral-100 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <p className="text-center text-sm text-neutral-400 mb-8">
-            {lang === 'zh' ? '被全球领先的 AI 公司信赖' : 'Trusted by leading AI companies worldwide'}
+          <p className="text-center text-sm text-neutral-500 mb-8">
+            {lang === 'zh' ? '被全球领先企业信赖' : 'Trusted by leading enterprises worldwide'}
           </p>
-          <LogoCloud />
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-50">
+            {['Fortune 500', '独角兽企业', '上市公司', '政府机构', '金融机构', '科技公司'].map((name) => (
+              <div key={name} className="text-lg font-semibold text-neutral-400">{name}</div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -367,40 +379,99 @@ export default function LandingPage() {
       <section id="features" className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-medium text-neutral-700 mb-4">
-              {t.features.badge}
+            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-semibold text-neutral-700 mb-4">
+              {lang === 'zh' ? '核心能力' : 'Core Capabilities'}
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
-              {t.features.title}
+              {lang === 'zh' ? '全方位 AI 成本管理' : 'Comprehensive AI Cost Management'}
             </h2>
             <p className="text-lg text-neutral-600">
-              {t.features.description}
+              {lang === 'zh'
+                ? '从成本分析到自动优化，为企业提供端到端的 AI 资源管理解决方案'
+                : 'From cost analysis to automatic optimization, providing end-to-end AI resource management solutions for enterprises'}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (
-              <FeatureCard
-                key={i}
-                icon={feature.icon}
-                title={feature.title}
-                description={feature.description}
-                delay={i * 100}
-              />
+              <FeatureCard key={i} {...feature} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof / Testimonials */}
+      {/* Enterprise Section */}
+      <section id="enterprise" className="py-20 md:py-32 bg-neutral-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-block px-4 py-2 rounded-full bg-white/10 text-sm font-semibold text-white/80 mb-6">
+                {lang === 'zh' ? '企业级安全与合规' : 'Enterprise Security & Compliance'}
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+                {lang === 'zh' ? '为大型企业' : 'Built for'}
+                <br />
+                <span className="text-emerald-400">{lang === 'zh' ? '安全而生' : 'Enterprise Security'}</span>
+              </h2>
+              <p className="text-lg text-white/70 mb-8">
+                {lang === 'zh'
+                  ? 'SOC 2 Type II、GDPR、ISO 27001 认证。端到端加密，细粒度权限控制，完整审计日志。'
+                  : 'SOC 2 Type II, GDPR, ISO 27001 certified. End-to-end encryption, granular access control, complete audit logs.'}
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {enterpriseFeatures.map((feature, i) => (
+                  <div key={i} className="flex items-center gap-2 text-white/80">
+                    <Shield className="w-4 h-4 text-emerald-400" />
+                    <span className="text-sm">{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
+              >
+                {lang === 'zh' ? '联系销售' : 'Contact Sales'}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-3xl blur-3xl" />
+              <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                    <Lock className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">{lang === 'zh' ? '安全认证' : 'Security Certifications'}</p>
+                    <p className="text-sm text-white/50">{lang === 'zh' ? '已通过全部认证' : 'All certifications passed'}</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {['SOC 2 Type II', 'ISO 27001', 'GDPR', 'HIPAA'].map((cert) => (
+                    <div key={cert} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
+                      <span className="text-white/80">{cert}</span>
+                      <Check className="w-5 h-5 text-emerald-400" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
       <section className="py-20 md:py-32 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-              {t.socialProof.title}
+              {lang === 'zh' ? '客户成功案例' : 'Customer Success Stories'}
             </h2>
             <p className="text-lg text-neutral-600">
-              {t.socialProof.description}
+              {lang === 'zh' ? '看看其他企业如何使用 AnyTokn 优化 AI 成本' : 'See how other enterprises use AnyTokn to optimize AI costs'}
             </p>
           </div>
 
@@ -416,55 +487,61 @@ export default function LandingPage() {
       <section id="pricing" className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-medium text-neutral-700 mb-4">
-              {t.pricing.badge}
+            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-semibold text-neutral-700 mb-4">
+              {lang === 'zh' ? '价格方案' : 'Pricing'}
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
-              {t.pricing.title}
+              {lang === 'zh' ? '选择适合您的方案' : 'Choose Your Plan'}
             </h2>
             <p className="text-lg text-neutral-600 mb-8">
-              {t.pricing.description}
+              {lang === 'zh' ? '从初创企业到大型企业，我们都有适合您的方案' : 'From startups to large enterprises, we have a plan for you'}
             </p>
-
-            {/* Toggle */}
-            <div className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium ${!isYearly ? 'text-black' : 'text-neutral-500'}`}>
-                {t.pricing.toggle.monthly}
-              </span>
-              <button
-                onClick={() => setIsYearly(!isYearly)}
-                className="relative w-14 h-7 rounded-full bg-neutral-200 transition-colors"
-              >
-                <div className={`absolute top-1 w-5 h-5 rounded-full bg-black transition-all ${
-                  isYearly ? 'left-8' : 'left-1'
-                }`} />
-              </button>
-              <span className={`text-sm font-medium ${isYearly ? 'text-black' : 'text-neutral-500'}`}>
-                {t.pricing.toggle.yearly}
-              </span>
-              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                {t.pricing.toggle.save}
-              </span>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {t.pricing.plans.map((plan, i) => (
-              <PricingCard
-                key={i}
-                name={plan.name}
-                price={isYearly && plan.price !== (lang === 'zh' ? '定制' : 'Custom')
-                  ? (lang === 'zh' ? '¥' : '$') + Math.round(parseInt(plan.price.replace(/[^0-9]/g, '')) * 0.8)
-                  : plan.price
-                }
-                period={plan.period}
-                description={plan.description}
-                features={plan.features}
-                cta={plan.cta}
-                popular={plan.popular}
-                isYearly={isYearly}
-              />
-            ))}
+            <PricingCard
+              name={lang === 'zh' ? '专业版' : 'Pro'}
+              price={lang === 'zh' ? '¥999' : '$149'}
+              period={lang === 'zh' ? '/月' : '/mo'}
+              description={lang === 'zh' ? '适合成长中的团队' : 'For growing teams'}
+              features={[
+                lang === 'zh' ? '每月 500,000 次 API 调用' : '500,000 API calls/month',
+                lang === 'zh' ? '高级成本分析' : 'Advanced cost analytics',
+                lang === 'zh' ? '20 个项目' : '20 projects',
+                lang === 'zh' ? '预算警报' : 'Budget alerts',
+                lang === 'zh' ? '邮件支持' : 'Email support',
+              ]}
+              cta={lang === 'zh' ? '开始试用' : 'Start Trial'}
+            />
+            <PricingCard
+              name={lang === 'zh' ? '企业版' : 'Enterprise'}
+              price={lang === 'zh' ? '¥4,999' : '$749'}
+              period={lang === 'zh' ? '/月' : '/mo'}
+              description={lang === 'zh' ? '适合大型企业' : 'For large enterprises'}
+              features={[
+                lang === 'zh' ? '无限 API 调用' : 'Unlimited API calls',
+                lang === 'zh' ? '企业级安全' : 'Enterprise security',
+                lang === 'zh' ? '无限项目' : 'Unlimited projects',
+                lang === 'zh' ? 'SSO / SAML' : 'SSO / SAML',
+                lang === 'zh' ? '专属客户成功经理' : 'Dedicated CSM',
+                lang === 'zh' ? '7x24 技术支持' : '24/7 support',
+              ]}
+              cta={lang === 'zh' ? '立即开始' : 'Get Started'}
+              popular
+            />
+            <PricingCard
+              name={lang === 'zh' ? '定制版' : 'Custom'}
+              price={lang === 'zh' ? '联系销售' : 'Contact Us'}
+              description={lang === 'zh' ? '适合超大规模部署' : 'For large-scale deployments'}
+              features={[
+                lang === 'zh' ? '私有化部署' : 'Private deployment',
+                lang === 'zh' ? '定制开发' : 'Custom development',
+                lang === 'zh' ? '专属架构师' : 'Dedicated architect',
+                lang === 'zh' ? 'SLA 保障' : 'SLA guarantee',
+                lang === 'zh' ? '现场培训' : 'On-site training',
+              ]}
+              cta={lang === 'zh' ? '联系销售' : 'Contact Sales'}
+            />
           </div>
         </div>
       </section>
@@ -473,23 +550,25 @@ export default function LandingPage() {
       <section className="py-20 md:py-32 bg-black">
         <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {t.cta.title}
+            {lang === 'zh' ? '准备好降低 AI 成本了吗？' : 'Ready to Reduce AI Costs?'}
           </h2>
-          <p className="text-lg text-neutral-400 mb-10 max-w-2xl mx-auto">
-            {t.cta.description}
+          <p className="text-lg text-white/60 mb-10 max-w-2xl mx-auto">
+            {lang === 'zh'
+              ? '加入 500+ 企业，使用 AnyTokn 智能管理 AI 资源，平均降低 35% 成本。'
+              : 'Join 500+ enterprises using AnyTokn to intelligently manage AI resources, reducing costs by an average of 35%.'}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/login"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-medium rounded-xl hover:bg-neutral-100 transition-colors"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
             >
-              {t.cta.primary}
+              {lang === 'zh' ? '免费试用 14 天' : 'Start 14-Day Free Trial'}
             </Link>
             <a
-              href="#demo"
-              className="w-full sm:w-auto px-8 py-4 border border-neutral-700 text-white font-medium rounded-xl hover:bg-neutral-900 transition-colors"
+              href="#contact"
+              className="w-full sm:w-auto px-8 py-4 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
             >
-              {t.cta.secondary}
+              {lang === 'zh' ? '联系销售' : 'Contact Sales'}
             </a>
           </div>
         </div>
@@ -500,35 +579,35 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h4 className="font-semibold text-black mb-4">{t.footer.product}</h4>
+              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '产品' : 'Product'}</h4>
               <ul className="space-y-2">
-                <li><a href="#features" className="text-sm text-neutral-600 hover:text-black">{t.nav.features}</a></li>
-                <li><a href="#pricing" className="text-sm text-neutral-600 hover:text-black">{t.nav.pricing}</a></li>
+                <li><a href="#features" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '功能' : 'Features'}</a></li>
+                <li><a href="#pricing" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '价格' : 'Pricing'}</a></li>
                 <li><a href="#" className="text-sm text-neutral-600 hover:text-black">API</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{t.footer.resources}</h4>
+              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '资源' : 'Resources'}</h4>
               <ul className="space-y-2">
-                <li><a href="#docs" className="text-sm text-neutral-600 hover:text-black">{t.nav.docs}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '文档' : 'Docs'}</a></li>
                 <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Blog</a></li>
                 <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Changelog</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{t.footer.company}</h4>
+              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '公司' : 'Company'}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">About</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Careers</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Contact</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '关于' : 'About'}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '招聘' : 'Careers'}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '联系' : 'Contact'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{t.footer.legal}</h4>
+              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '法律' : 'Legal'}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Privacy</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Terms</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Security</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '隐私' : 'Privacy'}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '条款' : 'Terms'}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '安全' : 'Security'}</a></li>
               </ul>
             </div>
           </div>
@@ -540,7 +619,9 @@ export default function LandingPage() {
               </div>
               <span className="font-semibold text-black">AnyTokn</span>
             </div>
-            <p className="text-sm text-neutral-500">{t.footer.copyright}</p>
+            <p className="text-sm text-neutral-500">
+              {lang === 'zh' ? '© 2024 AnyTokn. 保留所有权利。' : '© 2024 AnyTokn. All rights reserved.'}
+            </p>
           </div>
         </div>
       </footer>
