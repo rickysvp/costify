@@ -555,7 +555,7 @@ export default function Projects() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-surface-800 text-right">
-                        ${project.month_spend.toFixed(2)}
+                        ${(project.month_spend || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex flex-col items-end gap-1">
