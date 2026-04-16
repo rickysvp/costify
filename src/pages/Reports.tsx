@@ -313,18 +313,33 @@ export default function Reports() {
   };
 
   const handleDeleteReport = async (reportId: number) => {
+    console.log('Deleting report:', reportId);
     try {
       const token = localStorage.getItem('costio_token');
+      if (!token) {
+        alert('请先登录');
+        return;
+      }
+      
       const res = await fetch(`${API_BASE}/reports/${reportId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to delete report');
+      
+      console.log('Delete response status:', res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Delete error:', errorData);
+        throw new Error(errorData.error || `删除失败: ${res.status}`);
+      }
+      
       setShowDeleteConfirm(null);
       fetchReports();
-    } catch (err) {
+      alert('报告删除成功');
+    } catch (err: any) {
       console.error('Failed to delete report:', err);
-      alert(t.reports?.delete || '删除报告失败');
+      alert(err.message || '删除报告失败');
     }
   };
 
