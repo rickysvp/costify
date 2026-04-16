@@ -483,69 +483,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-semibold text-neutral-700 mb-4">
-              {lang === 'zh' ? '价格方案' : 'Pricing'}
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
-              {lang === 'zh' ? '选择适合您的方案' : 'Choose Your Plan'}
-            </h2>
-            <p className="text-lg text-neutral-600 mb-8">
-              {lang === 'zh' ? '从初创企业到大型企业，我们都有适合您的方案' : 'From startups to large enterprises, we have a plan for you'}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <PricingCard
-              name={lang === 'zh' ? '专业版' : 'Pro'}
-              price={lang === 'zh' ? '¥999' : '$149'}
-              period={lang === 'zh' ? '/月' : '/mo'}
-              description={lang === 'zh' ? '适合成长中的团队' : 'For growing teams'}
-              features={[
-                lang === 'zh' ? '每月 500,000 次 API 调用' : '500,000 API calls/month',
-                lang === 'zh' ? '高级成本分析' : 'Advanced cost analytics',
-                lang === 'zh' ? '20 个项目' : '20 projects',
-                lang === 'zh' ? '预算警报' : 'Budget alerts',
-                lang === 'zh' ? '邮件支持' : 'Email support',
-              ]}
-              cta={lang === 'zh' ? '开始试用' : 'Start Trial'}
-            />
-            <PricingCard
-              name={lang === 'zh' ? '企业版' : 'Enterprise'}
-              price={lang === 'zh' ? '¥4,999' : '$749'}
-              period={lang === 'zh' ? '/月' : '/mo'}
-              description={lang === 'zh' ? '适合大型企业' : 'For large enterprises'}
-              features={[
-                lang === 'zh' ? '无限 API 调用' : 'Unlimited API calls',
-                lang === 'zh' ? '企业级安全' : 'Enterprise security',
-                lang === 'zh' ? '无限项目' : 'Unlimited projects',
-                lang === 'zh' ? 'SSO / SAML' : 'SSO / SAML',
-                lang === 'zh' ? '专属客户成功经理' : 'Dedicated CSM',
-                lang === 'zh' ? '7x24 技术支持' : '24/7 support',
-              ]}
-              cta={lang === 'zh' ? '立即开始' : 'Get Started'}
-              popular
-            />
-            <PricingCard
-              name={lang === 'zh' ? '定制版' : 'Custom'}
-              price={lang === 'zh' ? '联系销售' : 'Contact Us'}
-              description={lang === 'zh' ? '适合超大规模部署' : 'For large-scale deployments'}
-              features={[
-                lang === 'zh' ? '私有化部署' : 'Private deployment',
-                lang === 'zh' ? '定制开发' : 'Custom development',
-                lang === 'zh' ? '专属架构师' : 'Dedicated architect',
-                lang === 'zh' ? 'SLA 保障' : 'SLA guarantee',
-                lang === 'zh' ? '现场培训' : 'On-site training',
-              ]}
-              cta={lang === 'zh' ? '联系销售' : 'Contact Sales'}
-            />
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20 md:py-32 bg-black">
         <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
