@@ -248,14 +248,14 @@ export default function UsagePage() {
       const modelsRes = await fetch(`${API_BASE}/usage?group_by=model`, { headers: getAuthHeaders() });
       if (modelsRes.ok) {
         const modelsData = await modelsRes.json();
-        setModels(modelsData.map((m: any) => m.name) || []);
+        setModels(Array.isArray(modelsData) ? modelsData.map((m: any) => m.name || m.model || '') : []);
       }
       
       // 获取用户列表
       const usersRes = await fetch(`${API_BASE}/members`, { headers: getAuthHeaders() });
       if (usersRes.ok) {
         const usersData = await usersRes.json();
-        setUsers(usersData.map((u: any) => u.name) || []);
+        setUsers(Array.isArray(usersData) ? usersData.map((u: any) => u.name || u.email || '') : []);
       }
     } catch (err) {
       console.error('获取筛选选项失败:', err);

@@ -196,9 +196,18 @@ export default function Reports() {
         fetch(`${API_BASE}/api-keys`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_BASE}/members`, { headers: { Authorization: `Bearer ${token}` } }),
       ]);
-      if (projectsRes.ok) setProjects(await projectsRes.json());
-      if (keysRes.ok) setApiKeys(await keysRes.json());
-      if (membersRes.ok) setMembers(await membersRes.json());
+      if (projectsRes.ok) {
+        const projectsData = await projectsRes.json();
+        setProjects(Array.isArray(projectsData) ? projectsData : []);
+      }
+      if (keysRes.ok) {
+        const keysData = await keysRes.json();
+        setApiKeys(Array.isArray(keysData) ? keysData : []);
+      }
+      if (membersRes.ok) {
+        const membersData = await membersRes.json();
+        setMembers(Array.isArray(membersData) ? membersData : []);
+      }
     } catch (err) {
       console.error('获取资源失败:', err);
     }
@@ -337,8 +346,8 @@ export default function Reports() {
   };
 
   const filteredReports = reports.filter(r =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    (r.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (r.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
 
   const addPermission = (type: 'user' | 'project' | 'api_key', id: number, name: string, level: string = 'view') => {

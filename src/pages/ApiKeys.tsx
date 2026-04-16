@@ -1051,12 +1051,12 @@ export default function ApiKeys() {
                   </div>
 
                   {/* Trend Chart Placeholder */}
-                  {analyticsData.trend.length > 0 && (
+                  {analyticsData.trend && analyticsData.trend.length > 0 && (
                     <div className="card p-4">
                       <h3 className="text-sm font-semibold mb-4">使用趋势</h3>
                       <div className="h-48 flex items-end gap-1">
                         {analyticsData.trend.slice(-30).map((item, idx) => {
-                          const maxCost = Math.max(...analyticsData.trend.map(t => t.cost)) || 1;
+                          const maxCost = Math.max(...analyticsData.trend.map((t: any) => t.cost)) || 1;
                           const height = (item.cost / maxCost) * 100;
                           return (
                             <div key={idx} className="flex-1 flex flex-col items-center gap-1">
@@ -1076,7 +1076,7 @@ export default function ApiKeys() {
                   )}
 
                   {/* Model Distribution */}
-                  {analyticsData.by_model.length > 0 && (
+                  {analyticsData.by_model && analyticsData.by_model.length > 0 && (
                     <div className="card p-4">
                       <h3 className="text-sm font-semibold mb-4">模型使用分布</h3>
                       <div className="space-y-3">
@@ -1105,7 +1105,7 @@ export default function ApiKeys() {
                   )}
 
                   {/* Recent Usage */}
-                  {analyticsData.recent_usage.length > 0 && (
+                  {analyticsData.recent_usage && analyticsData.recent_usage.length > 0 && (
                     <div className="card p-4">
                       <h3 className="text-sm font-semibold mb-4">最近使用记录</h3>
                       <div className="overflow-x-auto">
@@ -1138,7 +1138,7 @@ export default function ApiKeys() {
                   )}
 
                   {/* Anomalies */}
-                  {analyticsData.anomalies.length > 0 && (
+                  {analyticsData.anomalies && analyticsData.anomalies.length > 0 && (
                     <div className="card p-4 bg-red-50 border-red-100">
                       <h3 className="text-sm font-semibold text-red-800 mb-4 flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4" />
