@@ -120,16 +120,16 @@ export default function Reports() {
   // 获取报告类型配置
   const getReportTypeConfig = (type: string) => {
     const configs: Record<string, { label: string; color: string; icon: any; description: string }> = {
-      cost: { label: t.reports?.typeCost || '成本分析', color: 'bg-emerald-100 text-emerald-700', icon: TrendingUp, description: '成本构成、趋势、异常检测' },
-      usage: { label: t.reports?.typeUsage || '使用分析', color: 'bg-blue-100 text-blue-700', icon: BarChart3, description: 'Token使用、模型分布、效率分析' },
-      roi: { label: t.reports?.typeRoi || 'ROI分析', color: 'bg-violet-100 text-violet-700', icon: PieChart, description: '投入产出比、价值评估' },
-      budget: { label: t.reports?.typeBudget || '预算执行', color: 'bg-amber-100 text-amber-700', icon: Clock, description: '预算vs实际、预警分析' },
-      anomaly: { label: t.reports?.typeAnomaly || '异常诊断', color: 'bg-rose-100 text-rose-700', icon: AlertCircle, description: '异常使用、成本突增分析' },
-      comparison: { label: t.reports?.typeComparison || '对比分析', color: 'bg-cyan-100 text-cyan-700', icon: Filter, description: '项目对比、成员对比、周期对比' },
-      custom: { label: t.reports?.typeCustom || '自定义', color: 'bg-slate-100 text-slate-700', icon: Sparkles, description: '自定义指标和维度' },
-      weekly: { label: t.reports?.subtypeWeekly || '周报', color: 'bg-blue-100 text-blue-700', icon: BarChart3, description: '每周使用报告' },
-      monthly: { label: t.reports?.subtypeMonthly || '月报', color: 'bg-emerald-100 text-emerald-700', icon: BarChart3, description: '每月使用报告' },
-      quarterly: { label: t.reports?.subtypeQuarterly || '季报', color: 'bg-amber-100 text-amber-700', icon: BarChart3, description: '每季度使用报告' },
+      cost: { label: t.reports?.typeCost || '成本分析', color: 'bg-emerald-100 text-emerald-700', icon: TrendingUp, description: t.reports?.typeCostDesc || '成本构成、趋势、异常检测' },
+      usage: { label: t.reports?.typeUsage || '使用分析', color: 'bg-blue-100 text-blue-700', icon: BarChart3, description: t.reports?.typeUsageDesc || 'Token使用、模型分布、效率分析' },
+      roi: { label: t.reports?.typeRoi || 'ROI分析', color: 'bg-violet-100 text-violet-700', icon: PieChart, description: t.reports?.typeRoiDesc || '投入产出比、价值评估' },
+      budget: { label: t.reports?.typeBudget || '预算执行', color: 'bg-amber-100 text-amber-700', icon: Clock, description: t.reports?.typeBudgetDesc || '预算vs实际、预警分析' },
+      anomaly: { label: t.reports?.typeAnomaly || '异常诊断', color: 'bg-rose-100 text-rose-700', icon: AlertCircle, description: t.reports?.typeAnomalyDesc || '异常使用、成本突增分析' },
+      comparison: { label: t.reports?.typeComparison || '对比分析', color: 'bg-cyan-100 text-cyan-700', icon: Filter, description: t.reports?.typeComparisonDesc || '项目对比、成员对比、周期对比' },
+      custom: { label: t.reports?.typeCustom || '自定义', color: 'bg-slate-100 text-slate-700', icon: Sparkles, description: t.reports?.typeCustomDesc || '自定义指标和维度' },
+      weekly: { label: t.reports?.subtypeWeekly || '周报', color: 'bg-blue-100 text-blue-700', icon: BarChart3, description: t.reports?.usageMetrics ? '每周使用报告' : 'Weekly usage report' },
+      monthly: { label: t.reports?.subtypeMonthly || '月报', color: 'bg-emerald-100 text-emerald-700', icon: BarChart3, description: t.reports?.usageMetrics ? '每月使用报告' : 'Monthly usage report' },
+      quarterly: { label: t.reports?.subtypeQuarterly || '季报', color: 'bg-amber-100 text-amber-700', icon: BarChart3, description: t.reports?.usageMetrics ? '每季度使用报告' : 'Quarterly usage report' },
     };
     return configs[type] || { label: t.reports?.unknown || '未知', color: 'bg-slate-100 text-slate-600', icon: FileText, description: '' };
   };
