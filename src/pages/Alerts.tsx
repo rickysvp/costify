@@ -13,6 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -87,6 +88,7 @@ function formatTime(iso: string): string {
 
 // ---------- 组件 ----------
 export default function Alerts() {
+  const { t } = useLanguage();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

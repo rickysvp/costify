@@ -24,6 +24,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -131,6 +132,7 @@ const AVAILABLE_METRICS = {
 
 export default function Reports() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

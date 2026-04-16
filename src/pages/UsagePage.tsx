@@ -33,6 +33,7 @@ import {
   Bar,
   Legend,
 } from 'recharts';
+import { useLanguage } from '../contexts/LanguageContext';
 
 
 const API_BASE = 'http://localhost:3001/api';
@@ -135,6 +136,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 // ---------- 组件 ----------
 export default function UsagePage() {
+  const { t } = useLanguage();
 
   // 筛选状态
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
@@ -313,13 +315,13 @@ export default function UsagePage() {
   // 获取分组标签
   const getGroupByLabel = (type: GroupByType) => {
     const labels: Record<GroupByType, string> = {
-      date: '按日',
-      week: '按周',
-      month: '按月',
-      project: '按项目',
-      user: '按人员',
-      api_key: '按API Key',
-      model: '按模型',
+      date: t.usage?.byDay || 'By Day',
+      week: t.usage?.byWeek || 'By Week',
+      month: t.usage?.byMonth || 'By Month',
+      project: t.usage?.byProject || 'By Project',
+      user: t.usage?.byUser || 'By User',
+      api_key: t.usage?.byApiKey || 'By API Key',
+      model: t.usage?.byModel || 'By Model',
     };
     return labels[type];
   };
@@ -330,11 +332,11 @@ export default function UsagePage() {
       {/* 页面标题 */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">使用统计</h1>
-          <p className="text-sm text-surface-500 mt-1">多维度分析 AI 调用成本与使用情况</p>
+          <h1 className="text-xl font-bold text-surface-900">{t.layout.usage}</h1>
+          <p className="text-sm text-surface-500 mt-1">{t.usage?.subtitle || 'Multi-dimensional analysis of AI usage and costs'}</p>
           {lastUpdated && (
             <p className="text-xs text-surface-400 mt-1">
-              最后更新: {lastUpdated.toLocaleTimeString()}
+              {t.usage?.lastUpdated || 'Last Updated'}: {lastUpdated.toLocaleTimeString()}
             </p>
           )}
         </div>
@@ -344,7 +346,7 @@ export default function UsagePage() {
             onClick={handleExport}
           >
             <Download className="w-3.5 h-3.5" />
-            导出
+            {t.usage?.export || 'Export'}
           </button>
           <button
             className="btn-ghost text-xs flex items-center gap-1.5"
@@ -352,7 +354,7 @@ export default function UsagePage() {
             disabled={isLoading}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            刷新
+            {t.dashboard.refresh}
           </button>
         </div>
       </div>
@@ -362,24 +364,24 @@ export default function UsagePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* 时间范围 */}
           <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">时间范围</label>
+            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.timeRange || 'Time Range'}</label>
             <select
               className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value as TimeRange)}
             >
-              <option value="7d">最近7天</option>
-              <option value="30d">最近30天</option>
-              <option value="90d">最近90天</option>
-              <option value="custom">自定义</option>
+              <option value="7d">{t.usage?.last7Days || 'Last 7 Days'}</option>
+              <option value="30d">{t.usage?.last30Days || 'Last 30 Days'}</option>
+              <option value="90d">{t.usage?.last90Days || 'Last 90 Days'}</option>
+              <option value="custom">{t.usage?.custom || 'Custom'}</option>
             </select>
           </div>
-          
+
           {/* 自定义日期 */}
           {timeRange === 'custom' && (
             <>
               <div>
-                <label className="block text-xs font-medium text-surface-700 mb-1.5">开始日期</label>
+                <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.startDate || 'Start Date'}</label>
                 <input
                   type="date"
                   className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2"
@@ -388,7 +390,7 @@ export default function UsagePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-surface-700 mb-1.5">结束日期</label>
+                <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.endDate || 'End Date'}</label>
                 <input
                   type="date"
                   className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2"
