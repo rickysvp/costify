@@ -328,9 +328,9 @@ export default function LandingPage() {
             <EnterpriseBadge />
             
             <h1 className="mt-8 text-4xl md:text-6xl lg:text-7xl font-bold text-black leading-tight mb-6">
-              {lang === 'zh' ? '企业级 AI 成本' : 'Enterprise AI Cost'}
+              {lang === 'zh' ? '企业级 Token' : 'Enterprise Token'}
               <br />
-              <span className="text-emerald-600">{lang === 'zh' ? '控制与优化系统' : 'Control & Optimization'}</span>
+              <span className="text-emerald-600">{lang === 'zh' ? '高质量成本优化引擎' : 'Quality Cost Optimization Engine'}</span>
             </h1>
 
             <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto mb-10">
