@@ -166,82 +166,82 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: <Zap className="w-7 h-7" />,
-      title: lang === 'zh' ? '智能模型路由' : 'Intelligent Model Routing',
+      icon: <BarChart3 className="w-7 h-7" />,
+      title: lang === 'zh' ? '智能质量评估系统' : 'Intelligent Quality Assessment',
       description: lang === 'zh'
-        ? '基于质量、成本、延迟三维评估的智能路由，在保证输出质量的前提下，自动选择最优模型，实现 Token 成本最优化。'
-        : 'Quality-cost-latency based intelligent routing. Automatically selects optimal models while ensuring output quality, achieving Token cost optimization.',
-      metric: lang === 'zh' ? '成本降低 30-50%' : '30-50% cost reduction',
+        ? '基于多维度质量评分模型，实时监控输出质量。确保在任何成本优化策略下，服务质量始终保持在企业级标准之上。'
+        : 'Multi-dimensional quality scoring model for real-time output monitoring. Ensures service quality always exceeds enterprise standards under any cost optimization strategy.',
+      metric: lang === 'zh' ? '质量评分 98%+' : '98%+ quality score',
+    },
+    {
+      icon: <Zap className="w-7 h-7" />,
+      title: lang === 'zh' ? '质量优先模型路由' : 'Quality-First Model Routing',
+      description: lang === 'zh'
+        ? '以满足质量阈值为前提，智能选择成本最优模型。质量不达标时自动升级模型，确保用户体验不受影响的前提下实现成本优化。'
+        : 'Intelligently selects cost-optimal models while meeting quality thresholds. Automatically upgrades models when quality is substandard, ensuring cost optimization without compromising user experience.',
+      metric: lang === 'zh' ? '质量达标率 99.9%' : '99.9% quality compliance',
     },
     {
       icon: <Target className="w-7 h-7" />,
-      title: lang === 'zh' ? '语义缓存优化' : 'Semantic Caching',
+      title: lang === 'zh' ? '高质量语义缓存' : 'High-Quality Semantic Caching',
       description: lang === 'zh'
-        ? '智能识别语义相似请求，复用历史结果。在不影响输出质量的情况下，显著减少重复 API 调用，降低 Token 消耗。'
-        : 'Intelligently identifies semantically similar requests and reuses historical results. Significantly reduces duplicate API calls without affecting output quality.',
-      metric: lang === 'zh' ? '缓存命中率 35%+' : '35%+ cache hit rate',
+        ? '仅缓存高质量历史结果，通过语义相似度匹配复用。在确保输出质量一致性的前提下，显著降低重复请求成本。'
+        : 'Only caches high-quality historical results for semantic similarity matching. Significantly reduces duplicate request costs while ensuring output quality consistency.',
+      metric: lang === 'zh' ? '质量一致性 100%' : '100% quality consistency',
     },
     {
       icon: <PieChart className="w-7 h-7" />,
-      title: lang === 'zh' ? 'Token 级成本分析' : 'Token-Level Cost Analysis',
+      title: lang === 'zh' ? '质量成本平衡分析' : 'Quality-Cost Balance Analysis',
       description: lang === 'zh'
-        ? '精细化到单次请求、每个 Token 的成本追踪。识别高成本低效调用，提供优化建议，确保每一分钱都花在刀刃上。'
-        : 'Granular cost tracking down to single requests and each Token. Identifies high-cost inefficient calls and provides optimization recommendations.',
-      metric: lang === 'zh' ? '成本透明度 100%' : '100% cost transparency',
-    },
-    {
-      icon: <BarChart3 className="w-7 h-7" />,
-      title: lang === 'zh' ? '质量监控保障' : 'Quality Monitoring',
-      description: lang === 'zh'
-        ? '实时监控模型输出质量，自动检测异常和降级。确保成本优化不以牺牲服务质量为代价，维持用户体验一致性。'
-        : 'Real-time monitoring of model output quality, automatic detection of anomalies and degradation. Ensures cost optimization never compromises service quality.',
-      metric: lang === 'zh' ? '质量保持率 99%+' : '99%+ quality retention',
+        ? '追踪每次请求的质量评分与成本关系，识别高性价比调用模式。帮助企业在保证质量的前提下，找到最优成本结构。'
+        : 'Tracks quality scores and cost relationships per request to identify high-value calling patterns. Helps enterprises find optimal cost structure while ensuring quality.',
+      metric: lang === 'zh' ? '性价比提升 40%+' : '40%+ value improvement',
     },
     {
       icon: <Shield className="w-7 h-7" />,
-      title: lang === 'zh' ? '企业级预算管控' : 'Enterprise Budget Control',
+      title: lang === 'zh' ? '质量保障预算管控' : 'Quality-Assured Budget Control',
       description: lang === 'zh'
-        ? '多级预算分配与实时预警，项目级、团队级、个人级精细管控。防止预算超支，确保 AI 投入产出比最大化。'
-        : 'Multi-level budget allocation with real-time alerts. Project, team, and individual-level granular control to maximize AI ROI.',
-      metric: lang === 'zh' ? '预算偏差 < 5%' : '< 5% budget variance',
+        ? '设置质量红线预算，当成本优化可能影响质量时自动预警。确保预算控制不以牺牲服务质量为代价。'
+        : 'Sets quality baseline budgets with automatic alerts when cost optimization may affect quality. Ensures budget control never compromises service quality.',
+      metric: lang === 'zh' ? '质量零妥协' : 'Zero quality compromise',
     },
     {
       icon: <Users className="w-7 h-7" />,
-      title: lang === 'zh' ? '团队协作管理' : 'Team Collaboration',
+      title: lang === 'zh' ? '团队质量协同' : 'Team Quality Collaboration',
       description: lang === 'zh'
-        ? '多租户架构，RBAC 权限管理，SSO 单点登录。支持 LDAP、SAML、OIDC，满足大型企业复杂组织架构需求。'
-        : 'Multi-tenant architecture, RBAC permission management, SSO. Supports LDAP, SAML, OIDC for complex enterprise organizational structures.',
-      metric: lang === 'zh' ? '支持 1000+ 成员' : '1000+ members supported',
+        ? '团队级质量指标监控，确保组织内所有成员的 AI 调用都符合质量标准。统一质量评估体系，保障企业级服务一致性。'
+        : 'Team-level quality metrics monitoring ensures all members\' AI calls meet quality standards. Unified quality assessment system guarantees enterprise service consistency.',
+      metric: lang === 'zh' ? '团队质量达标率 100%' : '100% team quality compliance',
     },
   ];
 
   const testimonials = [
     {
       quote: lang === 'zh'
-        ? 'AnyTokn 帮助我们在3个月内将 AI 成本降低了 42%，同时保持了服务质量。ROI 非常显著。'
-        : 'AnyTokn helped us reduce AI costs by 42% in 3 months while maintaining service quality. The ROI is remarkable.',
+        ? '在确保输出质量不打折的前提下，AnyTokn 帮助我们将 AI 成本降低了 42%。质量评分始终保持在 98% 以上，ROI 非常显著。'
+        : 'While ensuring no compromise in output quality, AnyTokn helped us reduce AI costs by 42%. Quality scores consistently remain above 98%, with remarkable ROI.',
       author: lang === 'zh' ? '张明' : 'Michael Zhang',
       role: 'CTO',
       company: 'TechFlow AI',
-      metric: '-42%',
+      metric: lang === 'zh' ? '质量 98%+' : 'Quality 98%+',
     },
     {
       quote: lang === 'zh'
-        ? '预算管控功能非常强大，我们现在可以精确控制每个团队的 AI 支出，再也不会出现意外账单。'
-        : 'The budget control is incredibly powerful. We can now precisely control AI spending per team with no surprise bills.',
+        ? '最重要的是我们的服务质量完全没有下降。客户满意度反而提升了 15%，同时成本降低了 38%，这是真正的降本增效。'
+        : 'Most importantly, our service quality remained intact. Customer satisfaction actually improved by 15% while costs dropped 38% - true efficiency gains.',
       author: lang === 'zh' ? '李华' : 'Sarah Li',
       role: 'VP Engineering',
       company: 'DataMind',
-      metric: '-38%',
+      metric: lang === 'zh' ? '满意度 +15%' : 'Satisfaction +15%',
     },
     {
       quote: lang === 'zh'
-        ? '智能路由让我们的响应速度提升了 50%，同时成本降低了 30%。这是我们用过最好的 AI 成本管理工具。'
-        : 'Smart routing improved our response time by 50% while reducing costs by 30%. Best AI cost management tool we have used.',
+        ? '质量优先的路由策略让我们在降低成本 35% 的同时，响应质量指标反而提升了。终于找到了质量与成本的最佳平衡点。'
+        : 'Quality-first routing strategy allowed us to reduce costs by 35% while improving response quality metrics. Finally found the optimal balance between quality and cost.',
       author: lang === 'zh' ? '王芳' : 'David Wang',
       role: 'Tech Lead',
       company: 'CloudScale',
-      metric: '-30%',
+      metric: lang === 'zh' ? '质量提升' : 'Quality Up',
     },
   ];
 
@@ -499,25 +499,25 @@ export default function LandingPage() {
       <section className="py-20 md:py-32 bg-black">
         <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {lang === 'zh' ? '准备好降低 AI 成本了吗？' : 'Ready to Reduce AI Costs?'}
+            {lang === 'zh' ? '质量与成本兼得' : 'Quality & Cost Together'}
           </h2>
           <p className="text-lg text-white/60 mb-10 max-w-2xl mx-auto">
             {lang === 'zh'
-              ? '加入 500+ 企业，使用 AnyTokn 智能管理 AI 资源，平均降低 35% 成本。'
-              : 'Join 500+ enterprises using AnyTokn to intelligently manage AI resources, reducing costs by an average of 35%.'}
+              ? '加入 500+ 企业，在确保输出质量的前提下，实现 AI 成本优化。质量零妥协，成本更优。'
+              : 'Join 500+ enterprises in optimizing AI costs while ensuring output quality. Zero quality compromise, better costs.'}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/login"
               className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
             >
-              {lang === 'zh' ? '免费试用 14 天' : 'Start 14-Day Free Trial'}
+              {lang === 'zh' ? '立即降本增效' : 'Reduce Costs Now'}
             </Link>
             <a
               href="#contact"
               className="w-full sm:w-auto px-8 py-4 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
             >
-              {lang === 'zh' ? '联系销售' : 'Contact Sales'}
+              {lang === 'zh' ? '预约演示' : 'Book Demo'}
             </a>
           </div>
         </div>
