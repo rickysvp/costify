@@ -260,7 +260,7 @@ export default function Dashboard() {
           <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-brand-600" />
           </div>
-          <h2 className="text-xl font-bold text-surface-900 mb-2">欢迎使用 Costify</h2>
+          <h2 className="text-xl font-bold text-surface-900 mb-2">欢迎使用 AnyTokn</h2>
           <p className="text-sm text-surface-500 mb-6">
             开始管理您的 AI 成本，只需三步即可完成初始设置
           </p>

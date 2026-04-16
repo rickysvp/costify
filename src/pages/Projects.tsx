@@ -926,7 +926,7 @@ export default function Projects() {
 
               <p className="text-sm text-surface-600 mb-6">
                 这是您项目的 API Key，用于调用 AI
-                模型。请将其添加到您的应用中，所有请求都将通过 Costify
+                模型。请将其添加到您的应用中，所有请求都将通过 AnyTokn
                 进行路由和监控。
               </p>
 

@@ -5,6 +5,17 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.6] - 2026-04-16
+
+### Changed
+- 全局品牌名称替换为 AnyTokn
+- 更新 index.html 页面标题
+- 更新 Dashboard 欢迎语
+- 更新 Docs 接入指南文档
+- 更新 Projects 项目说明
+- 更新 LandingPage 首页全部品牌引用
+- 更新 server.js 启动日志
+
 ## [1.1.5] - 2026-04-16
 
 ### Changed

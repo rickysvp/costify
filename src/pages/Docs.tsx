@@ -137,11 +137,11 @@ async function main() {
 
   console.log(response.choices[0].message.content);
 
-  // Costify 成本元数据
-  console.log('Routed Model:', response.costify?.routed_model);
-  console.log('Cache Hit:', response.costify?.cache_hit);
-  console.log('Estimated Cost:', response.costify?.estimated_cost);
-  console.log('Remaining Balance:', response.costify?.remaining_balance);
+  // AnyTokn 成本元数据
+console.log('Routed Model:', response.anytokn?.routed_model);
+console.log('Cache Hit:', response.anytokn?.cache_hit);
+console.log('Estimated Cost:', response.anytokn?.estimated_cost);
+console.log('Remaining Balance:', response.anytokn?.remaining_balance);
 }
 
 main();`;
@@ -165,11 +165,11 @@ response = client.chat.completions.create(
 
 print(response.choices[0].message.content)
 
-# Costify 成本元数据
-print(f"Routed Model: {response.costify.routed_model}")
-print(f"Cache Hit: {response.costify.cache_hit}")
-print(f"Estimated Cost: {response.costify.estimated_cost}")
-print(f"Remaining Balance: {response.costify.remaining_balance}")`;
+# AnyTokn 成本元数据
+print(f"Routed Model: {response.anytokn.routed_model}")
+print(f"Cache Hit: {response.anytokn.cache_hit}")
+print(f"Estimated Cost: {response.anytokn.estimated_cost}")
+print(f"Remaining Balance: {response.anytokn.remaining_balance}")`;
 
 const responseExample = `{
   "id": "chatcmpl-abc123",
@@ -191,7 +191,7 @@ const responseExample = `{
     "completion_tokens": 42,
     "total_tokens": 67
   },
-  "costify": {
+  "anytokn": {
     "routed_model": "gpt-4o-mini",
     "cache_hit": true,
     "estimated_cost": 0.0012,
@@ -223,8 +223,8 @@ const requestParams = [
   { name: 'stream', type: 'boolean', required: false, desc: '是否流式输出，默认 false' },
 ];
 
-// ---------- Costify 元数据 ----------
-const costifyMetadata = [
+// ---------- AnyTokn 元数据 ----------
+const anytoknMetadata = [
   { key: 'routed_model', type: 'string', desc: '实际路由到的模型（可能与请求模型不同）' },
   { key: 'cache_hit', type: 'boolean', desc: '是否命中语义缓存' },
   { key: 'estimated_cost', type: 'number', desc: '本次请求预估成本（USD）' },
@@ -249,7 +249,7 @@ export default function Docs() {
       <div>
         <h1 className="text-xl font-bold text-surface-900">接入指南</h1>
         <p className="text-sm text-surface-500 mt-1">
-          Costify 兼容 OpenAI API 格式，零代码改动即可接入
+          AnyTokn 兼容 OpenAI API 格式，零代码改动即可接入
         </p>
       </div>
 
@@ -279,7 +279,7 @@ export default function Docs() {
         <div className="space-y-6">
           {/* 步骤说明 */}
           <div className="card p-5">
-            <h3 className="text-sm font-semibold text-surface-800 mb-4">三步接入 Costify</h3>
+            <h3 className="text-sm font-semibold text-surface-800 mb-4">三步接入 AnyTokn</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
@@ -291,7 +291,7 @@ export default function Docs() {
                 {
                   step: 2,
                   title: '修改 baseURL',
-                  desc: '将 OpenAI SDK 的 baseURL 指向 Costify',
+                  desc: '将 OpenAI SDK 的 baseURL 指向 AnyTokn',
                   icon: Globe,
                 },
                 {
@@ -422,9 +422,9 @@ curl http://localhost:3001/api/v1/chat/completions \\
             </div>
           </InfoCard>
 
-          <InfoCard icon={BarChart3} title="Costify 响应元数据">
+          <InfoCard icon={BarChart3} title="AnyTokn 响应元数据">
             <p className="text-xs text-surface-500 mb-3">
-              每次请求的响应中会包含 <code className="font-mono text-brand-700 bg-brand-50 px-1 rounded">costify</code> 字段，提供成本追踪信息：
+              每次请求的响应中会包含 <code className="font-mono text-brand-700 bg-brand-50 px-1 rounded">anytokn</code> 字段，提供成本追踪信息：
             </p>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -436,7 +436,7 @@ curl http://localhost:3001/api/v1/chat/completions \\
                   </tr>
                 </thead>
                 <tbody>
-                  {costifyMetadata.map(m => (
+                  {anytoknMetadata.map(m => (
                     <tr key={m.key} className="border-b border-surface-50">
                       <td className="table-cell">
                         <code className="text-xs font-mono text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded">
@@ -503,7 +503,7 @@ curl http://localhost:3001/api/v1/chat/completions \\
         <div className="space-y-6">
           <InfoCard icon={Cpu} title="可用模型列表">
             <p className="text-xs text-surface-500 mb-4">
-              Costify 支持多种主流大语言模型，通过统一接口访问。模型 ID 可直接用于 <code className="font-mono text-brand-700 bg-brand-50 px-1 rounded">model</code> 参数。
+              AnyTokn 支持多种主流大语言模型，通过统一接口访问。模型 ID 可直接用于 <code className="font-mono text-brand-700 bg-brand-50 px-1 rounded">model</code> 参数。
             </p>
             <div className="overflow-x-auto">
               <table className="w-full">
