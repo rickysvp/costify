@@ -13,7 +13,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
-// import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -27,45 +27,6 @@ interface Alert {
   created_at: string;
   read: boolean;
 }
-
-// ---------- 映射表 ----------
-const typeIcons: Record<Alert['type'], typeof Bell> = {
-  balance: DollarSign,
-  budget: AlertTriangle,
-  usage: Activity,
-  security: Shield,
-};
-
-const typeLabels: Record<Alert['type'], string> = {
-  balance: '余额',
-  budget: '预算',
-  usage: '用量',
-  security: '安全',
-};
-
-const severityColors: Record<Alert['severity'], string> = {
-  info: 'bg-blue-50 text-blue-700 border-blue-200',
-  warning: 'bg-amber-50 text-amber-700 border-amber-200',
-  critical: 'bg-red-50 text-red-700 border-red-200',
-};
-
-const severityDotColors: Record<Alert['severity'], string> = {
-  info: 'bg-blue-500',
-  warning: 'bg-amber-500',
-  critical: 'bg-red-500',
-};
-
-const severityLabels: Record<Alert['severity'], string> = {
-  info: '信息',
-  warning: '警告',
-  critical: '严重',
-};
-
-const severityBorderColors: Record<Alert['severity'], string> = {
-  info: 'border-l-blue-500',
-  warning: 'border-l-amber-500',
-  critical: 'border-l-red-500',
-};
 
 // ---------- 辅助函数 ----------
 function getToken(): string | null {
@@ -88,15 +49,14 @@ function formatTime(iso: string): string {
 
 // ---------- 组件 ----------
 export default function Alerts() {
-  // const { t } = useLanguage();
+  const { t } = useLanguage();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [typeFilter, setTypeFilter] = useState<Alert['type'] | 'all'>('all');
-  const [severityFilter, setSeverityFilter] = useState<Alert['severity'] | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | Alert['type']>('all');
+  const [severityFilter, setSeverityFilter] = useState<'all' | Alert['severity']>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [markingId, setMarkingId] = useState<number | null>(null);
-  const [markingAll, setMarkingAll] = useState(false);
 
   // 获取告警列表
   const fetchAlerts = useCallback(async () => {
@@ -109,7 +69,7 @@ export default function Alerts() {
       });
       if (!res.ok) throw new Error(`请求失败: ${res.status}`);
       const data = await res.json();
-      setAlerts(Array.isArray(data) ? data : data.alerts ?? []);
+      setAlerts(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || '获取告警失败');
     } finally {
@@ -126,34 +86,15 @@ export default function Alerts() {
     setMarkingId(id);
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/alerts/${id}/read`, {
+      await fetch(`${API_BASE}/alerts/${id}/read`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('标记失败');
       setAlerts(prev => prev.map(a => (a.id === id ? { ...a, read: true } : a)));
-    } catch {
-      // 乐观更新回滚不做了，简单提示
-    } finally {
-      setMarkingId(null);
-    }
-  };
-
-  // 全部标记已读
-  const markAllRead = async () => {
-    setMarkingAll(true);
-    try {
-      const token = getToken();
-      const res = await fetch(`${API_BASE}/alerts/read-all`, {
-        method: 'PUT',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('标记失败');
-      setAlerts(prev => prev.map(a => ({ ...a, read: true })));
     } catch {
       // ignore
     } finally {
-      setMarkingAll(false);
+      setMarkingId(null);
     }
   };
 
@@ -173,34 +114,76 @@ export default function Alerts() {
 
   const unreadCount = alerts.filter(a => !a.read).length;
 
+  // 获取类型图标
+  const getTypeIcon = (type: Alert['type']) => {
+    switch (type) {
+      case 'balance': return DollarSign;
+      case 'budget': return AlertTriangle;
+      case 'usage': return Activity;
+      case 'security': return Shield;
+      default: return Bell;
+    }
+  };
+
+  // 获取类型标签
+  const getTypeLabel = (type: Alert['type']) => {
+    switch (type) {
+      case 'balance': return '余额';
+      case 'budget': return '预算';
+      case 'usage': return '用量';
+      case 'security': return '安全';
+      default: return type;
+    }
+  };
+
+  // 获取严重程度样式
+  const getSeverityStyle = (severity: Alert['severity']) => {
+    switch (severity) {
+      case 'info': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'warning': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'critical': return 'bg-red-50 text-red-700 border-red-200';
+      default: return 'bg-surface-100 text-surface-600';
+    }
+  };
+
+  // 获取严重程度边框
+  const getSeverityBorder = (severity: Alert['severity']) => {
+    switch (severity) {
+      case 'info': return 'border-l-blue-500';
+      case 'warning': return 'border-l-amber-500';
+      case 'critical': return 'border-l-red-500';
+      default: return 'border-l-surface-300';
+    }
+  };
+
+  // 获取严重程度标签
+  const getSeverityLabel = (severity: Alert['severity']) => {
+    switch (severity) {
+      case 'info': return '信息';
+      case 'warning': return '警告';
+      case 'critical': return '严重';
+      default: return severity;
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* 标题栏 */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">消息通知</h1>
+          <h1 className="text-xl font-bold text-surface-900">{t.layout?.alerts || '消息通知'}</h1>
           <p className="text-sm text-surface-500 mt-1">
             共 {alerts.length} 条告警，{unreadCount} 条未读
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            className="btn-secondary text-xs flex items-center gap-1.5"
-            onClick={fetchAlerts}
-            disabled={isLoading}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            刷新
-          </button>
-          <button
-            className="btn-primary text-xs flex items-center gap-1.5"
-            onClick={markAllRead}
-            disabled={markingAll || unreadCount === 0}
-          >
-            <CheckCheck className="w-3.5 h-3.5" />
-            {markingAll ? '标记中...' : '全部已读'}
-          </button>
-        </div>
+        <button
+          className="btn-secondary text-xs flex items-center gap-1.5"
+          onClick={fetchAlerts}
+          disabled={isLoading}
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          {t.dashboard?.refresh || '刷新'}
+        </button>
       </div>
 
       {/* 筛选栏 */}
@@ -222,7 +205,7 @@ export default function Alerts() {
               全部类型
             </button>
             {(['balance', 'budget', 'usage', 'security'] as const).map(type => {
-              const Icon = typeIcons[type];
+              const Icon = getTypeIcon(type);
               return (
                 <button
                   key={type}
@@ -232,7 +215,7 @@ export default function Alerts() {
                   onClick={() => setTypeFilter(type)}
                 >
                   <Icon className="w-3 h-3" />
-                  {typeLabels[type]}
+                  {getTypeLabel(type)}
                 </button>
               );
             })}
@@ -254,12 +237,14 @@ export default function Alerts() {
               <button
                 key={s}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                  severityFilter === s ? severityColors[s] : 'bg-surface-50 text-surface-600 hover:bg-surface-100'
+                  severityFilter === s ? getSeverityStyle(s) : 'bg-surface-50 text-surface-600 hover:bg-surface-100'
                 }`}
                 onClick={() => setSeverityFilter(s)}
               >
-                <span className={`w-2 h-2 rounded-full ${severityDotColors[s]}`} />
-                {severityLabels[s]}
+                <span className={`w-2 h-2 rounded-full ${
+                  s === 'info' ? 'bg-blue-500' : s === 'warning' ? 'bg-amber-500' : 'bg-red-500'
+                }`} />
+                {getSeverityLabel(s)}
               </button>
             ))}
           </div>
@@ -299,7 +284,7 @@ export default function Alerts() {
       {isLoading && (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
-          <span className="ml-3 text-sm text-surface-600">加载中...</span>
+          <span className="ml-3 text-sm text-surface-600">{t.common?.loading || '加载中...'}</span>
         </div>
       )}
 
@@ -320,18 +305,18 @@ export default function Alerts() {
       {!isLoading && !error && filtered.length > 0 && (
         <div className="space-y-3">
           {filtered.map(alert => {
-            const TypeIcon = typeIcons[alert.type];
+            const TypeIcon = getTypeIcon(alert.type);
             return (
               <div
                 key={alert.id}
-                className={`card border-l-4 ${severityBorderColors[alert.severity]} ${
+                className={`card border-l-4 ${getSeverityBorder(alert.severity)} ${
                   alert.read ? 'opacity-70' : ''
                 }`}
               >
                 <div className="px-5 py-4 flex items-start gap-4">
                   {/* 类型图标 */}
                   <div
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${severityColors[alert.severity]}`}
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${getSeverityStyle(alert.severity)}`}
                   >
                     <TypeIcon className="w-4 h-4" />
                   </div>
@@ -339,13 +324,11 @@ export default function Alerts() {
                   {/* 内容 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`badge text-[10px] ${severityColors[alert.severity]}`}
-                      >
-                        {severityLabels[alert.severity]}
+                      <span className={`badge text-[10px] ${getSeverityStyle(alert.severity)}`}>
+                        {getSeverityLabel(alert.severity)}
                       </span>
                       <span className="badge-gray text-[10px]">
-                        {typeLabels[alert.type]}
+                        {getTypeLabel(alert.type)}
                       </span>
                       {!alert.read && (
                         <span className="w-2 h-2 rounded-full bg-brand-500 flex-shrink-0" />
@@ -374,7 +357,7 @@ export default function Alerts() {
                       title="标记已读"
                     >
                       {markingId === alert.id ? (
-                        <div className="loading-spinner w-4 h-4" />
+                        <div className="w-4 h-4 border-2 border-surface-300 border-t-brand-600 rounded-full animate-spin" />
                       ) : (
                         <Check className="w-4 h-4 text-surface-400 hover:text-brand-600" />
                       )}
