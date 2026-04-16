@@ -136,7 +136,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 // ---------- 组件 ----------
 export default function UsagePage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   // 筛选状态
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
@@ -273,11 +273,11 @@ export default function UsagePage() {
       ]);
       setLastUpdated(new Date());
     } catch (err) {
-      setError('加载数据失败，请稍后重试');
+      setError(t.usage?.loadFailed || '加载数据失败，请稍后重试');
     } finally {
       setIsLoading(false);
     }
-  }, [fetchSummary, fetchStats, fetchRecent]);
+  }, [fetchSummary, fetchStats, fetchRecent, t]);
 
   useEffect(() => {
     loadAll();
@@ -286,8 +286,9 @@ export default function UsagePage() {
 
   // 导出数据
   const handleExport = () => {
+    const headers = [t.usage?.name || '名称', t.usage?.cost || '花费', t.usage?.tokens || 'Token数', t.usage?.requests || '请求数', t.usage?.percentage || '占比'];
     const csvContent = [
-      ['名称', '花费', 'Token数', '请求数', '占比'].join(','),
+      headers.join(','),
       ...statsData.map(item => [
         item.name,
         item.cost.toFixed(4),
@@ -324,6 +325,17 @@ export default function UsagePage() {
       model: t.usage?.byModel || 'By Model',
     };
     return labels[type];
+  };
+
+  // 获取表格列标题
+  const getTableColumnLabel = () => {
+    switch (groupBy) {
+      case 'project': return t.usage?.project || '项目';
+      case 'user': return t.usage?.user || '人员';
+      case 'api_key': return t.usage?.apiKey || 'API Key';
+      case 'model': return t.usage?.model || '模型';
+      default: return t.usage?.date || '日期';
+    }
   };
 
   // ---------- 渲染 ----------
@@ -403,31 +415,31 @@ export default function UsagePage() {
           
           {/* 分组方式 */}
           <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">分析维度</label>
+            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.analysisDimension || 'Analysis Dimension'}</label>
             <select
               className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
               value={groupBy}
               onChange={(e) => setGroupBy(e.target.value as GroupByType)}
             >
-              <option value="date">按日</option>
-              <option value="week">按周</option>
-              <option value="month">按月</option>
-              <option value="project">按项目</option>
-              <option value="user">按人员</option>
-              <option value="api_key">按API Key</option>
-              <option value="model">按模型</option>
+              <option value="date">{t.usage?.byDay || 'By Day'}</option>
+              <option value="week">{t.usage?.byWeek || 'By Week'}</option>
+              <option value="month">{t.usage?.byMonth || 'By Month'}</option>
+              <option value="project">{t.usage?.byProject || 'By Project'}</option>
+              <option value="user">{t.usage?.byUser || 'By User'}</option>
+              <option value="api_key">{t.usage?.byApiKey || 'By API Key'}</option>
+              <option value="model">{t.usage?.byModel || 'By Model'}</option>
             </select>
           </div>
           
           {/* 项目筛选 */}
           <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">项目</label>
+            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.project || 'Project'}</label>
             <select
               className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
               value={filterProject}
               onChange={(e) => setFilterProject(e.target.value)}
             >
-              <option value="">全部项目</option>
+              <option value="">{t.usage?.allProjects || 'All Projects'}</option>
               {projects.map((p) => (
                 <option key={p} value={p}>{p}</option>
               ))}
@@ -436,13 +448,13 @@ export default function UsagePage() {
           
           {/* 人员筛选 */}
           <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">人员</label>
+            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.user || 'User'}</label>
             <select
               className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
               value={filterUser}
               onChange={(e) => setFilterUser(e.target.value)}
             >
-              <option value="">全部人员</option>
+              <option value="">{t.usage?.allUsers || 'All Users'}</option>
               {users.map((u) => (
                 <option key={u} value={u}>{u}</option>
               ))}
@@ -451,13 +463,13 @@ export default function UsagePage() {
           
           {/* 模型筛选 */}
           <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">模型</label>
+            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.model || 'Model'}</label>
             <select
               className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
               value={filterModel}
               onChange={(e) => setFilterModel(e.target.value)}
             >
-              <option value="">全部模型</option>
+              <option value="">{t.usage?.allModels || 'All Models'}</option>
               {models.map((m) => (
                 <option key={m} value={m}>{m}</option>
               ))}
@@ -478,7 +490,7 @@ export default function UsagePage() {
               setFilterModel('');
             }}
           >
-            重置筛选
+            {t.usage?.resetFilter || 'Reset Filters'}
           </button>
         </div>
       </div>
@@ -489,7 +501,7 @@ export default function UsagePage() {
           <AlertTriangle className="w-5 h-5 flex-shrink-0" />
           <span className="text-sm font-medium">{error}</span>
           <button onClick={loadAll} className="ml-auto text-sm underline hover:no-underline">
-            重试
+            {t.usage?.retry || 'Retry'}
           </button>
         </div>
       )}
@@ -498,7 +510,7 @@ export default function UsagePage() {
       {isLoading ? (
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600" />
-          <span className="ml-3 text-sm text-surface-600">加载中...</span>
+          <span className="ml-3 text-sm text-surface-600">{t.common?.loading || 'Loading...'}</span>
         </div>
       ) : (
         <>
@@ -509,69 +521,69 @@ export default function UsagePage() {
                 <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
                   <DollarSign className="w-4 h-4 text-blue-600" />
                 </div>
-                <span className="text-xs font-medium text-surface-500">总花费</span>
+                <span className="text-xs font-medium text-surface-500">{t.usage?.totalCost || 'Total Cost'}</span>
               </div>
               <p className="text-2xl font-bold text-surface-900">
                 {formatCurrencyCompact(summary?.total_cost ?? 0)}
               </p>
-              <p className="text-xs text-surface-400 mt-1">{dateRange.start} 至 {dateRange.end}</p>
+              <p className="text-xs text-surface-400 mt-1">{dateRange.start} {lang === 'zh' ? '至' : 'to'} {dateRange.end}</p>
             </div>
             <div className="card p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
                   <TrendingDown className="w-4 h-4 text-emerald-600" />
                 </div>
-                <span className="text-xs font-medium text-surface-500">总节省</span>
+                <span className="text-xs font-medium text-surface-500">{t.usage?.totalSavings || 'Total Savings'}</span>
               </div>
               <p className="text-2xl font-bold text-emerald-600">
                 {formatCurrencyCompact(summary?.total_savings ?? 0)}
               </p>
-              <p className="text-xs text-surface-400 mt-1">通过优化策略节省</p>
+              <p className="text-xs text-surface-400 mt-1">{t.usage?.savingsDesc || 'Saved through optimization'}</p>
             </div>
             <div className="card p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
                   <Hash className="w-4 h-4 text-violet-600" />
                 </div>
-                <span className="text-xs font-medium text-surface-500">总 Token</span>
+                <span className="text-xs font-medium text-surface-500">{t.usage?.totalTokens || 'Total Tokens'}</span>
               </div>
               <p className="text-2xl font-bold text-surface-900">
                 {formatNumber(summary?.total_tokens ?? 0)}
               </p>
-              <p className="text-xs text-surface-400 mt-1">输入 + 输出 Token</p>
+              <p className="text-xs text-surface-400 mt-1">{t.usage?.tokensDesc || 'Input + Output Tokens'}</p>
             </div>
             <div className="card p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
                   <Activity className="w-4 h-4 text-amber-600" />
                 </div>
-                <span className="text-xs font-medium text-surface-500">请求数</span>
+                <span className="text-xs font-medium text-surface-500">{t.usage?.requestCount || 'Requests'}</span>
               </div>
               <p className="text-2xl font-bold text-surface-900">
                 {formatNumber(summary?.request_count ?? 0)}
               </p>
-              <p className="text-xs text-surface-400 mt-1">API 调用次数</p>
+              <p className="text-xs text-surface-400 mt-1">{t.usage?.requestsDesc || 'API call count'}</p>
             </div>
             <div className="card p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
                   <Database className="w-4 h-4 text-cyan-600" />
                 </div>
-                <span className="text-xs font-medium text-surface-500">缓存命中率</span>
+                <span className="text-xs font-medium text-surface-500">{t.usage?.cacheHitRate || 'Cache Hit Rate'}</span>
               </div>
               <p className="text-2xl font-bold text-surface-900">
                 {formatPercentage(summary?.cache_hit_rate ?? 0)}
               </p>
-              <p className="text-xs text-surface-400 mt-1">重复请求缓存比例</p>
+              <p className="text-xs text-surface-400 mt-1">{t.usage?.cacheDesc || 'Cache hit ratio'}</p>
             </div>
           </div>
 
           {/* 标签页切换 */}
           <div className="flex items-center gap-2 border-b border-surface-200">
             {[
-              { key: 'overview', label: '数据概览', icon: Layers },
-              { key: 'trend', label: '趋势分析', icon: BarChart3 },
-              { key: 'detail', label: '详细记录', icon: Clock },
+              { key: 'overview', label: t.usage?.dataOverview || 'Data Overview', icon: Layers },
+              { key: 'trend', label: t.usage?.trendAnalysis || 'Trend Analysis', icon: BarChart3 },
+              { key: 'detail', label: t.usage?.detailRecords || 'Detailed Records', icon: Clock },
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -601,26 +613,21 @@ export default function UsagePage() {
                     {groupBy === 'model' && <Server className="w-4 h-4 text-emerald-600" />}
                     {(groupBy === 'date' || groupBy === 'week' || groupBy === 'month') && <Calendar className="w-4 h-4 text-cyan-600" />}
                     <h3 className="text-sm font-semibold text-surface-800">
-                      {getGroupByLabel(groupBy)}统计
+                      {getGroupByLabel(groupBy)}{t.usage?.statsBy || ' Statistics'}
                     </h3>
                   </div>
-                  <span className="text-xs text-surface-400">共 {statsData.length} 条记录</span>
+                  <span className="text-xs text-surface-400">{t.usage?.recordsCount?.replace('{count}', statsData.length.toString()) || `${statsData.length} records`}</span>
                 </div>
                 <div className="overflow-x-auto max-h-96 overflow-y-auto">
                   <table className="w-full">
                     <thead className="sticky top-0 bg-white">
                       <tr className="border-b border-surface-200">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">排名</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">
-                          {groupBy === 'project' ? '项目' : 
-                           groupBy === 'user' ? '人员' : 
-                           groupBy === 'api_key' ? 'API Key' : 
-                           groupBy === 'model' ? '模型' : '日期'}
-                        </th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">花费</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">Token</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">请求数</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">占比</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.usage?.rank || 'Rank'}</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{getTableColumnLabel()}</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.cost || 'Cost'}</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.tokens || 'Tokens'}</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.requests || 'Requests'}</th>
+                        <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.percentage || 'Percentage'}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -628,7 +635,7 @@ export default function UsagePage() {
                         <tr>
                           <td colSpan={6} className="px-4 py-8 text-center text-sm text-surface-400">
                             <Layers className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                            暂无数据
+                            {t.usage?.noData || 'No Data'}
                           </td>
                         </tr>
                       ) : (
@@ -682,7 +689,7 @@ export default function UsagePage() {
               {groupBy !== 'date' && groupBy !== 'week' && groupBy !== 'month' && (
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-surface-800">分布占比</h3>
+                    <h3 className="text-sm font-semibold text-surface-800">{t.usage?.distribution || 'Distribution'}</h3>
                   </div>
                   <div className="p-4">
                     <div className="h-80">
@@ -716,7 +723,7 @@ export default function UsagePage() {
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full text-surface-400">
                           <PieChartIcon className="w-12 h-12 mb-2 opacity-30" />
-                          <p className="text-sm">暂无数据</p>
+                          <p className="text-sm">{t.usage?.noData || 'No Data'}</p>
                         </div>
                       )}
                     </div>
@@ -727,7 +734,7 @@ export default function UsagePage() {
               {/* 柱状图对比 */}
               <div className="card">
                 <div className="card-header">
-                  <h3 className="text-sm font-semibold text-surface-800">花费对比</h3>
+                  <h3 className="text-sm font-semibold text-surface-800">{t.usage?.costComparison || 'Cost Comparison'}</h3>
                 </div>
                 <div className="p-4">
                   <div className="h-80">
@@ -750,7 +757,7 @@ export default function UsagePage() {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full text-surface-400">
                         <BarChart3 className="w-12 h-12 mb-2 opacity-30" />
-                        <p className="text-sm">暂无数据</p>
+                        <p className="text-sm">{t.usage?.noData || 'No Data'}</p>
                       </div>
                     )}
                   </div>
@@ -764,7 +771,7 @@ export default function UsagePage() {
             <div className="card">
               <div className="card-header">
                 <h3 className="text-sm font-semibold text-surface-800">
-                  {groupBy === 'month' ? '月度' : groupBy === 'week' ? '周度' : '每日'}趋势
+                  {groupBy === 'month' ? (t.usage?.byMonth || 'Monthly') : groupBy === 'week' ? (t.usage?.byWeek || 'Weekly') : (t.usage?.byDay || 'Daily')} {t.usage?.trend || 'Trend'}
                 </h3>
               </div>
               <div className="p-4">
@@ -778,7 +785,7 @@ export default function UsagePage() {
                           tick={{ fontSize: 11 }}
                           tickFormatter={(v: string) => {
                             if (groupBy === 'month' && v.length === 7) {
-                              return v.substring(5) + '月';
+                              return v.substring(5) + (lang === 'zh' ? '月' : '');
                             }
                             return v;
                           }}
@@ -792,7 +799,7 @@ export default function UsagePage() {
                         <Line
                           type="monotone"
                           dataKey="cost"
-                          name="花费"
+                          name={t.usage?.cost || 'Cost'}
                           stroke="#3b82f6"
                           strokeWidth={2}
                           dot={{ r: 4 }}
@@ -801,7 +808,7 @@ export default function UsagePage() {
                         <Line
                           type="monotone"
                           dataKey="tokens"
-                          name="Token数"
+                          name={t.usage?.tokens || 'Tokens'}
                           stroke="#10b981"
                           strokeWidth={2}
                           yAxisId={1}
@@ -811,7 +818,7 @@ export default function UsagePage() {
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full text-surface-400">
                       <BarChart3 className="w-12 h-12 mb-2 opacity-30" />
-                      <p className="text-sm">暂无趋势数据</p>
+                      <p className="text-sm">{t.usage?.noTrendData || 'No trend data'}</p>
                     </div>
                   )}
                 </div>
@@ -823,21 +830,21 @@ export default function UsagePage() {
           {activeTab === 'detail' && (
             <div className="card">
               <div className="card-header flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-surface-800">使用明细</h3>
-                <span className="text-xs text-surface-400">最近 50 条记录</span>
+                <h3 className="text-sm font-semibold text-surface-800">{t.usage?.detailRecords || 'Detailed Records'}</h3>
+                <span className="text-xs text-surface-400">{t.usage?.recent50Records || 'Last 50 records'}</span>
               </div>
               <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                 <table className="w-full">
                   <thead className="sticky top-0 bg-white">
                     <tr className="border-b border-surface-200">
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">时间</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">项目</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">人员</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">模型</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">Prompt</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">Completion</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">花费</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-surface-500">缓存</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.usage?.time || 'Time'}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.usage?.project || 'Project'}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.usage?.user || 'User'}</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.usage?.model || 'Model'}</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.prompt || 'Prompt'}</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.completion || 'Completion'}</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.usage?.cost || 'Cost'}</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-surface-500">{t.usage?.cached || 'Cached'}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -845,7 +852,7 @@ export default function UsagePage() {
                       <tr>
                         <td colSpan={8} className="px-4 py-8 text-center text-sm text-surface-400">
                           <Clock className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                          暂无记录
+                          {t.usage?.noRecords || 'No records'}
                         </td>
                       </tr>
                     ) : (
@@ -881,7 +888,7 @@ export default function UsagePage() {
                                   : 'bg-surface-100 text-surface-500'
                               }`}
                             >
-                              {r.cached ? '命中' : '未命中'}
+                              {r.cached ? (t.usage?.cacheHit || 'Hit') : (t.usage?.cacheMiss || 'Miss')}
                             </span>
                           </td>
                         </tr>
