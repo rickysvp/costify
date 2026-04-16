@@ -4,9 +4,10 @@ import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, Hexagon, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText, Store, Wallet
+  FileText, Store, Wallet, Globe
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -14,6 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, token, isAdmin, logout } = useAuth();
+  const { t, lang, setLang } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadAlerts, setUnreadAlerts] = useState(0);
@@ -21,41 +23,41 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   // 导航分组配置
   const navGroups = [
     {
-      title: '概览',
+      title: t.layout.overview,
       items: [
-        { path: '/dashboard', label: '总览', icon: LayoutDashboard },
+        { path: '/dashboard', label: t.layout.dashboard, icon: LayoutDashboard },
       ]
     },
     {
-      title: 'API 管理',
+      title: t.layout.apiManagement,
       items: [
-        { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
-        { path: '/api-market', label: '大模型库', icon: Store },
-        { path: '/billing', label: '充值管理', icon: Wallet, adminOnly: true },
+        { path: '/api-keys', label: t.layout.apiKeys, icon: Key, adminOnly: true },
+        { path: '/api-market', label: t.layout.apiMarket, icon: Store },
+        { path: '/billing', label: t.layout.billing, icon: Wallet, adminOnly: true },
       ]
     },
     {
-      title: '数据分析',
+      title: t.layout.dataAnalysis,
       items: [
-        { path: '/usage', label: '使用统计', icon: BarChart3 },
-        { path: '/reports', label: '分析报告', icon: FileText },
-        { path: '/alerts', label: '消息通知', icon: AlertTriangle },
+        { path: '/usage', label: t.layout.usage, icon: BarChart3 },
+        { path: '/reports', label: t.layout.reports, icon: FileText },
+        { path: '/alerts', label: t.layout.alerts, icon: AlertTriangle },
       ]
     },
     {
-      title: '成本中心',
+      title: t.layout.costCenter,
       items: [
-        { path: '/projects', label: '项目管理', icon: Building2 },
-        { path: '/members', label: '成员管理', icon: Users, adminOnly: true },
-        { path: '/budget', label: '预算管理', icon: Wallet, adminOnly: true },
-        { path: '/routing', label: '路由优化', icon: Zap, adminOnly: true },
+        { path: '/projects', label: t.layout.projects, icon: Building2 },
+        { path: '/members', label: t.layout.members, icon: Users, adminOnly: true },
+        { path: '/budget', label: t.layout.budget, icon: Wallet, adminOnly: true },
+        { path: '/routing', label: t.layout.routing, icon: Zap, adminOnly: true },
       ]
     },
     {
-      title: '支持',
+      title: t.layout.support,
       items: [
-        { path: '/docs', label: '接入指南', icon: BookOpen },
-        { path: '/settings', label: '系统设置', icon: Settings },
+        { path: '/docs', label: t.layout.docs, icon: BookOpen },
+        { path: '/settings', label: t.layout.settings, icon: Settings },
       ]
     },
   ];
@@ -143,9 +145,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-black truncate">{user?.name}</p>
-              <p className="text-xs text-neutral-500">{user?.role === 'org_admin' ? '企业管理员' : '成员'}</p>
+              <p className="text-xs text-neutral-500">{user?.role === 'org_admin' ? t.layout.admin : t.layout.member}</p>
             </div>
-            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors" title="退出登录">
+            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors" title={t.layout.logout}>
               <LogOut className="w-4 h-4 text-neutral-400" />
             </button>
           </div>
@@ -165,6 +167,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              className="p-2 rounded-lg hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              title={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+            >
+              <Globe className="w-4 h-4 text-neutral-500" />
+              <span className="text-xs font-medium text-neutral-600">{lang === 'zh' ? 'EN' : '中文'}</span>
+            </button>
             <button
               className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors"
               onClick={() => navigate('/alerts')}
@@ -195,13 +205,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     onClick={() => { setShowUserMenu(false); navigate('/settings'); }}
                   >
-                    <User className="w-4 h-4" /> 个人设置
+                    <User className="w-4 h-4" /> {t.layout.settings}
                   </button>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     onClick={handleLogout}
                   >
-                    <LogOut className="w-4 h-4" /> 退出登录
+                    <LogOut className="w-4 h-4" /> {t.layout.logout}
                   </button>
                 </div>
               )}

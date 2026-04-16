@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -76,9 +77,9 @@ const ROUTING_PROFILES = [
 ];
 
 const ROUTING_LABELS: Record<string, string> = {
-  cost_saver: '成本优先',
-  balanced: '平衡模式',
-  quality: '质量优先',
+  cost_saver: 'costSaver',
+  balanced: 'balanced',
+  quality: 'quality',
 };
 
 const ROUTING_BADGE: Record<string, string> = {
@@ -92,6 +93,7 @@ const ROUTING_BADGE: Record<string, string> = {
 export default function Projects() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -387,14 +389,14 @@ export default function Projects() {
       {/* 页面标题 */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">项目</h1>
-          <p className="text-sm text-surface-500">管理您的 AI 项目和预算</p>
+          <h1 className="text-2xl font-bold text-surface-900">{t.layout.projects}</h1>
+          <p className="text-sm text-surface-500">{t.projects.subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             className="btn-ghost inline-flex items-center gap-1.5"
             onClick={fetchProjects}
-            title="刷新"
+            title={t.dashboard.refresh}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -404,7 +406,7 @@ export default function Projects() {
               onClick={openCreateModal}
             >
               <Plus className="w-4 h-4" />
-              创建项目
+              {t.projects.createProject}
             </button>
           )}
         </div>
@@ -432,7 +434,7 @@ export default function Projects() {
               className="ml-auto text-xs text-red-500 hover:text-red-700 underline"
               onClick={fetchProjects}
             >
-              重试
+              {t.dashboard.reload}
             </button>
           </div>
         </div>
@@ -443,7 +445,7 @@ export default function Projects() {
         {isLoading ? (
           <div className="p-8 flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
-            <span className="ml-3 text-sm text-surface-600">加载中...</span>
+            <span className="ml-3 text-sm text-surface-600">{t.common.loading}</span>
           </div>
         ) : projects.length === 0 ? (
           /* 空状态引导 */
@@ -451,10 +453,10 @@ export default function Projects() {
             <div className="w-16 h-16 bg-surface-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Building2 className="w-8 h-8 text-surface-400" />
             </div>
-            <h3 className="text-lg font-medium text-surface-800 mb-1">暂无项目</h3>
+            <h3 className="text-lg font-medium text-surface-800 mb-1">{t.projects.noProjects}</h3>
             <p className="text-sm text-surface-500 mb-6">
               {isAdmin
-                ? '点击 "创建项目" 按钮开始管理您的 AI 成本'
+                ? t.dashboard.welcomeDesc
                 : '您还没有被分配到任何项目，请联系管理员'}
             </p>
             {isAdmin && (
@@ -462,22 +464,22 @@ export default function Projects() {
                 <div className="flex items-start gap-3 p-3 bg-surface-50 rounded-lg text-left">
                   <div className="w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
                   <div>
-                    <p className="text-sm font-medium text-surface-800">创建项目</p>
-                    <p className="text-xs text-surface-500">设置项目名称、预算和路由策略</p>
+                    <p className="text-sm font-medium text-surface-800">{t.dashboard.step1Title}</p>
+                    <p className="text-xs text-surface-500">{t.dashboard.step1Desc}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-surface-50 rounded-lg text-left">
                   <div className="w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
                   <div>
-                    <p className="text-sm font-medium text-surface-800">邀请成员</p>
-                    <p className="text-xs text-surface-500">添加团队成员到项目中</p>
+                    <p className="text-sm font-medium text-surface-800">{t.dashboard.step2Title}</p>
+                    <p className="text-xs text-surface-500">{t.dashboard.step2Desc}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-surface-50 rounded-lg text-left">
                   <div className="w-7 h-7 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
                   <div>
-                    <p className="text-sm font-medium text-surface-800">生成 API Key</p>
-                    <p className="text-xs text-surface-500">获取密钥并集成到您的应用</p>
+                    <p className="text-sm font-medium text-surface-800">{t.dashboard.step3Title}</p>
+                    <p className="text-xs text-surface-500">{t.dashboard.step3Desc}</p>
                   </div>
                 </div>
                 <button
@@ -485,7 +487,7 @@ export default function Projects() {
                   onClick={openCreateModal}
                 >
                   <Plus className="w-4 h-4" />
-                  创建第一个项目
+                  {t.projects.createFirst}
                 </button>
               </div>
             )}
@@ -535,7 +537,7 @@ export default function Projects() {
                             ROUTING_BADGE[project.routing_profile] || ROUTING_BADGE.balanced
                           }`}
                         >
-                          {ROUTING_LABELS[project.routing_profile] || project.routing_profile}
+                          {t.projects[ROUTING_LABELS[project.routing_profile] as keyof typeof t.projects] || project.routing_profile}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -620,7 +622,7 @@ export default function Projects() {
           <div className="bg-white rounded-xl w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-surface-200 sticky top-0 bg-white z-10">
               <h2 className="text-lg font-semibold text-surface-900">
-                {modalMode === 'create' ? '创建项目' : '编辑项目'}
+                {modalMode === 'create' ? t.projects.createProject : t.projects.editProject}
               </h2>
               <button
                 onClick={closeModal}

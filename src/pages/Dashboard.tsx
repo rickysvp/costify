@@ -9,6 +9,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
+import { useLanguage } from '../contexts/LanguageContext';
 
 
 const API_BASE = 'http://localhost:3001/api';
@@ -111,6 +112,7 @@ const MODEL_DISPLAY: Record<string, string> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,13 +168,13 @@ export default function Dashboard() {
   // 自定义 Tooltip
   const SpendTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (!active || !payload?.length) return null;
-    const costItem = payload.find(p => p.name === '花费');
-    const savingsItem = payload.find(p => p.name === '节省');
+    const costItem = payload.find(p => p.name === t.dashboard.spend);
+    const savingsItem = payload.find(p => p.name === t.dashboard.savings);
     return (
       <div className="bg-white border border-surface-200 rounded-lg shadow-lg p-3 text-xs">
         <p className="font-medium text-surface-800 mb-1">{label}</p>
-        {costItem && <p className="text-blue-600">花费: ${costItem.value?.toFixed(2)}</p>}
-        {savingsItem && <p className="text-emerald-600">节省: ${savingsItem.value?.toFixed(2)}</p>}
+        {costItem && <p className="text-blue-600">{t.dashboard.spend}: ${costItem.value?.toFixed(2)}</p>}
+        {savingsItem && <p className="text-emerald-600">{t.dashboard.savings}: ${savingsItem.value?.toFixed(2)}</p>}
       </div>
     );
   };
@@ -183,8 +185,8 @@ export default function Dashboard() {
     return (
       <div className="bg-white border border-surface-200 rounded-lg shadow-lg p-3 text-xs">
         <p className="font-medium text-surface-800">{item.name}</p>
-        <p className="text-blue-600">花费: ${item.value?.toFixed(2)}</p>
-        <p className="text-surface-500">请求数: {item.payload?.count?.toLocaleString()}</p>
+        <p className="text-blue-600">{t.dashboard.spend}: ${item.value?.toFixed(2)}</p>
+        <p className="text-surface-500">{t.dashboard.requests}: {item.payload?.count?.toLocaleString()}</p>
       </div>
     );
   };
@@ -222,22 +224,22 @@ export default function Dashboard() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-surface-900">总览</h1>
-            <p className="text-sm text-surface-500">查看您的 AI 成本概览</p>
+            <h1 className="text-2xl font-bold text-surface-900">{t.dashboard.title}</h1>
+            <p className="text-sm text-surface-500">{t.dashboard.subtitle}</p>
           </div>
         </div>
         <div className="card p-8 text-center">
           <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h3 className="text-lg font-medium text-surface-800 mb-2">加载失败</h3>
+          <h3 className="text-lg font-medium text-surface-800 mb-2">{t.dashboard.loadFailed}</h3>
           <p className="text-sm text-surface-500 mb-4">{error}</p>
           <button
             className="btn-primary inline-flex items-center gap-2"
             onClick={fetchDashboard}
           >
             <RefreshCw className="w-4 h-4" />
-            重新加载
+            {t.dashboard.reload}
           </button>
         </div>
       </div>
@@ -252,38 +254,38 @@ export default function Dashboard() {
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-surface-900">总览</h1>
-            <p className="text-sm text-surface-500">查看您的 AI 成本概览</p>
+            <h1 className="text-2xl font-bold text-surface-900">{t.dashboard.title}</h1>
+            <p className="text-sm text-surface-500">{t.dashboard.subtitle}</p>
           </div>
         </div>
         <div className="card p-8 text-center max-w-lg mx-auto">
           <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-brand-600" />
           </div>
-          <h2 className="text-xl font-bold text-surface-900 mb-2">欢迎使用 AnyTokn</h2>
+          <h2 className="text-xl font-bold text-surface-900 mb-2">{t.dashboard.welcomeTitle}</h2>
           <p className="text-sm text-surface-500 mb-6">
-            开始管理您的 AI 成本，只需三步即可完成初始设置
+            {t.dashboard.welcomeDesc}
           </p>
           <div className="space-y-4 text-left">
             <div className="flex items-start gap-3 p-4 bg-surface-50 rounded-lg">
               <div className="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
               <div>
-                <h4 className="text-sm font-medium text-surface-800">创建项目</h4>
-                <p className="text-xs text-surface-500 mt-0.5">为您的每个应用或团队创建独立的项目空间</p>
+                <h4 className="text-sm font-medium text-surface-800">{t.dashboard.step1Title}</h4>
+                <p className="text-xs text-surface-500 mt-0.5">{t.dashboard.step1Desc}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-surface-50 rounded-lg">
               <div className="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
               <div>
-                <h4 className="text-sm font-medium text-surface-800">邀请成员</h4>
-                <p className="text-xs text-surface-500 mt-0.5">添加团队成员，分配项目权限</p>
+                <h4 className="text-sm font-medium text-surface-800">{t.dashboard.step2Title}</h4>
+                <p className="text-xs text-surface-500 mt-0.5">{t.dashboard.step2Desc}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-surface-50 rounded-lg">
               <div className="w-8 h-8 bg-brand-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
               <div>
-                <h4 className="text-sm font-medium text-surface-800">生成 API Key</h4>
-                <p className="text-xs text-surface-500 mt-0.5">获取 API Key 并集成到您的应用中</p>
+                <h4 className="text-sm font-medium text-surface-800">{t.dashboard.step3Title}</h4>
+                <p className="text-xs text-surface-500 mt-0.5">{t.dashboard.step3Desc}</p>
               </div>
             </div>
           </div>
@@ -292,7 +294,7 @@ export default function Dashboard() {
             onClick={() => navigate('/projects')}
           >
             <Plus className="w-4 h-4" />
-            创建第一个项目
+            {t.dashboard.createFirstProject}
           </button>
         </div>
       </div>
@@ -305,16 +307,16 @@ export default function Dashboard() {
       {/* 页面标题 */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-surface-900">总览</h1>
-          <p className="text-sm text-surface-500">查看您的 AI 成本概览</p>
+          <h1 className="text-2xl font-bold text-surface-900">{t.dashboard.title}</h1>
+          <p className="text-sm text-surface-500">{t.dashboard.subtitle}</p>
         </div>
         <button
           className="btn-ghost inline-flex items-center gap-1.5"
           onClick={fetchDashboard}
-          title="刷新数据"
+          title={t.dashboard.refreshData}
         >
           <RefreshCw className="w-4 h-4" />
-          <span className="hidden sm:inline">刷新</span>
+          <span className="hidden sm:inline">{t.dashboard.refresh}</span>
         </button>
       </div>
 
@@ -324,11 +326,11 @@ export default function Dashboard() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Wallet className="w-4 h-4 text-brand-600" />
-            <span className="text-xs font-medium text-surface-500">账户余额</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.balance}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmt(data.balance)}</p>
           <p className="text-[11px] text-surface-400 mt-1">
-            阈值 {fmt(data.balance_threshold)}
+            {t.dashboard.balanceThreshold} {fmt(data.balance_threshold)}
           </p>
         </div>
 
@@ -336,7 +338,7 @@ export default function Dashboard() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Wallet className="w-4 h-4 text-indigo-600" />
-            <span className="text-xs font-medium text-surface-500">本月预算</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.monthBudget}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmt(data.month_budget)}</p>
           <div className="w-full h-1.5 bg-surface-100 rounded-full overflow-hidden mt-2">
@@ -349,7 +351,7 @@ export default function Dashboard() {
             />
           </div>
           <p className="text-[11px] text-surface-400 mt-1">
-            已用 {data.month_budget_used_pct.toFixed(1)}%
+            {t.dashboard.budgetUsed} {data.month_budget_used_pct.toFixed(1)}%
           </p>
         </div>
 
@@ -357,7 +359,7 @@ export default function Dashboard() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-blue-600" />
-            <span className="text-xs font-medium text-surface-500">本月花费</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.monthCost}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmt(data.month_cost)}</p>
           <div className="flex items-center gap-1 mt-1">
@@ -367,7 +369,7 @@ export default function Dashboard() {
               <TrendingDown className="w-3 h-3 text-emerald-500" />
             )}
             <span className={`text-[11px] font-medium ${isUp ? 'text-red-600' : 'text-emerald-600'}`}>
-              较上月 {isUp ? '+' : ''}{changePct.toFixed(1)}%
+              {t.dashboard.lastMonth} {isUp ? '+' : ''}{changePct.toFixed(1)}%
             </span>
           </div>
         </div>
@@ -376,21 +378,21 @@ export default function Dashboard() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <PiggyBank className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs font-medium text-surface-500">本月节省</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.monthSavings}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmt(data.month_savings)}</p>
-          <p className="text-[11px] text-surface-400 mt-1">通过智能路由节省</p>
+          <p className="text-[11px] text-surface-400 mt-1">{t.dashboard.savingsDesc}</p>
         </div>
 
         {/* 请求数 */}
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity className="w-4 h-4 text-violet-600" />
-            <span className="text-xs font-medium text-surface-500">请求数</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.requestCount}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmtNum(data.request_count)}</p>
           <p className="text-[11px] text-surface-400 mt-1">
-            {fmtNum(data.month_tokens)} tokens
+            {fmtNum(data.month_tokens)} {t.dashboard.tokens}
           </p>
         </div>
 
@@ -398,7 +400,7 @@ export default function Dashboard() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Zap className="w-4 h-4 text-amber-600" />
-            <span className="text-xs font-medium text-surface-500">缓存命中率</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.cacheHitRate}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{cacheRate.toFixed(1)}%</p>
           <div className="w-full h-1.5 bg-surface-100 rounded-full overflow-hidden mt-2">
@@ -415,9 +417,9 @@ export default function Dashboard() {
         {/* 30 天花费与节省趋势 */}
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800">30 天花费与节省趋势</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.costTrend}</h3>
             <span className="text-xs text-surface-400">
-              本月累计 {fmt(data.month_cost)}
+              {t.dashboard.thisMonthTotal} {fmt(data.month_cost)}
             </span>
           </div>
           <div className="p-4">
@@ -440,7 +442,7 @@ export default function Dashboard() {
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
-                      name="花费"
+                      name={t.dashboard.spend}
                     />
                     <Line
                       type="monotone"
@@ -449,13 +451,13 @@ export default function Dashboard() {
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
-                      name="节省"
+                      name={t.dashboard.savings}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-sm text-surface-400">
-                  暂无花费数据
+                  {t.dashboard.noSpendData}
                 </div>
               )}
             </div>
@@ -463,11 +465,11 @@ export default function Dashboard() {
             <div className="flex items-center justify-center gap-6 mt-2">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                <span className="text-[11px] text-surface-600">花费</span>
+                <span className="text-[11px] text-surface-600">{t.dashboard.spend}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] text-surface-600">节省</span>
+                <span className="text-[11px] text-surface-600">{t.dashboard.savings}</span>
               </div>
             </div>
           </div>
@@ -476,7 +478,7 @@ export default function Dashboard() {
         {/* 模型分布饼图 */}
         <div className="card">
           <div className="card-header">
-            <h3 className="text-sm font-semibold text-surface-800">模型分布</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.modelDistribution}</h3>
           </div>
           <div className="p-4">
             <div className="h-52">
@@ -501,7 +503,7 @@ export default function Dashboard() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-sm text-surface-400">
-                  暂无模型数据
+                  {t.dashboard.noModelData}
                 </div>
               )}
             </div>
@@ -528,12 +530,12 @@ export default function Dashboard() {
         {/* Top 10 项目花费 */}
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800">Top 10 项目</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.topProjects}</h3>
             <button
               className="text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
               onClick={() => navigate('/projects')}
             >
-              全部 <ArrowRight className="w-3 h-3" />
+              {t.dashboard.viewAll} <ArrowRight className="w-3 h-3" />
             </button>
           </div>
           {data.top_projects.length > 0 ? (
@@ -541,9 +543,9 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead className="sticky top-0 bg-white">
                   <tr className="border-b border-surface-200">
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">排名</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">项目</th>
-                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">花费</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.rank}</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.project}</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">{t.dashboard.spend}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -569,7 +571,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="p-8 text-center text-sm text-surface-400">
-              暂无项目花费数据
+              {t.dashboard.noProjectData}
             </div>
           )}
         </div>
@@ -577,12 +579,12 @@ export default function Dashboard() {
         {/* Top 10 API Key */}
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800">Top 10 API Key</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.topApiKeys}</h3>
             <button
               className="text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
               onClick={() => navigate('/api-keys')}
             >
-              全部 <ArrowRight className="w-3 h-3" />
+              {t.dashboard.viewAll} <ArrowRight className="w-3 h-3" />
             </button>
           </div>
           {data.top_api_keys?.length > 0 ? (
@@ -590,9 +592,9 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead className="sticky top-0 bg-white">
                   <tr className="border-b border-surface-200">
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">排名</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">Key</th>
-                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">花费</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.rank}</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.apiKey}</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">{t.dashboard.spend}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -623,7 +625,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="p-8 text-center text-sm text-surface-400">
-              暂无 API Key 使用数据
+              {t.dashboard.noApiKeyData}
             </div>
           )}
         </div>
@@ -631,12 +633,12 @@ export default function Dashboard() {
         {/* Top 10 人员 */}
         <div className="card">
           <div className="card-header flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-surface-800">Top 10 人员</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.topUsers}</h3>
             <button
               className="text-xs text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
               onClick={() => navigate('/members')}
             >
-              全部 <ArrowRight className="w-3 h-3" />
+              {t.dashboard.viewAll} <ArrowRight className="w-3 h-3" />
             </button>
           </div>
           {data.top_users?.length > 0 ? (
@@ -644,9 +646,9 @@ export default function Dashboard() {
               <table className="w-full">
                 <thead className="sticky top-0 bg-white">
                   <tr className="border-b border-surface-200">
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">排名</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">成员</th>
-                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">花费</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.rank}</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-surface-500">{t.dashboard.member}</th>
+                    <th className="px-3 py-2 text-right text-xs font-semibold text-surface-500">{t.dashboard.spend}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -682,7 +684,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="p-8 text-center text-sm text-surface-400">
-              暂无人员使用数据
+              {t.dashboard.noUserData}
             </div>
           )}
         </div>
