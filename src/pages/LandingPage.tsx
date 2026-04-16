@@ -335,8 +335,8 @@ export default function LandingPage() {
 
             <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto mb-10">
               {lang === 'zh'
-                ? '通过AI驱动的高精度智能优化引擎，及全链路数据洞察，结合客户业务场景实现让每个Token支出都转化为最大业务价值。'
-                : 'Through AI-driven high-precision intelligent optimization engine and full-link data insights, combined with customer business scenarios, transform every Token expenditure into maximum business value.'}
+                ? '在确保高质量输出的前提下，通过AI驱动的高精度智能优化引擎，及全链路数据洞察，结合客户业务场景实现让每个Token支出都转化为最大业务价值。'
+                : 'While ensuring high-quality output, through AI-driven high-precision intelligent optimization engine and full-link data insights, combined with customer business scenarios, transform every Token expenditure into maximum business value.'}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
