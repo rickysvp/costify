@@ -221,18 +221,18 @@ export default function Alerts() {
             >
               全部类型
             </button>
-            {(['balance', 'budget', 'usage', 'security'] as const).map(t => {
-              const Icon = typeIcons[t];
+            {(['balance', 'budget', 'usage', 'security'] as const).map(type => {
+              const Icon = typeIcons[type];
               return (
                 <button
-                  key={t}
+                  key={type}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
-                    typeFilter === t ? 'bg-brand-100 text-brand-700' : 'bg-surface-50 text-surface-600 hover:bg-surface-100'
+                    typeFilter === type ? 'bg-brand-100 text-brand-700' : 'bg-surface-50 text-surface-600 hover:bg-surface-100'
                   }`}
-                  onClick={() => setTypeFilter(t)}
+                  onClick={() => setTypeFilter(type)}
                 >
                   <Icon className="w-3 h-3" />
-                  {typeLabels[t]}
+                  {typeLabels[type]}
                 </button>
               );
             })}
