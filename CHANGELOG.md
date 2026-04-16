@@ -5,6 +5,16 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.8] - 2026-04-16
+
+### Changed
+- 重构首页落地页，参考 Helicone 专业风格
+- 突出企业级 AI 成本控制与优化系统定位
+- 添加企业级安全合规展示（SOC2、GDPR、ISO27001）
+- 添加客户成功案例模块
+- 全站支持中英文切换
+- 移除价格方案模块
+
 ## [1.1.7] - 2026-04-16
 
 ### Added
