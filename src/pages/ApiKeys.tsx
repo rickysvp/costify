@@ -22,6 +22,7 @@ import {
   Zap,
   RotateCcw,
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -119,6 +120,7 @@ interface CreateKeyForm {
 
 // ---------- Component ----------
 export default function ApiKeys() {
+  const { t } = useLanguage();
   const [apiKeys, setApiKeys] = useState<ApiKeyItem[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
@@ -537,11 +539,11 @@ export default function ApiKeys() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">API Key 管理</h1>
-          <p className="text-sm text-surface-500 mt-1">管理 API Keys，查看使用统计和成本分析</p>
+          <h1 className="text-xl font-bold text-surface-900">{t.layout.apiKeys}</h1>
+          <p className="text-sm text-surface-500 mt-1">{t.apiKeys.subtitle}</p>
         </div>
         <button className="btn-primary text-xs flex items-center gap-1.5 self-start" onClick={() => setShowCreateModal(true)}>
-          <Plus className="w-3.5 h-3.5" /> 创建 Key
+          <Plus className="w-3.5 h-3.5" /> {t.apiKeys.createKey}
         </button>
       </div>
 
@@ -550,13 +552,13 @@ export default function ApiKeys() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Key className="w-4 h-4 text-blue-600" />
-            <span className="text-xs text-surface-500">总 Keys</span>
+            <span className="text-xs text-surface-500">{t.layout.apiKeys}</span>
           </div>
           <p className="text-2xl font-bold">{summaryStats.total}</p>
           <div className="flex items-center gap-2 mt-1 text-xs">
-            <span className="text-emerald-600">{summaryStats.active} 活跃</span>
+            <span className="text-emerald-600">{summaryStats.active} {t.common.active}</span>
             <span className="text-surface-300">|</span>
-            <span className="text-amber-600">{summaryStats.paused} 暂停</span>
+            <span className="text-amber-600">{summaryStats.paused} {t.common.paused}</span>
           </div>
         </div>
         <div className="card p-4">

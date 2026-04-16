@@ -24,6 +24,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -72,6 +73,7 @@ const COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#10b981'
 export default function ApiKeyDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t, lang } = useLanguage();
   const [data, setData] = useState<ApiKeyDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,13 +143,13 @@ export default function ApiKeyDetail() {
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-surface-100 rounded-lg">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-surface-900">API Key 详情</h1>
+          <h1 className="text-xl font-bold text-surface-900">{t.apiKeys.title}</h1>
         </div>
         <div className="card p-8 text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600">{error || '加载失败'}</p>
+          <p className="text-red-600">{error || t.dashboard.loadFailed}</p>
           <button onClick={fetchDetail} className="btn-primary mt-4">
-            重试
+            {t.dashboard.reload}
           </button>
         </div>
       </div>
@@ -167,7 +169,7 @@ export default function ApiKeyDetail() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-surface-900">{data.name}</h1>
-            <p className="text-sm text-surface-500">API Key 详情</p>
+            <p className="text-sm text-surface-500">{t.apiKeys.subtitle}</p>
           </div>
         </div>
         <button
@@ -175,7 +177,7 @@ export default function ApiKeyDetail() {
           className="btn-ghost inline-flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
-          刷新
+          {t.dashboard.refresh}
         </button>
       </div>
 
@@ -221,7 +223,7 @@ export default function ApiKeyDetail() {
                 )}
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
-                  创建于 {new Date(data.created_at).toLocaleDateString('zh-CN')}
+                  {t.apiKeys.createdAt} {new Date(data.created_at).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')}
                 </span>
               </div>
             </div>
@@ -233,7 +235,7 @@ export default function ApiKeyDetail() {
                 : 'bg-red-100 text-red-700'
             }`}
           >
-            {data.status === 'active' ? '正常' : '已禁用'}
+            {data.status === 'active' ? t.common.active : t.common.revoked}
           </span>
         </div>
       </div>
@@ -243,33 +245,33 @@ export default function ApiKeyDetail() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-4 h-4 text-brand-600" />
-            <span className="text-xs font-medium text-surface-500">总花费</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiKeys.totalCost}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmt(data.spend)}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity className="w-4 h-4 text-blue-600" />
-            <span className="text-xs font-medium text-surface-500">Token 数</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.tokens}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmtNum(data.tokens)}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <BarChart3 className="w-4 h-4 text-violet-600" />
-            <span className="text-xs font-medium text-surface-500">请求数</span>
+            <span className="text-xs font-medium text-surface-500">{t.dashboard.requestCount}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{fmtNum(data.requests)}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-4 h-4 text-amber-600" />
-            <span className="text-xs font-medium text-surface-500">最后使用</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiKeys.lastUsed}</span>
           </div>
           <p className="text-lg font-bold text-surface-900">
             {data.last_used_at
-              ? new Date(data.last_used_at).toLocaleDateString('zh-CN')
-              : '从未'}
+              ? new Date(data.last_used_at).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')
+              : '-'}
           </p>
         </div>
       </div>
@@ -279,7 +281,7 @@ export default function ApiKeyDetail() {
         {/* 每日使用趋势 */}
         <div className="card">
           <div className="card-header">
-            <h3 className="text-sm font-semibold text-surface-800">30 天使用趋势</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.costTrend}</h3>
           </div>
           <div className="p-4">
             <div className="h-64">
@@ -295,7 +297,7 @@ export default function ApiKeyDetail() {
                     <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `$${v.toFixed(0)}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}
-                      formatter={(value) => [`$${Number(value).toFixed(2)}`, '花费']}
+                      formatter={(value) => [`$${Number(value).toFixed(2)}`, t.dashboard.spend]}
                     />
                     <Line
                       type="monotone"
@@ -309,7 +311,7 @@ export default function ApiKeyDetail() {
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-sm text-surface-400">
-                  暂无使用数据
+                  {t.dashboard.noSpendData}
                 </div>
               )}
             </div>
@@ -319,7 +321,7 @@ export default function ApiKeyDetail() {
         {/* 模型分布 */}
         <div className="card">
           <div className="card-header">
-            <h3 className="text-sm font-semibold text-surface-800">模型使用分布</h3>
+            <h3 className="text-sm font-semibold text-surface-800">{t.dashboard.modelDistribution}</h3>
           </div>
           <div className="p-4">
             {data.model_distribution.length > 0 ? (
@@ -348,14 +350,14 @@ export default function ApiKeyDetail() {
                       </div>
                     </div>
                     <span className="text-xs text-surface-400 w-12 text-right">
-                      {model.count} 次
+                      {model.count}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="h-64 flex items-center justify-center text-sm text-surface-400">
-                暂无模型使用数据
+                {t.dashboard.noModelData}
               </div>
             )}
           </div>

@@ -10,6 +10,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -37,6 +38,7 @@ function getToken(): string | null {
 
 // ---------- 主组件 ----------
 export default function Settings() {
+  const { t } = useLanguage();
   // 组织信息
   const [org, setOrg] = useState<OrgInfo | null>(null);
   const [orgName, setOrgName] = useState('');
@@ -208,8 +210,8 @@ export default function Settings() {
     <div className="p-6 space-y-6">
       {/* 标题 */}
       <div>
-        <h1 className="text-xl font-bold text-surface-900">设置</h1>
-        <p className="text-sm text-surface-500 mt-1">管理组织信息和个人设置</p>
+        <h1 className="text-xl font-bold text-surface-900">{t.layout.settings}</h1>
+        <p className="text-sm text-surface-500 mt-1">{t.settings.subtitle}</p>
       </div>
 
       {/* 标签切换 */}
@@ -221,7 +223,7 @@ export default function Settings() {
           onClick={() => setActiveTab('org')}
         >
           <Building2 className="w-3.5 h-3.5" />
-          组织设置
+          {t.settings.orgSettings}
         </button>
         <button
           className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
@@ -230,7 +232,7 @@ export default function Settings() {
           onClick={() => setActiveTab('profile')}
         >
           <User className="w-3.5 h-3.5" />
-          个人信息
+          {t.settings.profileSettings}
         </button>
         <button
           className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
@@ -239,7 +241,7 @@ export default function Settings() {
           onClick={() => setActiveTab('password')}
         >
           <Lock className="w-3.5 h-3.5" />
-          修改密码
+          {t.settings.passwordSettings}
         </button>
       </div>
 
@@ -249,7 +251,7 @@ export default function Settings() {
           <div className="card-header flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Building2 className="w-4 h-4 text-brand-600" />
-              <h3 className="text-sm font-semibold text-surface-800">组织信息</h3>
+              <h3 className="text-sm font-semibold text-surface-800">{t.settings.orgSettings}</h3>
             </div>
             <button
               className="btn-primary text-xs flex items-center gap-1.5"
@@ -259,17 +261,17 @@ export default function Settings() {
               {orgSaving ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  保存中...
+                  {t.common.loading}
                 </>
               ) : orgSaved ? (
                 <>
                   <Check className="w-3.5 h-3.5" />
-                  已保存
+                  {t.common.success}
                 </>
               ) : (
                 <>
                   <Save className="w-3.5 h-3.5" />
-                  保存更改
+                  {t.common.save}
                 </>
               )}
             </button>
@@ -277,20 +279,19 @@ export default function Settings() {
           <div className="p-5 space-y-5">
             {/* 组织名称 */}
             <div>
-              <label className="block text-xs font-medium text-surface-700 mb-1.5">组织名称</label>
+              <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.settings.orgName}</label>
               <input
                 type="text"
                 className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white text-surface-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
                 value={orgName}
                 onChange={e => setOrgName(e.target.value)}
-                placeholder="输入组织名称"
+                placeholder={t.settings.orgName}
               />
-              <p className="text-xs text-surface-400 mt-1">组织名称将显示在仪表盘和账单中</p>
             </div>
 
             {/* 余额阈值 */}
             <div>
-              <label className="block text-xs font-medium text-surface-700 mb-1.5">余额预警阈值 (USD)</label>
+              <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.settings.balanceThreshold} (USD)</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-sm text-surface-400">$</span>
                 <input

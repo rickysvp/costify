@@ -14,6 +14,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -42,6 +43,7 @@ interface InviteForm {
 // ---------- Component ----------
 export default function Members() {
   const { isAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [members, setMembers] = useState<Member[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -262,11 +264,11 @@ export default function Members() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">成员管理</h1>
-          <p className="text-sm text-surface-500 mt-1">邀请成员、分配角色和管理权限</p>
+          <h1 className="text-xl font-bold text-surface-900">{t.layout.members}</h1>
+          <p className="text-sm text-surface-500 mt-1">{t.members.subtitle}</p>
         </div>
         <button className="btn-primary text-xs flex items-center gap-1.5 self-start" onClick={() => setShowInviteModal(true)}>
-          <UserPlus className="w-3.5 h-3.5" /> 邀请成员
+          <UserPlus className="w-3.5 h-3.5" /> {t.members.inviteMember}
         </button>
       </div>
 
@@ -282,11 +284,11 @@ export default function Members() {
       <div className="card">
         {/* Search bar */}
         <div className="card-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h3 className="text-sm font-semibold text-surface-800">成员列表</h3>
+          <h3 className="text-sm font-semibold text-surface-800">{t.members.title}</h3>
           <div className="relative">
             <input
               type="text"
-              placeholder="搜索姓名或邮箱..."
+              placeholder={t.common.search + "..."}
               className="text-xs border border-surface-200 rounded-lg pl-8 pr-3 py-1.5 bg-white text-surface-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 w-full sm:w-56"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -304,20 +306,20 @@ export default function Members() {
         ) : filteredMembers.length === 0 ? (
           <div className="p-8 text-center">
             <Users className="w-10 h-10 text-surface-300 mx-auto mb-3" />
-            <h3 className="text-sm font-medium text-surface-700">暂无成员</h3>
-            <p className="text-xs text-surface-500 mt-1">点击上方按钮邀请第一位成员</p>
+            <h3 className="text-sm font-medium text-surface-700">{t.members.noMembers}</h3>
+            <p className="text-xs text-surface-500 mt-1">{t.members.subtitle}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="text-left border-b border-surface-200">
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">姓名</th>
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">邮箱</th>
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">角色</th>
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">所属项目</th>
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500 text-right">本月花费</th>
-                  <th className="px-5 py-3 text-xs font-semibold text-surface-500 text-right">操作</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">{t.members.memberName}</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">{t.members.memberEmail}</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">{t.common.role}</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500">{t.members.projects}</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500 text-right">{t.members.monthlySpend}</th>
+                  <th className="px-5 py-3 text-xs font-semibold text-surface-500 text-right">{t.common.action}</th>
                 </tr>
               </thead>
               <tbody>
@@ -335,10 +337,10 @@ export default function Members() {
                       >
                         {member.role === 'org_admin' ? (
                           <span className="inline-flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3" /> 管理员
+                            <ShieldCheck className="w-3 h-3" /> {t.layout.admin}
                           </span>
                         ) : (
-                          '成员'
+                          t.layout.member
                         )}
                       </span>
                     </td>
