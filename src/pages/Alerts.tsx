@@ -3,7 +3,7 @@ import {
   Bell,
   AlertTriangle,
   Info,
-  ShieldAlert,
+  Shield,
   DollarSign,
   Activity,
   CheckCheck,
@@ -33,7 +33,7 @@ const typeIcons: Record<Alert['type'], typeof Bell> = {
   balance: DollarSign,
   budget: AlertTriangle,
   usage: Activity,
-  security: ShieldAlert,
+  security: Shield,
 };
 
 const typeLabels: Record<Alert['type'], string> = {

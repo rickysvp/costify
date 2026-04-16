@@ -160,7 +160,7 @@ export default function BudgetManagement() {
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !data.org_budget) {
     return (
       <div className="p-6">
         <h1 className="text-xl font-bold text-surface-900 mb-6">预算管理</h1>
