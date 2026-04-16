@@ -564,45 +564,45 @@ export default function ApiKeys() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs text-surface-500">总花费</span>
+            <span className="text-xs text-surface-500">{t.apiKeys.totalCost}</span>
           </div>
           <p className="text-2xl font-bold">{formatCurrency(summaryStats.totalCost)}</p>
-          <p className="text-xs text-surface-400 mt-1">所有 Keys 累计</p>
+          <p className="text-xs text-surface-400 mt-1">{t.apiKeys.allKeysTotal}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity className="w-4 h-4 text-violet-600" />
-            <span className="text-xs text-surface-500">总请求</span>
+            <span className="text-xs text-surface-500">{t.apiKeys.totalRequests}</span>
           </div>
           <p className="text-2xl font-bold">{formatNumber(summaryStats.totalRequests)}</p>
-          <p className="text-xs text-surface-400 mt-1">所有 Keys 累计</p>
+          <p className="text-xs text-surface-400 mt-1">{t.apiKeys.allKeysTotal}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-4 h-4 text-red-600" />
-            <span className="text-xs text-surface-500">已吊销</span>
+            <span className="text-xs text-surface-500">{t.common.revoked}</span>
           </div>
           <p className="text-2xl font-bold">{summaryStats.revoked}</p>
-          <p className="text-xs text-surface-400 mt-1">不可恢复</p>
+          <p className="text-xs text-surface-400 mt-1">{t.apiKeys.notRecoverable}</p>
         </div>
       </div>
 
       {/* Batch Actions Bar */}
       {showBatchActions && (
         <div className="card p-3 bg-blue-50 border-blue-200 flex items-center justify-between">
-          <span className="text-sm text-blue-800">已选择 {selectedKeys.size} 个 API Key</span>
+          <span className="text-sm text-blue-800">{t.apiKeys.selected} {selectedKeys.size} API Key</span>
           <div className="flex items-center gap-2">
             <button onClick={() => handleBatchAction('pause')} className="btn-secondary text-xs flex items-center gap-1">
-              <Pause className="w-3.5 h-3.5" /> 暂停
+              <Pause className="w-3.5 h-3.5" /> {t.apiKeys.batchPause}
             </button>
             <button onClick={() => handleBatchAction('activate')} className="btn-secondary text-xs flex items-center gap-1">
-              <Play className="w-3.5 h-3.5" /> 启用
+              <Play className="w-3.5 h-3.5" /> {t.apiKeys.batchActivate}
             </button>
             <button onClick={() => handleBatchAction('revoke')} className="btn-secondary text-xs flex items-center gap-1 text-red-600 hover:text-red-700">
-              <Trash2 className="w-3.5 h-3.5" /> 吊销
+              <Trash2 className="w-3.5 h-3.5" /> {t.apiKeys.batchRevoke}
             </button>
             <button onClick={() => setSelectedKeys(new Set())} className="text-xs text-surface-500 hover:text-surface-700">
-              取消选择
+              {t.apiKeys.cancelSelection}
             </button>
           </div>
         </div>
@@ -616,7 +616,7 @@ export default function ApiKeys() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
               <input
                 type="text"
-                placeholder="搜索 API Key 名称、项目、归属者..."
+                placeholder={t.apiKeys.searchPlaceholder}
                 className="w-full pl-10 pr-4 py-2 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -628,7 +628,7 @@ export default function ApiKeys() {
             value={filterProject}
             onChange={(e) => setFilterProject(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
           >
-            <option value="all">全部项目</option>
+            <option value="all">{t.apiKeys.allProjects}</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -638,19 +638,19 @@ export default function ApiKeys() {
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
           >
-            <option value="all">全部状态</option>
-            <option value="active">活跃</option>
-            <option value="paused">已暂停</option>
-            <option value="revoked">已吊销</option>
+            <option value="all">{t.apiKeys.allStatus}</option>
+            <option value="active">{t.common.active}</option>
+            <option value="paused">{t.common.paused}</option>
+            <option value="revoked">{t.common.revoked}</option>
           </select>
           <select
             className="text-sm border border-surface-200 rounded-lg px-3 py-2"
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
-            <option value="all">全部类型</option>
-            <option value="project">项目 Key</option>
-            <option value="user">个人 Key</option>
+            <option value="all">{t.apiKeys.allTypes}</option>
+            <option value="project">{t.apiKeys.projectKey}</option>
+            <option value="user">{t.apiKeys.userKey}</option>
           </select>
           <select
             className="text-sm border border-surface-200 rounded-lg px-3 py-2"
@@ -661,12 +661,12 @@ export default function ApiKeys() {
               setSortOrder(order as any);
             }}
           >
-            <option value="cost-desc">按花费排序 (高→低)</option>
-            <option value="cost-asc">按花费排序 (低→高)</option>
-            <option value="requests-desc">按请求数排序</option>
-            <option value="last_used-desc">按最近使用排序</option>
-            <option value="created-desc">按创建时间排序</option>
-            <option value="name-asc">按名称排序</option>
+            <option value="cost-desc">{t.apiKeys.sortByCostDesc}</option>
+            <option value="cost-asc">{t.apiKeys.sortByCostAsc}</option>
+            <option value="requests-desc">{t.apiKeys.sortByRequests}</option>
+            <option value="last_used-desc">{t.apiKeys.sortByLastUsed}</option>
+            <option value="created-desc">{t.apiKeys.sortByCreated}</option>
+            <option value="name-asc">{t.apiKeys.sortByName}</option>
           </select>
         </div>
       </div>
@@ -681,11 +681,11 @@ export default function ApiKeys() {
       ) : filteredKeys.length === 0 ? (
         <div className="card p-12 text-center">
           <Key className="w-12 h-12 mx-auto text-surface-300 mb-4" />
-          <h3 className="text-lg font-medium text-surface-600 mb-2">暂无 API Key</h3>
-          <p className="text-sm text-surface-400 mb-4">创建您的第一个 API Key 开始使用</p>
+          <h3 className="text-lg font-medium text-surface-600 mb-2">{t.apiKeys.noKeys}</h3>
+          <p className="text-sm text-surface-400 mb-4">{t.dashboard.welcomeDesc}</p>
           <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            创建 Key
+            {t.apiKeys.createKey}
           </button>
         </div>
       ) : (

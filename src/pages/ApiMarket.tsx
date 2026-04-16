@@ -15,6 +15,7 @@ import {
   Clock,
   BarChart3,
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ==================== 模型价格数据 ====================
 
@@ -274,6 +275,7 @@ const providerColors: Record<string, string> = {
 // ==================== 组件 ====================
 
 export default function ApiMarket() {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedProvider, setSelectedProvider] = useState<string>('all');
@@ -330,9 +332,9 @@ export default function ApiMarket() {
     <div className="p-6 space-y-6">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-xl font-bold text-surface-900">API 市场</h1>
+        <h1 className="text-xl font-bold text-surface-900">{t.layout.apiMarket}</h1>
         <p className="text-sm text-surface-500 mt-1">
-          探索所有支持的 AI 模型，比较价格和性能，选择最适合您需求的模型
+          {t.apiMarket?.subtitle || 'Explore all supported AI models, compare prices and performance'}
         </p>
       </div>
 
