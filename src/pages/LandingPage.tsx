@@ -166,40 +166,52 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: <PieChart className="w-7 h-7" />,
-      title: '智能成本分析',
-      description: 'AI驱动的成本洞察，自动识别浪费点，提供优化建议。支持多维度成本归因分析。',
-      metric: '平均降低 35% 成本',
+      icon: <Zap className="w-7 h-7" />,
+      title: lang === 'zh' ? '智能模型路由' : 'Intelligent Model Routing',
+      description: lang === 'zh'
+        ? '基于质量、成本、延迟三维评估的智能路由，在保证输出质量的前提下，自动选择最优模型，实现 Token 成本最优化。'
+        : 'Quality-cost-latency based intelligent routing. Automatically selects optimal models while ensuring output quality, achieving Token cost optimization.',
+      metric: lang === 'zh' ? '成本降低 30-50%' : '30-50% cost reduction',
     },
     {
       icon: <Target className="w-7 h-7" />,
-      title: '精准预算管控',
-      description: '企业级预算分配与监控，实时预警机制，防止预算超支。支持项目级、团队级、个人级预算。',
-      metric: '预算偏差 < 5%',
+      title: lang === 'zh' ? '语义缓存优化' : 'Semantic Caching',
+      description: lang === 'zh'
+        ? '智能识别语义相似请求，复用历史结果。在不影响输出质量的情况下，显著减少重复 API 调用，降低 Token 消耗。'
+        : 'Intelligently identifies semantically similar requests and reuses historical results. Significantly reduces duplicate API calls without affecting output quality.',
+      metric: lang === 'zh' ? '缓存命中率 35%+' : '35%+ cache hit rate',
     },
     {
-      icon: <Zap className="w-7 h-7" />,
-      title: '智能模型路由',
-      description: '基于成本、延迟、质量的智能路由，自动选择最优模型。支持自定义路由策略。',
-      metric: '响应速度提升 40%',
-    },
-    {
-      icon: <Shield className="w-7 h-7" />,
-      title: '企业级安全合规',
-      description: 'SOC2、GDPR、ISO27001 认证。端到端加密，细粒度权限控制，完整审计日志。',
-      metric: '99.99% 安全可用',
+      icon: <PieChart className="w-7 h-7" />,
+      title: lang === 'zh' ? 'Token 级成本分析' : 'Token-Level Cost Analysis',
+      description: lang === 'zh'
+        ? '精细化到单次请求、每个 Token 的成本追踪。识别高成本低效调用，提供优化建议，确保每一分钱都花在刀刃上。'
+        : 'Granular cost tracking down to single requests and each Token. Identifies high-cost inefficient calls and provides optimization recommendations.',
+      metric: lang === 'zh' ? '成本透明度 100%' : '100% cost transparency',
     },
     {
       icon: <BarChart3 className="w-7 h-7" />,
-      title: '实时成本监控',
-      description: '毫秒级成本追踪，实时仪表盘，自定义报表。支持Webhook、Slack、邮件告警。',
-      metric: '延迟 < 100ms',
+      title: lang === 'zh' ? '质量监控保障' : 'Quality Monitoring',
+      description: lang === 'zh'
+        ? '实时监控模型输出质量，自动检测异常和降级。确保成本优化不以牺牲服务质量为代价，维持用户体验一致性。'
+        : 'Real-time monitoring of model output quality, automatic detection of anomalies and degradation. Ensures cost optimization never compromises service quality.',
+      metric: lang === 'zh' ? '质量保持率 99%+' : '99%+ quality retention',
+    },
+    {
+      icon: <Shield className="w-7 h-7" />,
+      title: lang === 'zh' ? '企业级预算管控' : 'Enterprise Budget Control',
+      description: lang === 'zh'
+        ? '多级预算分配与实时预警，项目级、团队级、个人级精细管控。防止预算超支，确保 AI 投入产出比最大化。'
+        : 'Multi-level budget allocation with real-time alerts. Project, team, and individual-level granular control to maximize AI ROI.',
+      metric: lang === 'zh' ? '预算偏差 < 5%' : '< 5% budget variance',
     },
     {
       icon: <Users className="w-7 h-7" />,
-      title: '团队协作管理',
-      description: '多租户架构，RBAC权限管理，SSO单点登录。支持LDAP、SAML、OIDC。',
-      metric: '支持 1000+ 成员',
+      title: lang === 'zh' ? '团队协作管理' : 'Team Collaboration',
+      description: lang === 'zh'
+        ? '多租户架构，RBAC 权限管理，SSO 单点登录。支持 LDAP、SAML、OIDC，满足大型企业复杂组织架构需求。'
+        : 'Multi-tenant architecture, RBAC permission management, SSO. Supports LDAP, SAML, OIDC for complex enterprise organizational structures.',
+      metric: lang === 'zh' ? '支持 1000+ 成员' : '1000+ members supported',
     },
   ];
 
@@ -321,10 +333,10 @@ export default function LandingPage() {
               <span className="text-emerald-600">{lang === 'zh' ? '控制与优化系统' : 'Control & Optimization'}</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-10">
+            <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto mb-10">
               {lang === 'zh'
-                ? '为大型企业打造的 AI 资源管理平台。智能分析、精准预算、自动优化，帮助您降低 30-50% 的 AI 成本。'
-                : 'AI resource management platform built for large enterprises. Smart analytics, precise budgeting, automatic optimization to reduce AI costs by 30-50%.'}
+                ? '通过 AI 驱动的 Token 智能优化引擎，在确保输出质量的前提下，实现 Token 使用效率最大化与成本精准控制。平均降低企业 AI 成本 30-50%，同时保持甚至提升服务质量。'
+                : 'Through AI-driven Token intelligent optimization engine, achieve maximum Token efficiency and precise cost control while ensuring output quality. Reduce enterprise AI costs by 30-50% while maintaining or even improving service quality.'}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
