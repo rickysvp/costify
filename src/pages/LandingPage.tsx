@@ -344,7 +344,7 @@ export default function LandingPage() {
                 to="/login"
                 className="w-full sm:w-auto px-8 py-4 bg-black text-white font-semibold rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
               >
-                {lang === 'zh' ? '免费试用 14 天' : 'Start 14-Day Free Trial'}
+                {lang === 'zh' ? '立即降本增效' : 'Reduce Costs Now'}
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
