@@ -8,7 +8,6 @@ import {
   TrendingDown,
   PieChart,
   Zap,
-  Building2,
   Check,
   Menu,
   X,
@@ -17,14 +16,11 @@ import {
   Lock,
   Users,
   ArrowUpRight,
-  Wallet,
-  LineChart,
   Target,
   BadgeCheck,
-  ChevronRight,
   Play,
 } from 'lucide-react';
-import { getTranslation, type Language } from '../i18n';
+import { type Language } from '../i18n';
 
 // Enterprise Badge Component
 const EnterpriseBadge = () => (
@@ -80,7 +76,8 @@ const TrustBadge = ({ text }: { text: string }) => (
   </div>
 );
 
-// Pricing Card Component
+// Pricing Card Component - Currently not used
+/*
 interface PricingCardProps {
   name: string;
   price: string;
@@ -125,6 +122,7 @@ const PricingCard = ({ name, price, period, description, features, cta, popular 
     </button>
   </div>
 );
+*/
 
 // Testimonial Card Component
 const TestimonialCard = ({ quote, author, role, company, metric }: { quote: string; author: string; role: string; company: string; metric: string }) => (
