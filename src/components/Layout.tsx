@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Building2, BarChart3, Settings,
-  ChevronDown, Bell, CreditCard, Menu,
+  ChevronDown, Bell, Hexagon, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
   FileText, Store, Wallet
 } from 'lucide-react';
@@ -31,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       items: [
         { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
         { path: '/api-market', label: 'API 市场', icon: Store },
-        { path: '/billing', label: '充值管理', icon: CreditCard, adminOnly: true },
+        { path: '/billing', label: '充值管理', icon: Wallet, adminOnly: true },
       ]
     },
     {
@@ -75,20 +75,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-neutral-50">
       <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)} />
 
       {/* Sidebar */}
-      <aside className={`sidebar w-60 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 ${sidebarOpen ? 'open' : ''}`}>
+      <aside className={`sidebar w-60 bg-white border-r border-neutral-200 flex flex-col flex-shrink-0 ${sidebarOpen ? 'open' : ''}`}>
         {/* Logo */}
-        <div className="px-4 py-4 border-b border-slate-100">
+        <div className="px-4 py-4 border-b border-neutral-100">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <CreditCard className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+              <Hexagon className="w-4 h-4 text-white" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-slate-900 tracking-tight">Costify</h1>
-              <p className="text-xs text-slate-500">AI 成本管理</p>
+              <h1 className="text-sm font-bold text-black tracking-tight">AnyTokn</h1>
+              <p className="text-xs text-neutral-500">AI Token Management</p>
             </div>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             return (
               <div key={group.title}>
-                <h3 className="px-3 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <h3 className="px-3 py-1 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
                   {group.title}
                 </h3>
                 <div className="space-y-1 mt-2">
@@ -114,15 +114,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         to={item.path}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                           isActive
-                            ? 'bg-primary-50 text-primary-700'
-                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            ? 'bg-neutral-100 text-black'
+                            : 'text-neutral-600 hover:bg-neutral-100 hover:text-black'
                         }`}
                         onClick={() => setSidebarOpen(false)}
                       >
                         <Icon className="w-4 h-4 flex-shrink-0" />
                         <span>{item.label}</span>
                         {item.path === '/alerts' && unreadAlerts > 0 && (
-                          <span className="ml-auto text-xs font-semibold bg-rose-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          <span className="ml-auto text-xs font-semibold bg-black text-white rounded-full w-5 h-5 flex items-center justify-center">
                             {unreadAlerts}
                           </span>
                         )}
@@ -136,17 +136,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* User Profile */}
-        <div className="px-3 py-3 border-t border-slate-100">
+        <div className="px-3 py-3 border-t border-neutral-100">
           <div className="flex items-center gap-3 px-2 py-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center text-sm font-semibold text-primary-700">
+            <div className="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center text-sm font-semibold text-black">
               {user?.name?.[0] || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-900 truncate">{user?.name}</p>
-              <p className="text-xs text-slate-500">{user?.role === 'org_admin' ? '企业管理员' : '成员'}</p>
+              <p className="text-sm font-medium text-black truncate">{user?.name}</p>
+              <p className="text-xs text-neutral-500">{user?.role === 'org_admin' ? '企业管理员' : '成员'}</p>
             </div>
-            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors" title="退出登录">
-              <LogOut className="w-4 h-4 text-slate-400" />
+            <button onClick={handleLogout} className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors" title="退出登录">
+              <LogOut className="w-4 h-4 text-neutral-400" />
             </button>
           </div>
         </div>
@@ -155,50 +155,50 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0">
+        <header className="h-14 bg-white border-b border-neutral-200 flex items-center justify-between px-4 md:px-6 flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              <Menu className="w-5 h-5 text-slate-600" />
+              <Menu className="w-5 h-5 text-neutral-600" />
             </button>
           </div>
           <div className="flex items-center gap-3">
             <button
-              className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors"
               onClick={() => navigate('/alerts')}
             >
-              <Bell className="w-5 h-5 text-slate-500" />
+              <Bell className="w-5 h-5 text-neutral-500" />
               {unreadAlerts > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-black rounded-full"></span>
               )}
             </button>
-            <div className="w-px h-6 bg-slate-200"></div>
+            <div className="w-px h-6 bg-neutral-200"></div>
             <div className="relative">
               <button
-                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                <div className="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center text-xs font-semibold text-primary-700">
+                <div className="w-7 h-7 rounded-lg bg-neutral-100 flex items-center justify-center text-xs font-semibold text-black">
                   {user?.name?.[0] || 'U'}
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-neutral-400" />
               </button>
               {showUserMenu && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-md border border-slate-100 py-1 z-50">
-                  <div className="px-4 py-3 border-b border-slate-100">
-                    <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                    <p className="text-xs text-slate-500">{user?.email}</p>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-md border border-neutral-100 py-1 z-50">
+                  <div className="px-4 py-3 border-b border-neutral-100">
+                    <p className="text-sm font-medium text-black">{user?.name}</p>
+                    <p className="text-xs text-neutral-500">{user?.email}</p>
                   </div>
                   <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     onClick={() => { setShowUserMenu(false); navigate('/settings'); }}
                   >
                     <User className="w-4 h-4" /> 个人设置
                   </button>
                   <button
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     onClick={handleLogout}
                   >
                     <LogOut className="w-4 h-4" /> 退出登录

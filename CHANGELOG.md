@@ -5,6 +5,16 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.5] - 2026-04-16
+
+### Changed
+- 品牌重定义为 AnyTokn
+- 全新黑白色系设计 - 极简专业风格
+- 主色调改为纯黑 (#000000) 和纯白 (#FFFFFF)
+- 使用 neutral 灰色系构建层次
+- 更新 Logo 为 Hexagon 几何图形
+- 更新标语为 "AI Token Management"
+
 ## [1.1.4] - 2026-04-14
 
 ### Fixed

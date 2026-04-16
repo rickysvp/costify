@@ -577,10 +577,7 @@ export default function ApiMarket() {
           <div>
             <h4 className="text-sm font-semibold text-surface-800 mb-2">使用提示</h4>
             <ul className="space-y-1.5 text-xs text-surface-600">
-              <li className="flex items-start gap-2">
-                <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                <span>点击复制按钮可复制模型 ID，直接在 API 调用中使用</span>
-              </li>
+
               <li className="flex items-start gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
                 <span>输入价格：每百万 tokens 的输入费用；输出价格：每百万 tokens 的生成费用</span>
