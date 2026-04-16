@@ -2,696 +2,545 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Hexagon,
-  TrendingDown,
-  PieChart,
-  ArrowDownRight,
-  Bot,
-  AlertTriangle,
-  ArrowUpRight,
-  ChevronRight,
-  Shield,
-  Check,
+  Globe,
+  ChevronDown,
   ArrowRight,
-  Star,
-  Mail,
-  Phone,
-  MapPin,
+  Shield,
+  Zap,
+  BarChart3,
+  Layers,
+  Database,
+  Lock,
+  Check,
   Menu,
   X,
+  Sparkles,
+  TrendingUp,
+  Clock,
+  Server,
 } from 'lucide-react';
+import { getTranslation, type Language } from '../i18n';
 
-// 价格方案数据
-const pricingPlans = [
-  {
-    name: '免费版',
-    price: '¥0',
-    description: '适合个人开发者和小型团队',
-    features: [
-      '最多 3 个项目',
-      '每月 1000 次 API 调用',
-      '基本成本监控',
-      '邮件支持',
-    ],
-    buttonText: '开始免费使用',
-    buttonClass: 'border border-black text-black hover:bg-neutral-100',
-    isPopular: false,
-  },
-  {
-    name: '专业版',
-    price: '¥999',
-    description: '适合中型企业和专业团队',
-    features: [
-      '最多 20 个项目',
-      '每月 50000 次 API 调用',
-      '高级成本监控',
-      '预算警报和通知',
-      '优先邮件支持',
-      'API 访问',
-    ],
-    buttonText: '立即购买',
-    buttonClass: 'bg-black text-white hover:bg-neutral-800',
-    isPopular: true,
-  },
-  {
-    name: '企业版',
-    price: '¥2999',
-    description: '适合大型企业和机构',
-    features: [
-      '无限项目',
-      '无限 API 调用',
-      '企业级成本监控',
-      '高级预算管理',
-      '24/7 专属支持',
-      'API 访问',
-      '自定义集成',
-      '审计日志',
-    ],
-    buttonText: '联系销售',
-    buttonClass: 'border border-black text-black hover:bg-neutral-100',
-    isPopular: false,
-  },
-];
+// Logo Cloud Component
+const LogoCloud = () => {
+  const logos = [
+    { name: 'OpenAI', color: '#10A37F' },
+    { name: 'Anthropic', color: '#D4A574' },
+    { name: 'Google', color: '#4285F4' },
+    { name: 'Meta', color: '#0668E1' },
+    { name: 'Microsoft', color: '#00A4EF' },
+    { name: 'Amazon', color: '#FF9900' },
+  ];
 
-// 客户案例数据
-const testimonials = [
-  {
-    name: '张总监',
-    company: '科技公司 CTO',
-    quote: 'AnyTokn 帮助我们将 AI 成本降低了 30%，同时提供了清晰的成本分析和预算控制。这是我们一直在寻找的解决方案。',
-    rating: 5,
-  },
-  {
-    name: '李经理',
-    company: '电商平台 技术总监',
-    quote: '使用 AnyTokn 后，我们能够精确追踪每个项目的 AI 使用成本，避免了预算超支的情况。界面直观，功能强大。',
-    rating: 5,
-  },
-  {
-    name: '王工程师',
-    company: 'AI 创业公司 创始人',
-    quote: '作为一家 AI 创业公司，成本控制至关重要。AnyTokn 不仅帮助我们节省了成本，还提供了有价值的分析数据，指导我们的业务决策。',
-    rating: 4,
-  },
-];
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-60">
+      {logos.map((logo) => (
+        <div
+          key={logo.name}
+          className="text-lg md:text-xl font-bold text-neutral-400 hover:text-neutral-600 transition-colors"
+          style={{ color: logo.color }}
+        >
+          {logo.name}
+        </div>
+      ))}
+    </div>
+  );
+};
 
-// 常见问题数据
-const faqs = [
-  {
-    question: 'AnyTokn 如何帮助我控制 AI 成本？',
-    answer: 'AnyTokn 通过提供实时的成本监控、预算设置和警报系统，帮助您精确追踪和控制 AI 使用成本。您可以为每个项目设置预算，并在接近或超出预算时收到通知。',
-  },
-  {
-    question: 'AnyTokn 支持哪些 AI 模型？',
-    answer: 'AnyTokn 支持所有主流的 AI 模型，包括 GPT-4o、GPT-4o-mini、GPT-3.5-turbo 等。我们会持续添加对新模型的支持。',
-  },
-  {
-    question: '我可以在多个项目中使用 AnyTokn 吗？',
-    answer: '是的，AnyTokn 支持多个项目管理。根据您选择的套餐，您可以创建不同数量的项目，并为每个项目设置独立的预算和 API Key。',
-  },
-  {
-    question: 'AnyTokn 提供 API 访问吗？',
-    answer: '是的，专业版和企业版用户可以通过 API 访问 AnyTokn 的功能，方便与其他系统集成。',
-  },
-  {
-    question: '如何开始使用 AnyTokn？',
-    answer: '您可以注册一个免费账户，开始使用 AnyTokn 的基本功能。如果您需要更多高级功能，可以升级到专业版或企业版。',
-  },
-];
+// Feature Card Component
+interface FeatureCardProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  delay?: number;
+}
+
+const FeatureCard = ({ icon, title, description, delay = 0 }: FeatureCardProps) => (
+  <div
+    className="group relative p-6 md:p-8 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all duration-300"
+    style={{ animationDelay: `${delay}ms` }}
+  >
+    <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center mb-4 group-hover:bg-black group-hover:text-white transition-colors">
+      {icon}
+    </div>
+    <h3 className="text-lg font-semibold text-black mb-2">{title}</h3>
+    <p className="text-sm text-neutral-600 leading-relaxed">{description}</p>
+  </div>
+);
+
+// Pricing Card Component
+interface PricingCardProps {
+  name: string;
+  price: string;
+  period?: string;
+  description: string;
+  features: string[];
+  cta: string;
+  popular?: boolean;
+  isYearly: boolean;
+}
+
+const PricingCard = ({ name, price, period, description, features, cta, popular, isYearly }: PricingCardProps) => (
+  <div className={`relative p-6 md:p-8 rounded-2xl border ${popular ? 'border-black shadow-xl' : 'border-neutral-200'} bg-white`}>
+    {popular && (
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+        <span className="bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
+          Most Popular
+        </span>
+      </div>
+    )}
+    <div className="mb-6">
+      <h3 className="text-lg font-semibold text-black mb-1">{name}</h3>
+      <p className="text-sm text-neutral-500">{description}</p>
+    </div>
+    <div className="mb-6">
+      <span className="text-4xl font-bold text-black">{price}</span>
+      {period && <span className="text-neutral-500 ml-1">{period}</span>}
+    </div>
+    <ul className="space-y-3 mb-8">
+      {features.map((feature, i) => (
+        <li key={i} className="flex items-start gap-3 text-sm text-neutral-600">
+          <Check className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
+          <span>{feature}</span>
+        </li>
+      ))}
+    </ul>
+    <button className={`w-full py-3 rounded-lg font-medium transition-colors ${
+      popular
+        ? 'bg-black text-white hover:bg-neutral-800'
+        : 'border border-neutral-200 text-black hover:bg-neutral-50'
+    }`}>
+      {cta}
+    </button>
+  </div>
+);
+
+// Testimonial Card Component
+interface TestimonialCardProps {
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+}
+
+const TestimonialCard = ({ quote, author, role, company }: TestimonialCardProps) => (
+  <div className="p-6 md:p-8 rounded-2xl bg-neutral-50 border border-neutral-100">
+    <div className="flex gap-1 mb-4">
+      {[...Array(5)].map((_, i) => (
+        <Sparkles key={i} className="w-4 h-4 text-black fill-black" />
+      ))}
+    </div>
+    <p className="text-neutral-700 mb-6 leading-relaxed">&ldquo;{quote}&rdquo;</p>
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-semibold text-black">
+        {author[0]}
+      </div>
+      <div>
+        <p className="font-medium text-black text-sm">{author}</p>
+        <p className="text-xs text-neutral-500">{role} · {company}</p>
+      </div>
+    </div>
+  </div>
+);
 
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [lang, setLang] = useState<Language>('zh');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isYearly, setIsYearly] = useState(false);
 
-  // 监听滚动事件
+  const t = getTranslation(lang);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // 切换 FAQ 展开/收起
-  const toggleFaq = (index: number) => {
-    setActiveFaq(activeFaq === index ? null : index);
-  };
+  const features = [
+    {
+      icon: <Layers className="w-6 h-6" />,
+      title: t.features.items[0].title,
+      description: t.features.items[0].description,
+    },
+    {
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: t.features.items[1].title,
+      description: t.features.items[1].description,
+    },
+    {
+      icon: <Database className="w-6 h-6" />,
+      title: t.features.items[2].title,
+      description: t.features.items[2].description,
+    },
+    {
+      icon: <Zap className="w-6 h-6" />,
+      title: t.features.items[3].title,
+      description: t.features.items[3].description,
+    },
+    {
+      icon: <Server className="w-6 h-6" />,
+      title: t.features.items[4].title,
+      description: t.features.items[4].description,
+    },
+    {
+      icon: <Lock className="w-6 h-6" />,
+      title: t.features.items[5].title,
+      description: t.features.items[5].description,
+    },
+  ];
+
+  const testimonials = [
+    {
+      quote: lang === 'zh'
+        ? 'AnyTokn 帮助我们将 AI 成本降低了 35%，同时提供了清晰的成本分析和预算控制。'
+        : 'AnyTokn helped us reduce AI costs by 35% while providing clear cost analysis and budget control.',
+      author: lang === 'zh' ? '张明' : 'John Smith',
+      role: 'CTO',
+      company: 'TechFlow AI',
+    },
+    {
+      quote: lang === 'zh'
+        ? '统一 API 网关让我们的开发效率提升了 50%，不再需要维护多个模型的接口。'
+        : 'The unified API gateway improved our development efficiency by 50%, no need to maintain multiple model interfaces.',
+      author: lang === 'zh' ? '李华' : 'Sarah Chen',
+      role: 'VP Engineering',
+      company: 'DataMind',
+    },
+    {
+      quote: lang === 'zh'
+        ? '语义缓存功能非常强大，我们的重复请求减少了 60%，节省了大量成本。'
+        : 'The semantic caching is incredibly powerful, reducing our duplicate requests by 60% and saving significant costs.',
+      author: lang === 'zh' ? '王芳' : 'Michael Wang',
+      role: 'Tech Lead',
+      company: 'CloudScale',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* 导航栏 */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+      {/* Navigation */}
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                <Hexagon className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
+                <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
-              <span className="text-lg font-bold text-black">AnyTokn</span>
-            </div>
+              <span className="text-xl font-bold text-black">AnyTokn</span>
+            </Link>
 
-            {/* 桌面导航 */}
+            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
-                产品特点
+              <a href="#features" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+                {t.nav.features}
               </a>
-              <a href="#pricing" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
-                价格方案
+              <a href="#pricing" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+                {t.nav.pricing}
               </a>
-              <a href="#testimonials" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
-                客户案例
-              </a>
-              <a href="#faq" className="text-sm font-medium text-neutral-700 hover:text-black transition-colors">
-                常见问题
+              <a href="#docs" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+                {t.nav.docs}
               </a>
             </nav>
 
+            {/* Right Side */}
             <div className="flex items-center gap-4">
-              <Link to="/login" className="hidden md:block text-sm font-medium text-neutral-700 hover:text-black transition-colors">
-                登录
-              </Link>
-              <Link to="/login" className="text-sm font-medium px-4 py-2 rounded-lg bg-black text-white hover:bg-neutral-800 transition-colors">
-                注册
-              </Link>
-              {/* 移动端菜单按钮 */}
-              <button 
-                className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+              {/* Language Switcher */}
+              <button
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-black transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+                <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+              </button>
+
+              {/* Auth Buttons */}
+              <div className="hidden md:flex items-center gap-3">
+                <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+                  {t.nav.login}
+                </Link>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
+                >
+                  {t.nav.signup}
+                </Link>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X className="w-5 h-5 text-neutral-700" /> : <Menu className="w-5 h-5 text-neutral-700" />}
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
-          {/* 移动端导航菜单 */}
+          {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden mt-4 py-4 border-t border-neutral-100">
+            <div className="md:hidden py-4 border-t border-neutral-100">
               <nav className="flex flex-col gap-4">
-                <a 
-                  href="#features" 
-                  className="text-sm font-medium text-neutral-700 hover:text-black transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  产品特点
-                </a>
-                <a 
-                  href="#pricing" 
-                  className="text-sm font-medium text-neutral-700 hover:text-black transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  价格方案
-                </a>
-                <a 
-                  href="#testimonials" 
-                  className="text-sm font-medium text-neutral-700 hover:text-black transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  客户案例
-                </a>
-                <a 
-                  href="#faq" 
-                  className="text-sm font-medium text-neutral-700 hover:text-black transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  常见问题
-                </a>
-                <Link 
-                  to="/login" 
-                  className="text-sm font-medium text-neutral-700 hover:text-black transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  登录
-                </Link>
+                <a href="#features" className="text-sm font-medium text-neutral-600">{t.nav.features}</a>
+                <a href="#pricing" className="text-sm font-medium text-neutral-600">{t.nav.pricing}</a>
+                <a href="#docs" className="text-sm font-medium text-neutral-600">{t.nav.docs}</a>
+                <Link to="/login" className="text-sm font-medium text-neutral-600">{t.nav.login}</Link>
+                <Link to="/login" className="text-sm font-medium text-black">{t.nav.signup}</Link>
               </nav>
             </div>
           )}
         </div>
       </header>
 
-      <main>
-        {/* 英雄区 */}
-        <section className="pt-32 pb-20 bg-neutral-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="flex flex-col md:flex-row items-center gap-12">
-              <div className="md:w-1/2">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
-                  AI Token<br />
-                  <span className="text-neutral-600">智能管理平台</span>
-                </h1>
-                <p className="text-lg text-neutral-600 mb-8 max-w-xl">
-                  AnyTokn 帮助企业精确控制 AI 使用成本，提供实时监控、预算管理和智能分析，让您的 AI 投资更高效。
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <a 
-                    href="/register" 
-                    className="px-8 py-3 rounded-lg bg-black text-white font-medium hover:bg-neutral-800 transition-colors text-center"
-                  >
-                    开始免费试用
-                  </a>
-                  <a 
-                    href="#features" 
-                    className="px-8 py-3 rounded-lg border border-neutral-200 text-neutral-700 font-medium hover:bg-neutral-50 transition-colors text-center"
-                  >
-                    了解更多
-                  </a>
-                </div>
-                <div className="mt-8 flex items-center gap-6">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center border-2 border-white">
-                        <span className="text-xs font-medium text-neutral-700">{i}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1 mb-1">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <Star key={i} className="w-4 h-4 fill-black text-black" />
-                      ))}
-                    </div>
-                    <p className="text-sm text-neutral-600">来自 500+ 企业的信任</p>
-                  </div>
-                </div>
-              </div>
-              <div className="md:w-1/2">
-                <div className="relative">
-                  <div className="absolute -top-6 -left-6 w-24 h-24 bg-neutral-100 rounded-full opacity-50"></div>
-                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-neutral-200 rounded-full opacity-50"></div>
-                  <div className="relative bg-white rounded-2xl shadow-xl p-6 border border-neutral-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-black">AI 成本概览</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-1 rounded-full bg-neutral-100 text-black">节省 30%</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="bg-neutral-50 rounded-lg p-4">
-                        <p className="text-xs text-neutral-500 mb-1">本月花费</p>
-                        <p className="text-xl font-bold text-black">¥12,500</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <ArrowDownRight className="w-3 h-3 text-black" />
-                          <span className="text-xs text-black">较上月 -15%</span>
-                        </div>
-                      </div>
-                      <div className="bg-neutral-50 rounded-lg p-4">
-                        <p className="text-xs text-neutral-500 mb-1">预算使用</p>
-                        <p className="text-xl font-bold text-black">62%</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <ArrowUpRight className="w-3 h-3 text-neutral-600" />
-                          <span className="text-xs text-neutral-600">较上月 +5%</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      {['产品开发', '市场营销', '客户支持'].map((project, index) => (
-                        <div key={index}>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-medium text-neutral-700">{project}</span>
-                            <span className="text-sm font-medium text-neutral-700">¥{Math.floor(Math.random() * 5000) + 1000}</span>
-                          </div>
-                          <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full rounded-full bg-black"
-                              style={{ width: `${Math.floor(Math.random() * 40) + 40}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 产品特点 */}
-        <section id="features" className="py-20 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">强大的 AI Token 管理功能</h2>
-              <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-                AnyTokn 提供全面的功能，帮助您精确控制和优化 AI 使用成本
-              </p>
+      {/* Hero Section */}
+      <section className="pt-32 md:pt-40 pb-20 md:pb-32 bg-gradient-to-b from-neutral-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 border border-neutral-200 mb-8">
+              <Sparkles className="w-4 h-4 text-black" />
+              <span className="text-sm font-medium text-neutral-700">{t.hero.badge}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* 功能 1 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <Hexagon className="w-6 h-6 text-black" strokeWidth={2.5} />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">实时成本监控</h3>
-                <p className="text-neutral-600 mb-4">
-                  实时追踪所有 AI 模型的使用成本，提供详细的使用报告和趋势分析。
-                </p>
-                <ul className="space-y-2">
-                  {['实时成本更新', '详细使用报告', '趋势分析图表', '多维度数据视图'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {/* Title */}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-black leading-tight mb-6">
+              {t.hero.title}
+              <br />
+              <span className="text-neutral-400">{t.hero.titleHighlight}</span>
+            </h1>
 
-              {/* 功能 2 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <PieChart className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">智能预算管理</h3>
-                <p className="text-neutral-600 mb-4">
-                  为每个项目设置预算，自动监控使用情况，当接近或超出预算时收到警报。
-                </p>
-                <ul className="space-y-2">
-                  {['项目级预算设置', '自动预算监控', '多级别警报', '预算使用预测'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {/* Description */}
+            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto mb-10">
+              {t.hero.description}
+            </p>
 
-              {/* 功能 3 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <TrendingDown className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">成本优化建议</h3>
-                <p className="text-neutral-600 mb-4">
-                  基于使用数据，提供智能成本优化建议，帮助您降低 AI 使用成本。
-                </p>
-                <ul className="space-y-2">
-                  {['智能模型推荐', '使用模式分析', '成本优化建议', '节省效果跟踪'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* 功能 4 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <Bot className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">API Key 管理</h3>
-                <p className="text-neutral-600 mb-4">
-                  为每个项目生成和管理 API Key，控制访问权限，确保安全使用。
-                </p>
-                <ul className="space-y-2">
-                  {['项目级 API Key', '访问权限控制', 'Key 吊销功能', '使用记录跟踪'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* 功能 5 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <Shield className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">安全与合规</h3>
-                <p className="text-neutral-600 mb-4">
-                  提供企业级安全保障，确保数据安全和合规性，满足企业级需求。
-                </p>
-                <ul className="space-y-2">
-                  {['企业级安全', '数据加密', '合规性报告', '审计日志'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* 功能 6 */}
-              <div className="bg-white rounded-xl border border-neutral-200 p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-neutral-100 rounded-lg flex items-center justify-center mb-4">
-                  <AlertTriangle className="w-6 h-6 text-black" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-3">智能警报系统</h3>
-                <p className="text-neutral-600 mb-4">
-                  当成本异常或预算接近上限时，自动发送警报，帮助您及时采取行动。
-                </p>
-                <ul className="space-y-2">
-                  {['多渠道通知', '自定义警报规则', '异常检测', '实时提醒'].map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-black" />
-                      <span className="text-sm text-neutral-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 价格方案 */}
-        <section id="pricing" className="py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">选择适合您的方案</h2>
-              <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-                无论您是个人开发者还是大型企业，AnyTokn 都有适合您的方案
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {pricingPlans.map((plan, index) => (
-                <div 
-                  key={index} 
-                  className={`rounded-xl border transition-all duration-300 ${plan.isPopular ? 'border-black shadow-lg relative' : 'border-neutral-200 hover:shadow-md'}`}
-                >
-                  {plan.isPopular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="bg-black text-white text-xs font-medium px-3 py-1 rounded-full">
-                        推荐
-                      </span>
-                    </div>
-                  )}
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-black mb-2">{plan.name}</h3>
-                    <p className="text-neutral-600 mb-6">{plan.description}</p>
-                    <div className="mb-6">
-                      <span className="text-3xl font-bold text-black">{plan.price}</span>
-                      {plan.price !== '¥0' && <span className="text-neutral-500 ml-2">/月</span>}
-                    </div>
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-neutral-600">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <a 
-                      href="/register" 
-                      className={`w-full block text-center py-3 rounded-lg font-medium transition-colors ${plan.buttonClass}`}
-                    >
-                      {plan.buttonText}
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-12 text-center">
-              <p className="text-neutral-600 mb-4">需要更灵活的方案？</p>
-              <a 
-                href="#contact" 
-                className="inline-flex items-center gap-2 text-black font-medium hover:underline"
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              <Link
+                to="/login"
+                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-medium rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
               >
-                联系我们获取自定义方案 <ArrowRight className="w-4 h-4" />
+                {t.hero.ctaPrimary}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="#docs"
+                className="w-full sm:w-auto px-8 py-4 border border-neutral-200 text-black font-medium rounded-xl hover:bg-neutral-50 transition-colors"
+              >
+                {t.hero.ctaSecondary}
               </a>
             </div>
-          </div>
-        </section>
 
-        {/* 客户案例 */}
-        <section id="testimonials" className="py-20 bg-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">客户的成功故事</h2>
-              <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-                看看其他企业如何使用 AnyTokn 优化 AI 成本
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-neutral-50 rounded-xl p-6 border border-neutral-200">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-black text-black" />
-                    ))}
-                    {[...Array(5 - testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-neutral-300" />
-                    ))}
-                  </div>
-                  <p className="text-neutral-700 mb-6 italic">
-                    "{testimonial.quote}"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <span className="text-sm font-bold text-black">{testimonial.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-black">{testimonial.name}</p>
-                      <p className="text-xs text-neutral-500">{testimonial.company}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 常见问题 */}
-        <section id="faq" className="py-20 bg-neutral-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">常见问题</h2>
-              <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-                解答您关于 AnyTokn 的疑问
-              </p>
-            </div>
-
-            <div className="max-w-3xl mx-auto space-y-4">
-              {faqs.map((faq, index) => (
-                <div key={index} className="border border-neutral-200 rounded-lg overflow-hidden">
-                  <button 
-                    className="w-full flex items-center justify-between p-4 text-left bg-white hover:bg-neutral-50 transition-colors"
-                    onClick={() => toggleFaq(index)}
-                  >
-                    <span className="font-medium text-black">{faq.question}</span>
-                    <ChevronRight 
-                      className={`w-5 h-5 text-neutral-500 transition-transform ${activeFaq === index ? 'transform rotate-90' : ''}`}
-                    />
-                  </button>
-                  {activeFaq === index && (
-                    <div className="p-4 bg-white border-t border-neutral-100">
-                      <p className="text-neutral-600">{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 行动号召 */}
-        <section className="py-20 bg-black text-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">准备好开始优化您的 AI 成本了吗？</h2>
-              <p className="text-lg mb-8 text-neutral-300">
-                加入 500+ 企业，使用 AnyTokn 智能管理 AI 成本，提高投资回报率。
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a 
-                  href="/register" 
-                  className="px-8 py-3 rounded-lg bg-white text-black font-medium hover:bg-neutral-100 transition-colors text-center"
-                >
-                  开始免费试用
-                </a>
-                <a 
-                  href="#contact" 
-                  className="px-8 py-3 rounded-lg border border-white text-white font-medium hover:bg-white/10 transition-colors text-center"
-                >
-                  联系销售
-                </a>
+            {/* Stats */}
+            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-bold text-black">500+</div>
+                <div className="text-sm text-neutral-500">{t.hero.stats.companies}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-bold text-black">99.9%</div>
+                <div className="text-sm text-neutral-500">{t.hero.stats.uptime}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-bold text-black">50+</div>
+                <div className="text-sm text-neutral-500">{t.hero.stats.models}</div>
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      {/* 页脚 */}
-      <footer className="bg-neutral-900 text-neutral-400 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                  <Hexagon className="w-4.5 h-4.5 text-black" strokeWidth={2.5} />
-                </div>
-                <span className="text-lg font-bold text-white">AnyTokn</span>
-              </div>
-              <p className="text-sm mb-4">
-                智能 AI Token 管理解决方案，帮助企业精确控制和优化 AI 使用成本。
-              </p>
-              <div className="flex gap-4">
-                <a href="#" className="hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-                </a>
-              </div>
-            </div>
+      {/* Logo Cloud */}
+      <section className="py-12 border-y border-neutral-100">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <p className="text-center text-sm text-neutral-400 mb-8">
+            {lang === 'zh' ? '被全球领先的 AI 公司信赖' : 'Trusted by leading AI companies worldwide'}
+          </p>
+          <LogoCloud />
+        </div>
+      </section>
 
-            <div>
-              <h3 className="text-white font-medium mb-4">产品</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-white transition-colors">功能</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">价格</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API 文档</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">集成</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-white font-medium mb-4">资源</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">文档</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">博客</a></li>
-                <li><a href="#testimonials" className="hover:text-white transition-colors">客户案例</a></li>
-                <li><a href="#faq" className="hover:text-white transition-colors">常见问题</a></li>
-              </ul>
-            </div>
-
-            <div id="contact">
-              <h3 className="text-white font-medium mb-4">联系我们</h3>
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>contact@anytokn.io</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>400-123-4567</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>北京市朝阳区科技园区</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm mb-4 md:mb-0">
-              © 2024 AnyTokn. 保留所有权利。
+      {/* Features Section */}
+      <section id="features" className="py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-medium text-neutral-700 mb-4">
+              {t.features.badge}
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
+              {t.features.title}
+            </h2>
+            <p className="text-lg text-neutral-600">
+              {t.features.description}
             </p>
-            <div className="flex gap-6 text-sm">
-              <a href="#" className="hover:text-white transition-colors">隐私政策</a>
-              <a href="#" className="hover:text-white transition-colors">服务条款</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie 政策</a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => (
+              <FeatureCard
+                key={i}
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+                delay={i * 100}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof / Testimonials */}
+      <section className="py-20 md:py-32 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
+              {t.socialProof.title}
+            </h2>
+            <p className="text-lg text-neutral-600">
+              {t.socialProof.description}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, i) => (
+              <TestimonialCard key={i} {...testimonial} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-medium text-neutral-700 mb-4">
+              {t.pricing.badge}
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
+              {t.pricing.title}
+            </h2>
+            <p className="text-lg text-neutral-600 mb-8">
+              {t.pricing.description}
+            </p>
+
+            {/* Toggle */}
+            <div className="flex items-center justify-center gap-4">
+              <span className={`text-sm font-medium ${!isYearly ? 'text-black' : 'text-neutral-500'}`}>
+                {t.pricing.toggle.monthly}
+              </span>
+              <button
+                onClick={() => setIsYearly(!isYearly)}
+                className="relative w-14 h-7 rounded-full bg-neutral-200 transition-colors"
+              >
+                <div className={`absolute top-1 w-5 h-5 rounded-full bg-black transition-all ${
+                  isYearly ? 'left-8' : 'left-1'
+                }`} />
+              </button>
+              <span className={`text-sm font-medium ${isYearly ? 'text-black' : 'text-neutral-500'}`}>
+                {t.pricing.toggle.yearly}
+              </span>
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                {t.pricing.toggle.save}
+              </span>
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {t.pricing.plans.map((plan, i) => (
+              <PricingCard
+                key={i}
+                name={plan.name}
+                price={isYearly && plan.price !== (lang === 'zh' ? '定制' : 'Custom')
+                  ? (lang === 'zh' ? '¥' : '$') + Math.round(parseInt(plan.price.replace(/[^0-9]/g, '')) * 0.8)
+                  : plan.price
+                }
+                period={plan.period}
+                description={plan.description}
+                features={plan.features}
+                cta={plan.cta}
+                popular={plan.popular}
+                isYearly={isYearly}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 md:py-32 bg-black">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+            {t.cta.title}
+          </h2>
+          <p className="text-lg text-neutral-400 mb-10 max-w-2xl mx-auto">
+            {t.cta.description}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/login"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-medium rounded-xl hover:bg-neutral-100 transition-colors"
+            >
+              {t.cta.primary}
+            </Link>
+            <a
+              href="#demo"
+              className="w-full sm:w-auto px-8 py-4 border border-neutral-700 text-white font-medium rounded-xl hover:bg-neutral-900 transition-colors"
+            >
+              {t.cta.secondary}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-16 bg-neutral-50 border-t border-neutral-200">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <h4 className="font-semibold text-black mb-4">{t.footer.product}</h4>
+              <ul className="space-y-2">
+                <li><a href="#features" className="text-sm text-neutral-600 hover:text-black">{t.nav.features}</a></li>
+                <li><a href="#pricing" className="text-sm text-neutral-600 hover:text-black">{t.nav.pricing}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">API</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4">{t.footer.resources}</h4>
+              <ul className="space-y-2">
+                <li><a href="#docs" className="text-sm text-neutral-600 hover:text-black">{t.nav.docs}</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Blog</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Changelog</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4">{t.footer.company}</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">About</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Careers</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-black mb-4">{t.footer.legal}</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Privacy</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Terms</a></li>
+                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Security</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-neutral-200">
+            <div className="flex items-center gap-2 mb-4 md:mb-0">
+              <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center">
+                <Hexagon className="w-3 h-3 text-white" strokeWidth={2.5} />
+              </div>
+              <span className="font-semibold text-black">AnyTokn</span>
+            </div>
+            <p className="text-sm text-neutral-500">{t.footer.copyright}</p>
           </div>
         </div>
       </footer>

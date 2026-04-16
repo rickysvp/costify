@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       title: 'API 管理',
       items: [
         { path: '/api-keys', label: 'API Keys', icon: Key, adminOnly: true },
-        { path: '/api-market', label: 'API 市场', icon: Store },
+        { path: '/api-market', label: '大模型库', icon: Store },
         { path: '/billing', label: '充值管理', icon: Wallet, adminOnly: true },
       ]
     },

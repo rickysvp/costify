@@ -187,10 +187,10 @@ export default function ApiKeys() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/api-keys/analytics/summary`, { headers: getAuthHeaders() });
+      const res = await fetch(`${API_BASE}/api-keys`, { headers: getAuthHeaders() });
       if (!res.ok) throw new Error('获取 API Key 列表失败');
       const data = await res.json();
-      setApiKeys(data.keys || []);
+      setApiKeys(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : '获取 API Key 列表失败');
     } finally {
