@@ -577,7 +577,17 @@ export default function Reports() {
                           <Eye className="w-4 h-4" />
                         </button>
                       )}
-                      <button onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(report.id); }} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title={t.reports?.delete || '删除'}>
+                      <button 
+                        onClick={(e) => { 
+                          e.preventDefault();
+                          e.stopPropagation(); 
+                          console.log('Delete button clicked for report:', report.id);
+                          setShowDeleteConfirm(report.id); 
+                        }} 
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" 
+                        title={t.reports?.delete || '删除'}
+                        type="button"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -999,17 +1009,46 @@ export default function Reports() {
       )}
 
       {/* 删除确认 */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {showDeleteConfirm !== null && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowDeleteConfirm(null);
+            }
+          }}
+        >
           <div className="bg-white rounded-xl w-full max-w-sm shadow-xl p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center"><AlertCircle className="w-6 h-6 text-red-600" /></div>
-              <div><h3 className="text-lg font-semibold">{t.reports?.confirmDelete || '确认删除'}</h3><p className="text-sm text-slate-500">{t.reports?.deleteWarning || '此操作不可撤销'}</p></div>
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">{t.reports?.confirmDelete || '确认删除'}</h3>
+                <p className="text-sm text-slate-500">{t.reports?.deleteWarning || '此操作不可撤销'}</p>
+              </div>
             </div>
-            <p className="text-sm text-slate-600 mb-6">{t.reports?.deleteConfirmMessage || '确定要删除这份报告吗？报告相关的所有数据都将被永久删除。'}</p>
+            <p className="text-sm text-slate-600 mb-6">
+              {t.reports?.deleteConfirmMessage || '确定要删除这份报告吗？报告相关的所有数据都将被永久删除。'}
+            </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowDeleteConfirm(null)} className="px-4 py-2 text-sm hover:bg-slate-100 rounded-lg">{t.reports?.cancel || '取消'}</button>
-              <button onClick={() => handleDeleteReport(showDeleteConfirm)} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.reports?.confirm || '确认'}</button>
+              <button 
+                onClick={() => setShowDeleteConfirm(null)} 
+                className="px-4 py-2 text-sm hover:bg-slate-100 rounded-lg"
+                type="button"
+              >
+                {t.reports?.cancel || '取消'}
+              </button>
+              <button 
+                onClick={() => {
+                  console.log('Confirming delete for report:', showDeleteConfirm);
+                  handleDeleteReport(showDeleteConfirm);
+                }} 
+                className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+                type="button"
+              >
+                {t.reports?.confirm || '确认'}
+              </button>
             </div>
           </div>
         </div>
