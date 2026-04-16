@@ -335,8 +335,8 @@ export default function LandingPage() {
 
             <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto mb-10">
               {lang === 'zh'
-                ? '通过 AI 驱动的 Token 智能优化引擎，在确保输出质量的前提下，实现 Token 使用效率最大化与成本精准控制。平均降低企业 AI 成本 30-50%，同时保持甚至提升服务质量。'
-                : 'Through AI-driven Token intelligent optimization engine, achieve maximum Token efficiency and precise cost control while ensuring output quality. Reduce enterprise AI costs by 30-50% while maintaining or even improving service quality.'}
+                ? '通过AI驱动的高精度智能优化引擎，及全链路数据洞察，结合客户业务场景实现让每个Token支出都转化为最大业务价值。'
+                : 'Through AI-driven high-precision intelligent optimization engine and full-link data insights, combined with customer business scenarios, transform every Token expenditure into maximum business value.'}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
