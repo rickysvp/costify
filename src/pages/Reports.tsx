@@ -150,28 +150,28 @@ export default function Reports() {
   // 可选指标
   const getAvailableMetrics = () => ({
     cost: [
-      { id: 'total_cost', label: t.reports?.costMetrics ? '总成本' : 'Total Cost', unit: '$' },
-      { id: 'avg_daily_cost', label: t.reports?.costMetrics ? '日均成本' : 'Avg Daily Cost', unit: '$' },
-      { id: 'cost_per_request', label: t.reports?.costMetrics ? '单次请求成本' : 'Cost Per Request', unit: '$' },
-      { id: 'cost_trend', label: t.reports?.costMetrics ? '成本趋势' : 'Cost Trend', unit: '' },
-      { id: 'cost_forecast', label: t.reports?.costMetrics ? '成本预测' : 'Cost Forecast', unit: '$' },
-      { id: 'cost_by_project', label: t.reports?.costMetrics ? '项目成本分布' : 'Cost By Project', unit: '' },
-      { id: 'cost_by_model', label: t.reports?.costMetrics ? '模型成本分布' : 'Cost By Model', unit: '' },
-      { id: 'cost_by_member', label: t.reports?.costMetrics ? '成员成本分布' : 'Cost By Member', unit: '' },
+      { id: 'total_cost', label: t.reports?.metricTotalCost || 'Total Cost', unit: '$' },
+      { id: 'avg_daily_cost', label: t.reports?.metricAvgDailyCost || 'Avg Daily Cost', unit: '$' },
+      { id: 'cost_per_request', label: t.reports?.metricCostPerRequest || 'Cost Per Request', unit: '$' },
+      { id: 'cost_trend', label: t.reports?.metricCostTrend || 'Cost Trend', unit: '' },
+      { id: 'cost_forecast', label: t.reports?.metricCostForecast || 'Cost Forecast', unit: '$' },
+      { id: 'cost_by_project', label: t.reports?.metricCostByProject || 'Cost By Project', unit: '' },
+      { id: 'cost_by_model', label: t.reports?.metricCostByModel || 'Cost By Model', unit: '' },
+      { id: 'cost_by_member', label: t.reports?.metricCostByMember || 'Cost By Member', unit: '' },
     ],
     usage: [
-      { id: 'total_tokens', label: t.reports?.usageMetrics ? '总Token数' : 'Total Tokens', unit: '' },
-      { id: 'total_requests', label: t.reports?.usageMetrics ? '总请求数' : 'Total Requests', unit: '' },
-      { id: 'avg_response_time', label: t.reports?.usageMetrics ? '平均响应时间' : 'Avg Response Time', unit: 'ms' },
-      { id: 'model_distribution', label: t.reports?.usageMetrics ? '模型使用分布' : 'Model Distribution', unit: '' },
-      { id: 'token_efficiency', label: t.reports?.usageMetrics ? 'Token效率' : 'Token Efficiency', unit: '' },
-      { id: 'usage_trend', label: t.reports?.usageMetrics ? '使用趋势' : 'Usage Trend', unit: '' },
+      { id: 'total_tokens', label: t.reports?.metricTotalTokens || 'Total Tokens', unit: '' },
+      { id: 'total_requests', label: t.reports?.metricTotalRequests || 'Total Requests', unit: '' },
+      { id: 'avg_response_time', label: t.reports?.metricAvgResponseTime || 'Avg Response Time', unit: 'ms' },
+      { id: 'model_distribution', label: t.reports?.metricModelDistribution || 'Model Distribution', unit: '' },
+      { id: 'token_efficiency', label: t.reports?.metricTokenEfficiency || 'Token Efficiency', unit: '' },
+      { id: 'usage_trend', label: t.reports?.metricUsageTrend || 'Usage Trend', unit: '' },
     ],
     efficiency: [
-      { id: 'cache_hit_rate', label: t.reports?.efficiencyMetrics ? '缓存命中率' : 'Cache Hit Rate', unit: '%' },
-      { id: 'routing_savings', label: t.reports?.efficiencyMetrics ? '路由节省金额' : 'Routing Savings', unit: '$' },
-      { id: 'budget_execution', label: t.reports?.efficiencyMetrics ? '预算执行率' : 'Budget Execution', unit: '%' },
-      { id: 'cost_per_1k_tokens', label: t.reports?.efficiencyMetrics ? '每千Token成本' : 'Cost Per 1K Tokens', unit: '$' },
+      { id: 'cache_hit_rate', label: t.reports?.metricCacheHitRate || 'Cache Hit Rate', unit: '%' },
+      { id: 'routing_savings', label: t.reports?.metricRoutingSavings || 'Routing Savings', unit: '$' },
+      { id: 'budget_execution', label: t.reports?.metricBudgetExecution || 'Budget Execution', unit: '%' },
+      { id: 'cost_per_1k_tokens', label: t.reports?.metricCostPer1kTokens || 'Cost Per 1K Tokens', unit: '$' },
     ],
   });
 
@@ -225,30 +225,51 @@ export default function Reports() {
   }, [fetchReports, fetchResources]);
 
   const handleCreateReport = async () => {
+    console.log('Creating report with data:', newReport);
     try {
       const token = localStorage.getItem('costio_token');
+      if (!token) {
+        alert('请先登录');
+        return;
+      }
+      
+      const requestBody = {
+        name: newReport.name,
+        description: newReport.description,
+        type: newReport.type,
+        subtype: newReport.subtype,
+        date_range_start: newReport.date_range_start,
+        date_range_end: newReport.date_range_end,
+        metrics: newReport.metrics,
+        permissions: newReport.permissions.map(p => ({ type: p.type, id: p.id, level: p.level })),
+        schedule: newReport.schedule.enabled ? newReport.schedule : null,
+      };
+      console.log('Request body:', requestBody);
+      
       const res = await fetch(`${API_BASE}/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          name: newReport.name,
-          description: newReport.description,
-          type: newReport.type,
-          subtype: newReport.subtype,
-          date_range_start: newReport.date_range_start,
-          date_range_end: newReport.date_range_end,
-          metrics: newReport.metrics,
-          permissions: newReport.permissions.map(p => ({ type: p.type, id: p.id, level: p.level })),
-          schedule: newReport.schedule.enabled ? newReport.schedule : null,
-        }),
+        body: JSON.stringify(requestBody),
       });
-      if (!res.ok) throw new Error('Failed to create report');
+      
+      console.log('Response status:', res.status);
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Error response:', errorData);
+        throw new Error(errorData.error || `Failed to create report: ${res.status}`);
+      }
+      
+      const result = await res.json();
+      console.log('Success:', result);
+      
       setShowCreateModal(false);
       resetForm();
       fetchReports();
-    } catch (err) {
+      alert('报告创建成功');
+    } catch (err: any) {
       console.error('Failed to create report:', err);
-      alert(t.reports?.createReport || '创建报告失败');
+      alert(err.message || t.reports?.createReport || '创建报告失败');
     }
   };
 
@@ -826,7 +847,7 @@ export default function Reports() {
                                 </div>
                                 <div>
                                   <div className="text-sm font-medium">{metric.label}</div>
-                                  {metric.unit && <div className="text-xs text-slate-500">{t.reports?.costMetrics ? '单位' : 'Unit'}: {metric.unit}</div>}
+                                  {metric.unit && <div className="text-xs text-slate-500">{t.reports?.unit || 'Unit'}: {metric.unit}</div>}
                                 </div>
                               </button>
                             ))}
