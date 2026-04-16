@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Hexagon, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { Hexagon, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 
 const API_BASE = 'http://localhost:3001/api';
 
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,36 +32,58 @@ export default function Login() {
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '操作失败');
+      if (!res.ok) throw new Error(data.error || t.login.loginError);
       login(data.token, data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '操作失败');
+      setError(err instanceof Error ? err.message : t.login.loginError);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const features = lang === 'zh' 
+    ? ['多模型统一接入', '智能成本优化', '实时使用监控', '团队权限管理']
+    : ['Unified Multi-Model Access', 'Intelligent Cost Optimization', 'Real-time Usage Monitoring', 'Team Access Control'];
+
   return (
     <div className="min-h-screen bg-white flex">
-      {/* 左侧品牌区域 - 黑白色系 */}
+      {/* Left Brand Area */}
       <div className="hidden lg:flex lg:w-1/2 bg-black items-center justify-center p-12">
         <div className="max-w-md text-white">
-          <div className="flex items-center gap-3 mb-12 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
-              <Hexagon className="w-8 h-8 text-black" strokeWidth={2.5} />
+          <div className="flex items-center justify-between mb-12">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
+                <Hexagon className="w-8 h-8 text-black" strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">AnyTokn</h1>
+                <p className="text-white/60 text-sm">AI Token Management</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">AnyTokn</h1>
-              <p className="text-white/60 text-sm">AI Token Management</p>
-            </div>
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/80 hover:bg-white/20 transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+              <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+            </button>
           </div>
           
-          <h2 className="text-4xl font-bold mb-6 leading-tight">统一 AI 资源<br/>管理平台</h2>
-          <p className="text-white/70 text-lg mb-10">聚合多模型 API，智能路由，成本优化。让 AI 资源管理更简单、更高效。</p>
+          <h2 className="text-4xl font-bold mb-6 leading-tight">
+            {lang === 'zh' ? '企业级 Token' : 'Enterprise Token'}
+            <br/>
+            {lang === 'zh' ? '高质量成本优化引擎' : 'Quality Cost Optimization Engine'}
+          </h2>
+          <p className="text-white/70 text-lg mb-10">
+            {lang === 'zh' 
+              ? '在确保高质量输出的前提下，通过AI驱动的高精度智能优化引擎，让每个Token支出都转化为最大业务价值。'
+              : 'Through AI-driven high-precision intelligent optimization engine, transform every Token expenditure into maximum business value while ensuring high-quality output.'}
+          </p>
           
           <div className="space-y-4 mb-12">
-            {['多模型统一接入', '智能成本优化', '实时使用监控', '团队权限管理'].map((item, i) => (
+            {features.map((item, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center text-xs font-medium">{i + 1}</div>
                 <span className="text-white/80">{item}</span>
@@ -68,30 +92,40 @@ export default function Login() {
           </div>
 
           <div className="p-5 bg-white/5 rounded-2xl border border-white/10">
-            <p className="text-xs text-white/50 mb-3 uppercase tracking-wider">演示账号</p>
-            <p className="text-sm text-white/80">管理员: admin@anytokn.io / admin123</p>
-            <p className="text-sm text-white/80">成员: alice@anytokn.io / member123</p>
+            <p className="text-xs text-white/50 mb-3 uppercase tracking-wider">{t.login.demoAccount}</p>
+            <p className="text-sm text-white/80">{t.login.demoAdmin}: admin@anytokn.io / admin123</p>
+            <p className="text-sm text-white/80">{t.login.demoMember}: alice@anytokn.io / member123</p>
           </div>
         </div>
       </div>
 
-      {/* 右侧登录区域 */}
+      {/* Right Login Area */}
       <div className="flex-1 flex items-center justify-center p-6 bg-neutral-50">
         <div className="w-full max-w-sm">
-          {/* 移动端 Logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-              <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
+          {/* Mobile Header */}
+          <div className="lg:hidden flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
+                <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-black">AnyTokn</h1>
+                <p className="text-xs text-neutral-500">AI Token Management</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-black">AnyTokn</h1>
-              <p className="text-xs text-neutral-500">AI Token Management</p>
-            </div>
+            {/* Mobile Language Switcher */}
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 rounded-lg text-sm text-neutral-700 hover:bg-neutral-300 transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+              <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+            </button>
           </div>
 
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100">
-            <h2 className="text-2xl font-bold text-black mb-2">{isLogin ? '欢迎回来' : '创建账号'}</h2>
-            <p className="text-sm text-neutral-500 mb-6">{isLogin ? '登录到您的 AnyTokn 控制台' : '开始管理您的 AI 资源'}</p>
+            <h2 className="text-2xl font-bold text-black mb-2">{isLogin ? t.login.title : (lang === 'zh' ? '创建账号' : 'Create Account')}</h2>
+            <p className="text-sm text-neutral-500 mb-6">{isLogin ? t.login.subtitle : (lang === 'zh' ? '开始管理您的 AI 资源' : 'Start managing your AI resources')}</p>
 
             {error && (
               <div className="bg-neutral-100 border border-neutral-200 text-neutral-700 p-3 rounded-lg text-sm mb-4">{error}</div>
@@ -100,19 +134,19 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">姓名</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">{lang === 'zh' ? '姓名' : 'Name'}</label>
                   <input 
                     type="text" 
                     value={name} 
                     onChange={e => setName(e.target.value)}
                     className="w-full text-sm bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
-                    placeholder="请输入您的姓名"
+                    placeholder={lang === 'zh' ? '请输入您的姓名' : 'Enter your name'}
                     required 
                   />
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5">邮箱</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t.login.email}</label>
                 <input 
                   type="email" 
                   value={email} 
@@ -123,7 +157,7 @@ export default function Login() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5">密码</label>
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t.login.password}</label>
                 <div className="relative">
                   <input 
                     type={showPassword ? 'text' : 'password'} 
@@ -152,7 +186,7 @@ export default function Login() {
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                 ) : (
                   <>
-                    {isLogin ? '登录' : '创建账号'}
+                    {isLogin ? t.login.loginButton : (lang === 'zh' ? '创建账号' : 'Create Account')}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -160,18 +194,18 @@ export default function Login() {
             </form>
 
             <p className="mt-6 text-center text-sm text-neutral-500">
-              {isLogin ? '还没有账号？' : '已有账号？'}
+              {isLogin ? t.login.noAccount : (lang === 'zh' ? '已有账号？' : 'Already have an account?')}
               <button 
                 className="text-black font-medium ml-1 hover:underline" 
                 onClick={() => { setIsLogin(!isLogin); setError(''); }}
               >
-                {isLogin ? '立即注册' : '直接登录'}
+                {isLogin ? t.login.register : t.login.loginButton}
               </button>
             </p>
           </div>
 
           <p className="mt-6 text-center text-xs text-neutral-400">
-            登录即表示您同意我们的服务条款和隐私政策
+            {lang === 'zh' ? '登录即表示您同意我们的服务条款和隐私政策' : 'By signing in, you agree to our Terms of Service and Privacy Policy'}
           </p>
         </div>
       </div>
