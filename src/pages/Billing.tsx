@@ -43,18 +43,18 @@ function formatCurrency(v: number): string {
 }
 
 const PAYMENT_METHODS = [
-  { key: 'credit_card', label: '信用卡/借记卡', icon: CreditCard },
-  { key: 'alipay', label: '支付宝', icon: null, badge: '支付宝' },
-  { key: 'wechat', label: '微信支付', icon: null, badge: '微信' },
+  { key: 'credit_card', label: 'methods.card', icon: CreditCard },
+  { key: 'alipay', label: 'methods.alipay', icon: null, badge: 'ALIPAY' },
+  { key: 'wechat', label: 'methods.wechat', icon: null, badge: 'WECHAT' },
 ];
 
 const STATUS_MAP: Record<
   string,
   { label: string; className: string }
 > = {
-  success: { label: '成功', className: 'bg-emerald-100 text-emerald-700' },
-  pending: { label: '处理中', className: 'bg-amber-100 text-amber-700' },
-  failed: { label: '失败', className: 'bg-red-100 text-red-700' },
+  success: { label: 'statusText.success', className: 'bg-emerald-100 text-emerald-700' },
+  pending: { label: 'statusText.pending', className: 'bg-amber-100 text-amber-700' },
+  failed: { label: 'statusText.failed', className: 'bg-red-100 text-red-700' },
 };
 
 // ---------- 组件 ----------
@@ -112,7 +112,7 @@ export default function Billing() {
     try {
       await Promise.all([fetchBalance(), fetchHistory()]);
     } catch (err) {
-      setError('加载数据失败，请稍后重试');
+      setError(t.billing?.loadingError || 'Failed to load data, please try again later');
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +126,7 @@ export default function Billing() {
   const handleRechargeSubmit = async () => {
     const amount = parseFloat(rechargeAmount);
     if (!amount || amount <= 0) {
-      setSubmitError('请输入有效的充值金额');
+      setSubmitError(t.billing?.invalidAmount || 'Please enter a valid recharge amount');
       return;
     }
 
@@ -161,7 +161,7 @@ export default function Billing() {
       setRechargeNote('');
       setRechargeMethod('credit_card');
     } catch (err: any) {
-      setSubmitError(err.message || '充值失败，请稍后重试');
+      setSubmitError(err.message || t.billing?.rechargeError || 'Recharge failed, please try again later');
     } finally {
       setIsSubmitting(false);
     }
@@ -301,18 +301,18 @@ export default function Billing() {
                           </td>
                           <td className="px-4 py-3 text-sm text-surface-700">
                             {record.payment_method === 'credit_card'
-                              ? '信用卡/借记卡'
+                              ? t.billing?.methods?.card
                               : record.payment_method === 'alipay'
-                                ? '支付宝'
+                                ? t.billing?.methods?.alipay
                                 : record.payment_method === 'wechat'
-                                  ? '微信支付'
+                                  ? t.billing?.methods?.wechat
                                   : record.payment_method}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span
                               className={`badge text-[10px] ${statusInfo.className}`}
                             >
-                              {statusInfo.label}
+                              {t.billing?.[statusInfo.label.split('.')[0]]?.[statusInfo.label.split('.')[1]] || statusInfo.label}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-sm text-surface-500 font-mono">
@@ -345,7 +345,7 @@ export default function Billing() {
             {/* 头部 */}
             <div className="p-6 border-b border-surface-100">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-surface-900">账户充值</h3>
+                <h3 className="text-lg font-semibold text-surface-900">{t.billing?.rechargeModalTitle || 'Account Recharge'}</h3>
                 <button
                   onClick={() => {
                     if (!isSubmitting) setShowRechargeModal(false);
@@ -355,7 +355,7 @@ export default function Billing() {
                   <X className="w-4 h-4 text-surface-500" />
                 </button>
               </div>
-              <p className="text-xs text-surface-500 mt-1">为组织账户充值余额</p>
+              <p className="text-xs text-surface-500 mt-1">{t.billing?.rechargeModalDesc || 'Recharge balance for your organization'}</p>
             </div>
 
             {/* 内容 */}
@@ -363,7 +363,7 @@ export default function Billing() {
               {/* 金额输入 */}
               <div>
                 <label className="block text-xs font-medium text-surface-700 mb-1.5">
-                  充值金额
+                  {t.billing?.amountLabel || 'Recharge Amount'}
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-500 text-sm">
@@ -374,7 +374,7 @@ export default function Billing() {
                     value={rechargeAmount}
                     onChange={(e) => setRechargeAmount(e.target.value)}
                     className="w-full pl-8 pr-4 py-2.5 border border-surface-200 rounded-lg text-sm bg-white text-surface-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
-                    placeholder="输入充值金额"
+                    placeholder={t.billing?.amountPlaceholder || 'Enter recharge amount'}
                     min="1"
                     step="1"
                   />
@@ -400,7 +400,7 @@ export default function Billing() {
               {/* 支付方式选择 */}
               <div>
                 <label className="block text-xs font-medium text-surface-700 mb-1.5">
-                  支付方式
+                  {t.billing?.paymentMethodLabel || 'Payment Method'}
                 </label>
                 <div className="space-y-2">
                   {PAYMENT_METHODS.map((method) => {
@@ -427,7 +427,7 @@ export default function Billing() {
                           </div>
                         )}
                         <span className="text-sm font-medium text-surface-800 flex-1">
-                          {method.label}
+                          {t.billing?.[method.label.split('.')[0]]?.[method.label.split('.')[1]] || method.label}
                         </span>
                         {rechargeMethod === method.key && (
                           <CheckCircle className="w-5 h-5 text-brand-600" />
@@ -441,14 +441,14 @@ export default function Billing() {
               {/* 备注 */}
               <div>
                 <label className="block text-xs font-medium text-surface-700 mb-1.5">
-                  备注（可选）
+                  {t.billing?.noteLabel || 'Note (Optional)'}
                 </label>
                 <input
                   type="text"
                   value={rechargeNote}
                   onChange={(e) => setRechargeNote(e.target.value)}
                   className="w-full px-3 py-2.5 border border-surface-200 rounded-lg text-sm bg-white text-surface-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
-                  placeholder="输入备注信息"
+                  placeholder={t.billing?.notePlaceholder || 'Enter note'}
                 />
               </div>
 
@@ -467,7 +467,7 @@ export default function Billing() {
                 onClick={() => setShowRechargeModal(false)}
                 disabled={isSubmitting}
               >
-                取消
+                {t.common.cancel}
               </button>
               <button
                 className="btn-primary text-xs flex-1 flex items-center justify-center gap-1.5"
@@ -477,11 +477,11 @@ export default function Billing() {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                    处理中...
+                    {t.billing?.processing || 'Processing...'}
                   </>
                 ) : (
                   <>
-                    确认充值
+                    {t.billing?.confirmRecharge || 'Confirm Recharge'}
                     <DollarSign className="w-3.5 h-3.5" />
                   </>
                 )}

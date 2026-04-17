@@ -231,38 +231,38 @@ const modelData: ModelPricing[] = [
 
 // ==================== 分类配置 ====================
 
-const categoryConfig = {
+const categoryConfig = (t: any) => ({
   flagship: {
-    label: '旗舰模型',
+    label: t.apiMarket.flagship,
     color: 'bg-purple-50 text-purple-700 border-purple-200',
     icon: Sparkles,
-    description: '最强大的模型，适合复杂任务',
+    description: t.apiMarket.flagshipDesc,
   },
   advanced: {
-    label: '高级模型',
+    label: t.apiMarket.advanced,
     color: 'bg-blue-50 text-blue-700 border-blue-200',
     icon: TrendingUp,
-    description: '高性能，适合专业场景',
+    description: t.apiMarket.advancedDesc,
   },
   lightweight: {
-    label: '轻量模型',
+    label: t.apiMarket.lightweight,
     color: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     icon: Zap,
-    description: '快速响应，高性价比',
+    description: t.apiMarket.lightweightDesc,
   },
   economy: {
-    label: '经济模型',
+    label: t.apiMarket.economy,
     color: 'bg-amber-50 text-amber-700 border-amber-200',
     icon: DollarSign,
-    description: '低成本，适合批量处理',
+    description: t.apiMarket.economyDesc,
   },
   reasoning: {
-    label: '推理模型',
+    label: t.apiMarket.reasoning,
     color: 'bg-violet-50 text-violet-700 border-violet-200',
     icon: Layers,
-    description: '专注推理和数学问题',
+    description: t.apiMarket.reasoningDesc,
   },
-};
+});
 
 const providerColors: Record<string, string> = {
   'OpenAI': 'bg-green-50 text-green-700',
@@ -343,35 +343,35 @@ export default function ApiMarket() {
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Cpu className="w-4 h-4 text-brand-600" />
-            <span className="text-xs font-medium text-surface-500">可用模型</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiMarket.availableModels}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">{modelData.length}</p>
-          <p className="text-[11px] text-surface-400 mt-1">持续更新中</p>
+          <p className="text-[11px] text-surface-400 mt-1">{t.apiMarket.updating}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Globe className="w-4 h-4 text-blue-600" />
-            <span className="text-xs font-medium text-surface-500">提供商</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiMarket.providers}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">
             {new Set(modelData.map((m) => m.provider)).size}
           </p>
-          <p className="text-[11px] text-surface-400 mt-1">全球顶级厂商</p>
+          <p className="text-[11px] text-surface-400 mt-1">{t.apiMarket.topTier}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-4 h-4 text-emerald-600" />
-            <span className="text-xs font-medium text-surface-500">最低价格</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiMarket.minPrice}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">
             ${Math.min(...modelData.map((m) => m.inputPrice))}
           </p>
-          <p className="text-[11px] text-surface-400 mt-1">/ 1M tokens</p>
+          <p className="text-[11px] text-surface-400 mt-1">{t.apiMarket.unitPerMillion}</p>
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2">
             <BarChart3 className="w-4 h-4 text-violet-600" />
-            <span className="text-xs font-medium text-surface-500">最大上下文</span>
+            <span className="text-xs font-medium text-surface-500">{t.apiMarket.maxContext}</span>
           </div>
           <p className="text-2xl font-bold text-surface-900">1M</p>
           <p className="text-[11px] text-surface-400 mt-1">tokens</p>
@@ -388,9 +388,9 @@ export default function ApiMarket() {
               : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
           }`}
         >
-          全部模型
+          {t.apiMarket.allModels}
         </button>
-        {Object.entries(categoryConfig).map(([key, config]) => {
+        {Object.entries(categoryConfig(t)).map(([key, config]: [string, any]) => {
           const Icon = config.icon;
           return (
             <button
@@ -415,7 +415,7 @@ export default function ApiMarket() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
           <input
             type="text"
-            placeholder="搜索模型名称、提供商..."
+            placeholder={t.apiMarket.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-sm border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
@@ -427,7 +427,7 @@ export default function ApiMarket() {
             onChange={(e) => setSelectedProvider(e.target.value)}
             className="px-3 py-2 text-sm border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
           >
-            <option value="all">全部提供商</option>
+            <option value="all">{t.apiMarket.allProviders}</option>
             {Array.from(new Set(modelData.map((m) => m.provider))).map((provider) => (
               <option key={provider} value={provider}>
                 {provider}
@@ -439,9 +439,9 @@ export default function ApiMarket() {
             onChange={(e) => setSortBy(e.target.value as 'price' | 'popularity' | 'context')}
             className="px-3 py-2 text-sm border border-surface-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
           >
-            <option value="popularity">按热度</option>
-            <option value="price">按价格</option>
-            <option value="context">按上下文</option>
+            <option value="popularity">{t.apiMarket.sortByPopularity}</option>
+            <option value="price">{t.apiMarket.sortByPrice}</option>
+            <option value="context">{t.apiMarket.sortByContext}</option>
           </select>
         </div>
       </div>
@@ -449,7 +449,7 @@ export default function ApiMarket() {
       {/* 模型列表 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredModels.map((model) => {
-          const category = categoryConfig[model.category];
+          const category = categoryConfig(t)[model.category as keyof ReturnType<typeof categoryConfig>];
           const CategoryIcon = category.icon;
 
           return (
@@ -472,7 +472,7 @@ export default function ApiMarket() {
                       <h3 className="text-base font-semibold text-surface-900">{model.name}</h3>
                       {model.recommended && (
                         <span className="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[10px] font-medium">
-                          推荐
+                          {t.apiMarket.recommended}
                         </span>
                       )}
                     </div>
@@ -485,7 +485,7 @@ export default function ApiMarket() {
                         {model.provider}
                       </span>
                       <span className="text-xs text-surface-400">
-                        {formatContextWindow(model.contextWindow)} 上下文
+                        {formatContextWindow(model.contextWindow)} {t.apiMarket.context}
                       </span>
                     </div>
                   </div>
@@ -493,7 +493,7 @@ export default function ApiMarket() {
                 <button
                   onClick={() => copyModelId(model.id)}
                   className="p-1.5 rounded-lg hover:bg-surface-100 transition-colors"
-                  title="复制模型 ID"
+                  title={t.apiMarket.copyId}
                 >
                   {copiedId === model.id ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -504,29 +504,29 @@ export default function ApiMarket() {
               </div>
 
               {/* 描述 */}
-              <p className="text-sm text-surface-600 mb-4">{model.description}</p>
+              <p className="text-sm text-surface-600 mb-4">{t.apiMarket.models[model.id as keyof typeof t.apiMarket.models]?.description || model.description}</p>
 
               {/* 价格 */}
               <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-surface-50 rounded-lg">
                 <div>
-                  <p className="text-[10px] text-surface-400 mb-1">输入价格</p>
+                  <p className="text-[10px] text-surface-400 mb-1">{t.apiMarket.inputPrice}</p>
                   <p className="text-lg font-bold text-surface-900">
                     ${model.inputPrice}
-                    <span className="text-xs font-normal text-surface-500">/ 1M tokens</span>
+                    <span className="text-xs font-normal text-surface-500">{t.apiMarket.unitPerMillion}</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-surface-400 mb-1">输出价格</p>
+                  <p className="text-[10px] text-surface-400 mb-1">{t.apiMarket.outputPrice}</p>
                   <p className="text-lg font-bold text-surface-900">
                     ${model.outputPrice}
-                    <span className="text-xs font-normal text-surface-500">/ 1M tokens</span>
+                    <span className="text-xs font-normal text-surface-500">{t.apiMarket.unitPerMillion}</span>
                   </p>
                 </div>
               </div>
 
               {/* 特性标签 */}
               <div className="flex flex-wrap gap-1.5 mb-4">
-                {model.features.map((feature) => (
+                {(t.apiMarket.models[model.id as keyof typeof t.apiMarket.models]?.features || model.features).map((feature: string) => (
                   <span
                     key={feature}
                     className="px-2 py-0.5 rounded-full bg-surface-100 text-surface-600 text-[10px]"
@@ -542,12 +542,12 @@ export default function ApiMarket() {
                   <div className="flex items-center gap-1">
                     <Clock className={`w-3.5 h-3.5 ${getLatencyColor(model.latency)}`} />
                     <span className={`text-xs ${getLatencyColor(model.latency)}`}>
-                      {model.latency === 'low' ? '低延迟' : model.latency === 'medium' ? '中延迟' : '高延迟'}
+                      {model.latency === 'low' ? t.apiMarket.lowLatency : model.latency === 'medium' ? t.apiMarket.mediumLatency : t.apiMarket.highLatency}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <TrendingUp className="w-3.5 h-3.5 text-surface-400" />
-                    <span className="text-xs text-surface-500">热度 {model.popularity}%</span>
+                    <span className="text-xs text-surface-500">{t.apiMarket.popularity} {model.popularity}%</span>
                   </div>
                 </div>
                 <code className="text-[10px] font-mono text-surface-400 bg-surface-100 px-2 py-0.5 rounded">
@@ -565,8 +565,8 @@ export default function ApiMarket() {
           <div className="w-16 h-16 bg-surface-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="w-8 h-8 text-surface-400" />
           </div>
-          <h3 className="text-lg font-medium text-surface-800 mb-2">未找到匹配的模型</h3>
-          <p className="text-sm text-surface-500">请尝试调整搜索条件或筛选选项</p>
+          <h3 className="text-lg font-medium text-surface-800 mb-2">{t.apiMarket.noModelsFound}</h3>
+          <p className="text-sm text-surface-500">{t.apiMarket.noModelsDesc}</p>
         </div>
       )}
 
@@ -577,20 +577,20 @@ export default function ApiMarket() {
             <Info className="w-4 h-4 text-blue-600" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-surface-800 mb-2">使用提示</h4>
+            <h4 className="text-sm font-semibold text-surface-800 mb-2">{t.apiMarket.usageTips}</h4>
             <ul className="space-y-1.5 text-xs text-surface-600">
 
               <li className="flex items-start gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                <span>输入价格：每百万 tokens 的输入费用；输出价格：每百万 tokens 的生成费用</span>
+                <span>{t.apiMarket.tipPrice}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                <span>推荐模型经过优化，在性能和成本之间达到最佳平衡</span>
+                <span>{t.apiMarket.tipRecommended}</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
-                <span>长上下文模型适合处理大型文档和复杂对话</span>
+                <span>{t.apiMarket.tipContext}</span>
               </li>
             </ul>
           </div>
