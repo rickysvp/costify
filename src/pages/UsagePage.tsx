@@ -36,7 +36,7 @@ import {
 import { useLanguage } from '../contexts/LanguageContext';
 
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 // ---------- 类型定义 ----------
 type GroupByType = 'date' | 'week' | 'month' | 'project' | 'user' | 'api_key' | 'model';

@@ -23,7 +23,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 interface UserDetail {
   id: number;

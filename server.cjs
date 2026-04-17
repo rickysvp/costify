@@ -61,6 +61,56 @@ let DEMO_MEMBERS = [
   { id: 2, name: 'Alice', email: 'alice@anytokn.io', role: 'member', org_id: 1, projects: [{ id: 1, name: '产品开发' }, { id: 3, name: '客户支持' }], monthly_spend: 430.00 }
 ];
 
+let DEMO_REPORTS = [
+  {
+    id: 1,
+    name: '月度成本分析报告',
+    description: '分析本月的 API 成本消耗趋势数据',
+    type: 'cost',
+    subtype: 'monthly',
+    status: 'ready',
+    created_at: '2024-03-01T10:00:00Z',
+    generated_at: '2024-03-01T10:05:00Z',
+    content: '本月总成本 $1,250.50，较上月增长 15%。主要增长来自 GPT-4o 模型的调用。建议优化缓存策略以降低重复请求成本。',
+    ai_insights: JSON.stringify({
+      summary: '本月 API 调用成本呈现稳步上升趋势，主要受新项目上线影响。',
+      recommendations: ['建议为产品开发项目增加语义缓存。', '部分低频任务可以切换至 gpt-4o-mini 以降低成本。']
+    }),
+    data_snapshot: JSON.stringify({
+      summary: { total_cost: 1250.50, total_tokens: 15420, request_count: 850, total_savings: 320.80, avg_response_time: 450, cache_hit_rate: 35.5 },
+      by_project: [{ id: 1, name: '产品开发', cost: 720.50, tokens: 9200, requests: 520, members: 2, trend: 15.2 }],
+      by_member: [{ id: 1, name: '管理员', cost: 720.50, tokens: 9200, requests: 520, efficiency: 85, projects: 3 }],
+      by_model: [{ name: 'gpt-4o', cost: 450.20, tokens: 1200, requests: 1200, avg_cost_per_1k: 0.375 }],
+      by_day: Array.from({ length: 30 }, (_, i) => ({ date: new Date(Date.now() - (29 - i) * 86400000).toISOString().split('T')[0], cost: Math.random() * 50 + 20, tokens: Math.random() * 5000 + 1000, requests: Math.random() * 100 + 20 })),
+      anomalies: []
+    }),
+    User: { name: '管理员' },
+    ReportPermissions: []
+  },
+  {
+    id: 2,
+    name: '模型使用效率报告',
+    description: '各大模型调用频率与响应时间对比',
+    type: 'usage',
+    subtype: 'weekly',
+    status: 'ready',
+    created_at: '2024-02-15T14:30:00Z',
+    generated_at: '2024-02-15T14:35:00Z',
+    content: 'GPT-4o 使用占比 45%，Claude 占比 30%。平均响应时间 450ms，符合预期 SLA。',
+    ai_insights: JSON.stringify({
+      summary: '模型调用分布合理。',
+      recommendations: ['增加对 Claude 3.5 Sonnet 的测试。']
+    }),
+    data_snapshot: JSON.stringify({
+      summary: { total_cost: 980.20, total_tokens: 12000, request_count: 600, total_savings: 150.00, avg_response_time: 420, cache_hit_rate: 30.0 },
+      by_project: [{ id: 1, name: '产品开发', cost: 500.20, tokens: 6000, requests: 300, members: 2, trend: 5.0 }],
+      by_member: [], by_model: [], by_day: [], anomalies: []
+    }),
+    User: { name: '管理员' },
+    ReportPermissions: []
+  }
+];
+
 app.use(cors());
 app.use(express.json());
 
@@ -463,30 +513,49 @@ app.get('/api/users/:id/usage', authenticateToken, async (req, res) => {
 // ==================== Reports ====================
 
 app.get('/api/reports', authenticateToken, async (req, res) => {
-  res.json([
-    { id: 1, title: '月度成本分析报告', type: 'monthly', created_at: '2024-03-01', status: 'completed' },
-    { id: 2, title: '模型使用效率报告', type: 'efficiency', created_at: '2024-02-15', status: 'completed' },
-    { id: 3, title: '预算执行报告', type: 'budget', created_at: '2024-02-01', status: 'completed' }
-  ]);
+  res.json(DEMO_REPORTS);
 });
 
 app.get('/api/reports/:id', authenticateToken, async (req, res) => {
-  const reports = [
-    { id: 1, title: '月度成本分析报告', type: 'monthly', created_at: '2024-03-01', status: 'completed', content: '本月总成本 ¥12,500，较上月增长 15%' },
-    { id: 2, title: '模型使用效率报告', type: 'efficiency', created_at: '2024-02-15', status: 'completed', content: 'GPT-4o 使用占比 45%，Claude 占比 30%' },
-    { id: 3, title: '预算执行报告', type: 'budget', created_at: '2024-02-01', status: 'completed', content: '当前预算使用率 62%，预计月底不超支' }
-  ];
-  const report = reports.find(r => r.id === parseInt(req.params.id));
+  const report = DEMO_REPORTS.find(r => r.id === parseInt(req.params.id));
   if (!report) return res.status(404).json({ error: 'Report not found' });
   res.json(report);
 });
 
 app.post('/api/reports', authenticateToken, async (req, res) => {
-  res.status(201).json({ id: Date.now(), ...req.body, status: 'completed', created_at: new Date().toISOString() });
+  const { name, type, subtype, description } = req.body;
+  const newReport = {
+    id: Date.now(),
+    name,
+    type: type || 'cost',
+    subtype: subtype || 'monthly',
+    description: description || '',
+    status: 'ready',
+    created_at: new Date().toISOString(),
+    generated_at: new Date().toISOString(),
+    content: '新生成的报告内容内容预览...',
+    ai_insights: JSON.stringify({
+      summary: '已成功生成关于 ' + name + ' 的 AI 洞见。',
+      recommendations: ['集成后开启自动成本监控。', '优化 Token 消耗策略。']
+    }),
+    data_snapshot: JSON.stringify({
+      summary: { total_cost: 0, total_tokens: 0, request_count: 0, total_savings: 0, avg_response_time: 0, cache_hit_rate: 0 },
+      by_project: [], by_member: [], by_model: [], by_day: [], anomalies: []
+    }),
+    User: { name: '管理员' },
+    ReportPermissions: []
+  };
+  DEMO_REPORTS.push(newReport);
+  res.status(201).json(newReport);
 });
 
 app.delete('/api/reports/:id', authenticateToken, async (req, res) => {
-  res.json({ success: true, id: parseInt(req.params.id) });
+  const idx = DEMO_REPORTS.findIndex(r => r.id === parseInt(req.params.id));
+  if (idx !== -1) {
+    DEMO_REPORTS.splice(idx, 1);
+    return res.json({ success: true, id: parseInt(req.params.id) });
+  }
+  res.status(404).json({ error: 'Report not found' });
 });
 
 // ==================== Usage ====================
@@ -671,9 +740,13 @@ app.patch('/api/alerts/:id/read', authenticateToken, async (req, res) => {
 
 // ==================== Start ====================
 
-app.listen(PORT, () => {
-  console.log('🚀 AnyTokn Server running on port 3001');
-  console.log('📍 Demo mode enabled - Use:');
-  console.log('   Admin: admin@anytokn.io / admin123');
-  console.log('   Member: alice@anytokn.io / member123');
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 AnyTokn Server running on port ${PORT}`);
+    console.log('📍 Demo mode enabled - Use:');
+    console.log('   Admin: admin@anytokn.io / admin123');
+    console.log('   Member: alice@anytokn.io / member123');
+  });
+}
+
+module.exports = app;

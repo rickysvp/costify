@@ -9,7 +9,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();

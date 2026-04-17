@@ -12,7 +12,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 interface Report {
   id: number;

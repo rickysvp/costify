@@ -25,7 +25,7 @@ import {
 } from 'recharts';
 
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 // ---------- 类型定义 ----------
 interface SavingsSummary {

@@ -4,7 +4,7 @@ import { ArrowLeft, Edit, Trash2, Plus, Copy, Key, Users, AlertTriangle, Check, 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 const ROUTING_LABELS: Record<string, string> = { cost_saver: '成本优先', balanced: '平衡模式', quality: '质量优先' };
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {

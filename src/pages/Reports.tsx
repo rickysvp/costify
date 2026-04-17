@@ -26,7 +26,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const API_BASE = 'http://localhost:3001/api';
+import { API_BASE } from '../config';
 
 // 生成虚拟报告数据
 const generateMockReports = (): Report[] => {
