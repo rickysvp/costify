@@ -14,25 +14,25 @@ const supabaseKey = process.env.SUPABASE_KEY || 'your-anon-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const DEMO_USERS = [
-  { id: 1, email: 'admin@anytokn.io', password: 'admin123', name: '管理员', role: 'org_admin', org_id: 1 },
+  { id: 1, email: 'admin@anytokn.io', password: 'admin123', name: 'System Admin', role: 'org_admin', org_id: 1 },
   { id: 2, email: 'alice@anytokn.io', password: 'member123', name: 'Alice', role: 'member', org_id: 1 }
 ];
 
 let DEMO_PROJECTS = [
   {
-    id: 1, name: '产品开发', description: '核心产品功能开发', monthly_budget: 20000,
+    id: 1, name: 'Production App', description: 'Core product features and API', monthly_budget: 20000,
     routing_profile: 'balanced', max_tokens_per_request: 4096, default_model: 'gpt-4o-mini',
     models: 'gpt-4o-mini,gpt-4o,claude-3-sonnet', status: 'active', org_id: 1,
     month_spend: 520.30, month_savings: 120.50, budget_percentage: 26, key_count: 2, member_count: 2
   },
   {
-    id: 2, name: '市场营销', description: '市场推广活动', monthly_budget: 15000,
+    id: 2, name: 'Marketing Web', description: 'Marketing and landing page analytics', monthly_budget: 15000,
     routing_profile: 'cost_saver', max_tokens_per_request: 2048, default_model: 'gpt-4o-mini',
     models: 'gpt-4o-mini,deepseek-chat', status: 'active', org_id: 1,
     month_spend: 380.20, month_savings: 85.30, budget_percentage: 25, key_count: 1, member_count: 1
   },
   {
-    id: 3, name: '客户支持', description: '客服自动化系统', monthly_budget: 10000,
+    id: 3, name: 'Customer Support', description: 'Customer support automation bot', monthly_budget: 10000,
     routing_profile: 'quality', max_tokens_per_request: 8192, default_model: 'gpt-4o',
     models: 'gpt-4o,claude-3-opus', status: 'active', org_id: 1,
     month_spend: 250.00, month_savings: 45.20, budget_percentage: 25, key_count: 1, member_count: 2
@@ -42,14 +42,14 @@ let DEMO_PROJECTS = [
 let DEMO_API_KEYS = [
   {
     id: 1, name: 'Production Key', key_prefix: 'ak_prod_xxxx', status: 'active',
-    project_id: 1, type: 'project', project: '产品开发', user_id: null, owner: null,
+    project_id: 1, type: 'project', project: 'Production App', user_id: null, owner: null,
     monthly_budget: 5000, monthly_spend: 680.50, total_cost: 680.50, total_tokens: 8200,
     total_requests: 450, request_count: 450, budget_usage: 13.6, last_used: new Date(Date.now() - 2 * 3600000).toISOString(),
     created_at: new Date(Date.now() - 30 * 86400000).toISOString()
   },
   {
     id: 2, name: 'Test Key', key_prefix: 'ak_test_xxxx', status: 'active',
-    project_id: 2, type: 'project', project: '市场营销', user_id: null, owner: null,
+    project_id: 2, type: 'project', project: 'Marketing Web', user_id: null, owner: null,
     monthly_budget: 2000, monthly_spend: 320.00, total_cost: 320.00, total_tokens: 4100,
     total_requests: 280, request_count: 280, budget_usage: 16.0, last_used: new Date(Date.now() - 5 * 3600000).toISOString(),
     created_at: new Date(Date.now() - 15 * 86400000).toISOString()

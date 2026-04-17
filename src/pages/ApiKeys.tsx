@@ -190,11 +190,11 @@ export default function ApiKeys() {
     setError(null);
     try {
       const res = await fetch(`${API_BASE}/api-keys`, { headers: getAuthHeaders() });
-      if (!res.ok) throw new Error('获取 API Key 列表失败');
+      if (!res.ok) throw new Error(t.apiKeys.fetchError);
       const data = await res.json();
       setApiKeys(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取 API Key 列表失败');
+      setError(err instanceof Error ? err.message : t.apiKeys.fetchError);
     } finally {
       setIsLoading(false);
     }
@@ -233,11 +233,11 @@ export default function ApiKeys() {
       const res = await fetch(`${API_BASE}/api-keys/${keyId}/analytics?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
-      if (!res.ok) throw new Error('获取分析数据失败');
+      if (!res.ok) throw new Error(t.apiKeys.analyticsError);
       const data = await res.json();
       setAnalyticsData(data);
     } catch (err) {
-      showToast('获取分析数据失败', 'error');
+      showToast(t.apiKeys.analyticsError, 'error');
     } finally {
       setIsLoadingAnalytics(false);
     }
@@ -271,14 +271,14 @@ export default function ApiKeys() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || '创建 API Key 失败');
+        throw new Error(errData.error || t.apiKeys.createError);
       }
       const data = await res.json();
       setNewKeyDisplay(data.key ?? null);
-      showToast('API Key 创建成功');
+      showToast(t.apiKeys.createSuccess);
       fetchApiKeys();
     } catch (err) {
-      setCreateError(err instanceof Error ? err.message : '创建 API Key 失败');
+      setCreateError(err instanceof Error ? err.message : t.apiKeys.createError);
     } finally {
       setIsCreating(false);
     }
@@ -297,14 +297,14 @@ export default function ApiKeys() {
           settings,
         }),
       });
-      if (!res.ok) throw new Error('批量操作失败');
+      if (!res.ok) throw new Error(t.apiKeys.batchError);
       const data = await res.json();
-      showToast(`批量操作完成：${data.results.success.length} 成功`);
+      showToast((t.apiKeys.batchSuccess).replace('{count}', data.results.success.length.toString()));
       setSelectedKeys(new Set());
       setShowBatchActions(false);
       fetchApiKeys();
     } catch (err) {
-      showToast('批量操作失败', 'error');
+      showToast(t.apiKeys.batchError, 'error');
     }
   };
 
@@ -336,18 +336,18 @@ export default function ApiKeys() {
         headers: getAuthHeaders(),
       });
       
-      if (!res.ok) throw new Error('操作失败');
+      if (!res.ok) throw new Error(t.apiKeys.actionError);
       const data = await res.json();
       
       if (action === 'reset') {
         setResetKeyResult(data.key);
-        showToast('API Key 已重置');
+        showToast(t.apiKeys.resetSuccess);
       } else {
-        showToast(action === 'pause' ? '已暂停' : action === 'activate' ? '已启用' : '已吊销');
+        showToast(action === 'pause' ? (t.apiKeys.pausedSuccess) : action === 'activate' ? (t.apiKeys.activatedSuccess) : (t.apiKeys.revokedSuccess));
       }
       fetchApiKeys();
     } catch (err) {
-      showToast('操作失败', 'error');
+      showToast(t.apiKeys.actionError, 'error');
     }
   };
 
@@ -359,12 +359,12 @@ export default function ApiKeys() {
         headers: getAuthHeaders(),
         body: JSON.stringify({ monthly_budget: parseFloat(budgetValue) || null }),
       });
-      if (!res.ok) throw new Error('更新预算失败');
-      showToast('预算更新成功');
+      if (!res.ok) throw new Error(t.apiKeys.updateBudgetError);
+      showToast(t.apiKeys.updateBudgetSuccess);
       setEditBudgetKey(null);
       fetchApiKeys();
     } catch (err) {
-      showToast('更新预算失败', 'error');
+      showToast(t.apiKeys.updateBudgetError, 'error');
     }
   };
 
@@ -399,9 +399,9 @@ export default function ApiKeys() {
         setCopiedResetKey(true);
         setTimeout(() => setCopiedResetKey(false), 2000);
       }
-      showToast('已复制到剪贴板');
+      showToast(t.apiKeys.copySuccess);
     } catch {
-      showToast('复制失败', 'error');
+      showToast(t.apiKeys.copyError, 'error');
     }
   };
 
@@ -442,9 +442,9 @@ export default function ApiKeys() {
   };
 
   const formatDate = (dateStr: string) => {
-    if (!dateStr) return '从未使用';
+    if (!dateStr) return t.apiKeys.neverUsed;
     try {
-      return new Date(dateStr).toLocaleDateString('zh-CN', {
+      return new Date(dateStr).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -459,11 +459,11 @@ export default function ApiKeys() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1"></span>活跃</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1"></span>{t.common.active}</span>;
       case 'paused':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"><span className="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1"></span>已暂停</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"><span className="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1"></span>{t.common.paused}</span>;
       case 'revoked':
-        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-700"><span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>已吊销</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-700"><span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-1"></span>{t.common.revoked}</span>;
       default:
         return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-surface-100 text-surface-600">{status}</span>;
     }
@@ -699,13 +699,13 @@ export default function ApiKeys() {
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">API Key</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">项目/归属</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">花费</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">请求数</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">预算使用</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">状态</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">最后使用</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-surface-600">操作</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">{t.apiKeys.projectOwner}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">{t.apiKeys.spend}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">{t.apiKeys.requests}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-surface-600">{t.apiKeys.budgetUsage}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">{t.common.status}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-surface-600">{t.apiKeys.lastUsed}</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-surface-600">{t.common.action}</th>
               </tr>
             </thead>
             <tbody>
@@ -746,7 +746,7 @@ export default function ApiKeys() {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-xs text-surface-400">未设置</span>
+                      <span className="text-xs text-surface-400">{t.apiKeys.notSet}</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -757,26 +757,26 @@ export default function ApiKeys() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-1">
-                      <button onClick={() => openAnalytics(key)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="查看统计">
+                      <button onClick={() => openAnalytics(key)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title={t.apiKeys.viewStats}>
                         <BarChart3 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => { setEditBudgetKey(key); setBudgetValue(key.monthly_budget?.toString() || ''); }} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="设置预算">
+                      <button onClick={() => { setEditBudgetKey(key); setBudgetValue(key.monthly_budget?.toString() || ''); }} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title={t.apiKeys.setBudget || '设置预算'}>
                         <DollarSign className="w-4 h-4" />
                       </button>
                       {key.status === 'active' ? (
-                        <button onClick={() => handleSingleAction(key.id, 'pause')} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="暂停">
+                        <button onClick={() => handleSingleAction(key.id, 'pause')} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title={t.apiKeys.pause || '暂停'}>
                           <Pause className="w-4 h-4" />
                         </button>
                       ) : key.status === 'paused' ? (
-                        <button onClick={() => handleSingleAction(key.id, 'activate')} className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600" title="启用">
+                        <button onClick={() => handleSingleAction(key.id, 'activate')} className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600" title={t.apiKeys.activate || '启用'}>
                           <Play className="w-4 h-4" />
                         </button>
                       ) : null}
-                      <button onClick={() => setResetKeyModal(key)} className="p-1.5 rounded-lg hover:bg-violet-50 text-violet-600" title="重置">
+                      <button onClick={() => setResetKeyModal(key)} className="p-1.5 rounded-lg hover:bg-violet-50 text-violet-600" title={t.apiKeys.reset || '重置'}>
                         <RotateCcw className="w-4 h-4" />
                       </button>
                       {key.status !== 'revoked' && (
-                        <button onClick={() => handleSingleAction(key.id, 'revoke')} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title="吊销">
+                        <button onClick={() => handleSingleAction(key.id, 'revoke')} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title={t.apiKeys.revoke || '吊销'}>
                           <Trash2 className="w-4 h-4" />
                         </button>
                       )}
@@ -794,7 +794,7 @@ export default function ApiKeys() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white">
-              <h2 className="text-lg font-semibold">创建 API Key</h2>
+              <h2 className="text-lg font-semibold">{t.apiKeys.createKeyModalTitle || '创建 API Key'}</h2>
               <button onClick={closeCreateModal}><X className="w-5 h-5 text-surface-400" /></button>
             </div>
             
@@ -802,8 +802,8 @@ export default function ApiKeys() {
               <div className="p-6 space-y-4">
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center">
                   <Check className="w-12 h-12 mx-auto text-emerald-500 mb-2" />
-                  <h3 className="text-lg font-semibold text-emerald-800 mb-1">创建成功</h3>
-                  <p className="text-sm text-emerald-600 mb-4">请立即复制您的 API Key，此密钥仅显示一次</p>
+                  <h3 className="text-lg font-semibold text-emerald-800 mb-1">{t.apiKeys.createSuccessTitle}</h3>
+                  <p className="text-sm text-emerald-600 mb-4">{t.apiKeys.createSuccessDesc}</p>
                 </div>
                 <div className="bg-surface-100 rounded-lg p-3 flex items-center justify-between">
                   <code className="text-sm font-mono text-surface-700 break-all">{newKeyDisplay}</code>
@@ -811,75 +811,75 @@ export default function ApiKeys() {
                     {copiedNewKey ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-                <button onClick={closeCreateModal} className="w-full btn-primary">完成</button>
+                <button onClick={closeCreateModal} className="w-full btn-primary">{t.apiKeys.complete}</button>
               </div>
             ) : (
               <form onSubmit={handleCreateKey} className="p-6 space-y-4">
                 {createError && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">{createError}</div>}
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">名称 *</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.keyNameLabel}</label>
                   <input
                     type="text"
                     required
                     className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                    placeholder="例如：生产环境 Key"
+                    placeholder={t.apiKeys.keyNamePlaceholder}
                     value={createForm.name}
                     onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">类型</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.keyTypeLabel}</label>
                   <select
                     className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                     value={createForm.type}
                     onChange={(e) => setCreateForm({ ...createForm, type: e.target.value as 'project' | 'user' })}
                   >
-                    <option value="project">项目 Key</option>
-                    <option value="user">个人 Key</option>
+                    <option value="project">{t.apiKeys.projectKey}</option>
+                    <option value="user">{t.apiKeys.userKey}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">项目 *</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.projectLabel}</label>
                   <select
                     required
                     className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                     value={createForm.project_id || ''}
                     onChange={(e) => setCreateForm({ ...createForm, project_id: parseInt(e.target.value) })}
                   >
-                    <option value="">选择项目</option>
+                    <option value="">{t.apiKeys.selectProject}</option>
                     {projects.map((p) => (<option key={p.id} value={p.id}>{p.name}</option>))}
                   </select>
                 </div>
                 {createForm.type === 'user' && (
                   <div>
-                    <label className="block text-sm font-medium text-surface-700 mb-1">归属成员</label>
+                    <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.ownerLabel}</label>
                     <select
                       className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       value={createForm.user_id || ''}
                       onChange={(e) => setCreateForm({ ...createForm, user_id: parseInt(e.target.value) || null })}
                     >
-                      <option value="">选择成员</option>
+                      <option value="">{t.apiKeys.selectMember}</option>
                       {members.map((m) => (<option key={m.id} value={m.id}>{m.name}</option>))}
                     </select>
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">月度预算（可选）</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.budgetLabel}</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                    placeholder="例如：100"
+                    placeholder={t.apiKeys.budgetPlaceholder}
                     value={createForm.monthly_budget || ''}
                     onChange={(e) => setCreateForm({ ...createForm, monthly_budget: parseFloat(e.target.value) || undefined })}
                   />
-                  <p className="text-xs text-surface-400 mt-1">达到预算上限后将自动暂停该 Key</p>
+                  <p className="text-xs text-surface-400 mt-1">{t.apiKeys.budgetHint}</p>
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
-                  <button type="button" onClick={closeCreateModal} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">取消</button>
+                  <button type="button" onClick={closeCreateModal} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
                   <button type="submit" disabled={isCreating} className="btn-primary disabled:opacity-50">
-                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : '创建'}
+                    {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : t.common.create}
                   </button>
                 </div>
               </form>
@@ -892,10 +892,10 @@ export default function ApiKeys() {
       {editBudgetKey && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-sm shadow-xl p-6">
-            <h2 className="text-lg font-semibold mb-4">设置月度预算</h2>
+            <h2 className="text-lg font-semibold mb-4">{t.apiKeys.setBudgetTitle}</h2>
             <p className="text-sm text-surface-600 mb-4">{editBudgetKey.name}</p>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-surface-700 mb-1">预算金额（USD）</label>
+              <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.budgetAmount}</label>
               <input
                 type="number"
                 step="0.01"
@@ -905,11 +905,11 @@ export default function ApiKeys() {
                 value={budgetValue}
                 onChange={(e) => setBudgetValue(e.target.value)}
               />
-              <p className="text-xs text-surface-400 mt-1">留空表示不限制</p>
+              <p className="text-xs text-surface-400 mt-1">{t.apiKeys.noLimitHint}</p>
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setEditBudgetKey(null)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">取消</button>
-              <button onClick={handleUpdateBudget} className="btn-primary">保存</button>
+              <button onClick={() => setEditBudgetKey(null)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
+              <button onClick={handleUpdateBudget} className="btn-primary">{t.common.save}</button>
             </div>
           </div>
         </div>
@@ -921,24 +921,24 @@ export default function ApiKeys() {
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl p-6">
             {!resetKeyResult ? (
               <>
-                <h2 className="text-lg font-semibold mb-2">重置 API Key</h2>
+                <h2 className="text-lg font-semibold mb-2">{t.apiKeys.resetKeyTitle}</h2>
                 <p className="text-sm text-surface-600 mb-4">{resetKeyModal.name}</p>
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm text-amber-800 font-medium">警告</p>
-                      <p className="text-sm text-amber-700">重置后旧 Key 将立即失效，所有使用旧 Key 的请求都会失败。请确保您已准备好更新相关配置。</p>
+                      <p className="text-sm text-amber-800 font-medium">{t.common.warning}</p>
+                      <p className="text-sm text-amber-700">{t.apiKeys.resetWarningDesc}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex justify-end gap-3">
-                  <button onClick={() => setResetKeyModal(null)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">取消</button>
+                  <button onClick={() => setResetKeyModal(null)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
                   <button 
                     onClick={() => handleSingleAction(resetKeyModal.id, 'reset')} 
                     className="btn-primary bg-red-600 hover:bg-red-700"
                   >
-                    确认重置
+                    {t.apiKeys.confirmReset}
                   </button>
                 </div>
               </>
@@ -946,8 +946,8 @@ export default function ApiKeys() {
               <>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-center mb-4">
                   <Check className="w-12 h-12 mx-auto text-emerald-500 mb-2" />
-                  <h3 className="text-lg font-semibold text-emerald-800 mb-1">重置成功</h3>
-                  <p className="text-sm text-emerald-600">请立即复制新的 API Key</p>
+                  <h3 className="text-lg font-semibold text-emerald-800 mb-1">{t.apiKeys.resetSuccessTitle}</h3>
+                  <p className="text-sm text-emerald-600">{t.apiKeys.resetSuccessDesc}</p>
                 </div>
                 <div className="bg-surface-100 rounded-lg p-3 flex items-center justify-between mb-4">
                   <code className="text-sm font-mono text-surface-700 break-all">{resetKeyResult}</code>
@@ -955,7 +955,7 @@ export default function ApiKeys() {
                     {copiedResetKey ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-                <button onClick={closeResetModal} className="w-full btn-primary">完成</button>
+                <button onClick={closeResetModal} className="w-full btn-primary">{t.apiKeys.complete}</button>
               </>
             )}
           </div>
@@ -968,8 +968,8 @@ export default function ApiKeys() {
           <div className="bg-white rounded-xl w-full max-w-5xl shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b sticky top-0 bg-white">
               <div>
-                <h2 className="text-lg font-semibold">{analyticsKey.name} - 使用统计</h2>
-                <p className="text-sm text-surface-500">详细的使用分析和成本统计</p>
+                <h2 className="text-lg font-semibold">{analyticsKey.name} - {t.apiKeys.usageStats}</h2>
+                <p className="text-sm text-surface-500">{t.apiKeys.usageStatsDesc}</p>
               </div>
               <button onClick={() => setAnalyticsKey(null)}><X className="w-5 h-5 text-surface-400" /></button>
             </div>
@@ -985,7 +985,7 @@ export default function ApiKeys() {
                     value={dateRange.start}
                     onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                   />
-                  <span className="text-surface-400">至</span>
+                  <span className="text-surface-400">{t.apiKeys.to}</span>
                   <input
                     type="date"
                     className="border border-surface-200 rounded-lg px-3 py-1.5 text-sm"
@@ -998,13 +998,13 @@ export default function ApiKeys() {
                   value={groupBy}
                   onChange={(e) => setGroupBy(e.target.value as any)}
                 >
-                  <option value="day">按天</option>
-                  <option value="week">按周</option>
-                  <option value="month">按月</option>
+                  <option value="day">{t.apiKeys.byDay}</option>
+                  <option value="week">{t.apiKeys.byWeek}</option>
+                  <option value="month">{t.apiKeys.byMonth}</option>
                 </select>
                 <button onClick={() => fetchAnalytics(analyticsKey.id)} className="btn-secondary text-xs flex items-center gap-1">
                   <RefreshCw className="w-3.5 h-3.5" />
-                  刷新
+                  {t.dashboard.refresh}
                 </button>
               </div>
 
@@ -1019,17 +1019,17 @@ export default function ApiKeys() {
                     <div className="card p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <DollarSign className="w-4 h-4 text-blue-600" />
-                        <span className="text-xs text-surface-500">总花费</span>
+                        <span className="text-xs text-surface-500">{t.apiKeys.totalCost}</span>
                       </div>
                       <p className="text-xl font-bold">{formatCurrency(analyticsData.summary.total_cost)}</p>
                       {analyticsData.summary.total_savings > 0 && (
-                        <p className="text-xs text-emerald-600 mt-1">节省 {formatCurrency(analyticsData.summary.total_savings)}</p>
+                        <p className="text-xs text-emerald-600 mt-1">{(t.apiKeys.savedAmount) + formatCurrency(analyticsData.summary.total_savings)}</p>
                       )}
                     </div>
                     <div className="card p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Activity className="w-4 h-4 text-violet-600" />
-                        <span className="text-xs text-surface-500">请求数</span>
+                        <span className="text-xs text-surface-500">{t.dashboard.requestCount}</span>
                       </div>
                       <p className="text-xl font-bold">{formatNumber(analyticsData.summary.request_count)}</p>
                       <p className="text-xs text-surface-400 mt-1">{formatNumber(analyticsData.summary.total_tokens)} tokens</p>
@@ -1037,14 +1037,14 @@ export default function ApiKeys() {
                     <div className="card p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <TrendingUp className="w-4 h-4 text-emerald-600" />
-                        <span className="text-xs text-surface-500">平均延迟</span>
+                        <span className="text-xs text-surface-500">{t.apiKeys.avgLatency}</span>
                       </div>
                       <p className="text-xl font-bold">{(analyticsData.summary.avg_latency / 1000).toFixed(2)}s</p>
                     </div>
                     <div className="card p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Zap className="w-4 h-4 text-amber-600" />
-                        <span className="text-xs text-surface-500">缓存命中率</span>
+                        <span className="text-xs text-surface-500">{t.dashboard.cacheHitRate}</span>
                       </div>
                       <p className="text-xl font-bold">{analyticsData.summary.cache_hit_rate.toFixed(1)}%</p>
                     </div>
@@ -1053,7 +1053,7 @@ export default function ApiKeys() {
                   {/* Trend Chart Placeholder */}
                   {analyticsData.trend && analyticsData.trend.length > 0 && (
                     <div className="card p-4">
-                      <h3 className="text-sm font-semibold mb-4">使用趋势</h3>
+                      <h3 className="text-sm font-semibold mb-4">{t.apiKeys.usageTrend}</h3>
                       <div className="h-48 flex items-end gap-1">
                         {analyticsData.trend.slice(-30).map((item, idx) => {
                           const maxCost = Math.max(...analyticsData.trend.map((t: any) => t.cost)) || 1;
@@ -1078,7 +1078,7 @@ export default function ApiKeys() {
                   {/* Model Distribution */}
                   {analyticsData.by_model && analyticsData.by_model.length > 0 && (
                     <div className="card p-4">
-                      <h3 className="text-sm font-semibold mb-4">模型使用分布</h3>
+                      <h3 className="text-sm font-semibold mb-4">{t.apiKeys.modelDistribution}</h3>
                       <div className="space-y-3">
                         {analyticsData.by_model.map((model) => (
                           <div key={model.model} className="flex items-center justify-between">
@@ -1095,8 +1095,8 @@ export default function ApiKeys() {
                               </div>
                             </div>
                             <div className="ml-4 text-right min-w-[80px]">
-                              <p className="text-xs text-surface-500">{formatNumber(model.requests)} 请求</p>
-                              <p className="text-xs text-surface-400">{(model.avg_latency / 1000).toFixed(2)}s 平均</p>
+                              <p className="text-xs text-surface-500">{formatNumber(model.requests)} {t.apiKeys.requestsUnit}</p>
+                              <p className="text-xs text-surface-400">{(model.avg_latency / 1000).toFixed(2)}s {t.apiKeys.avgUnit}</p>
                             </div>
                           </div>
                         ))}
@@ -1107,17 +1107,17 @@ export default function ApiKeys() {
                   {/* Recent Usage */}
                   {analyticsData.recent_usage && analyticsData.recent_usage.length > 0 && (
                     <div className="card p-4">
-                      <h3 className="text-sm font-semibold mb-4">最近使用记录</h3>
+                      <h3 className="text-sm font-semibold mb-4">{t.apiKeys.recentUsage}</h3>
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead className="text-xs text-surface-500 border-b">
                             <tr>
-                              <th className="text-left py-2">时间</th>
-                              <th className="text-left py-2">项目</th>
-                              <th className="text-left py-2">模型</th>
-                              <th className="text-right py-2">Token</th>
-                              <th className="text-right py-2">花费</th>
-                              <th className="text-right py-2">延迟</th>
+                              <th className="text-left py-2">{t.apiKeys.time}</th>
+                              <th className="text-left py-2">{t.apiKeys.project}</th>
+                              <th className="text-left py-2">{t.apiKeys.model}</th>
+                              <th className="text-right py-2">{t.apiKeys.token}</th>
+                              <th className="text-right py-2">{t.apiKeys.spend}</th>
+                              <th className="text-right py-2">{t.apiKeys.latency}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1142,13 +1142,13 @@ export default function ApiKeys() {
                     <div className="card p-4 bg-red-50 border-red-100">
                       <h3 className="text-sm font-semibold text-red-800 mb-4 flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4" />
-                        异常检测 ({analyticsData.anomalies.length})
+                        {t.apiKeys.anomalyDetection} ({analyticsData.anomalies.length})
                       </h3>
                       <div className="space-y-2">
                         {analyticsData.anomalies.slice(0, 5).map((anomaly) => (
                           <div key={anomaly.id} className="flex items-center justify-between text-sm">
                             <div>
-                              <span className="text-red-700">{anomaly.reason === 'high_latency' ? '高延迟' : '高成本'}</span>
+                              <span className="text-red-700">{anomaly.reason === 'high_latency' ? (t.apiKeys.highLatency) : (t.apiKeys.highCost)}</span>
                               <span className="text-surface-500 ml-2">{anomaly.model}</span>
                             </div>
                             <div className="text-right">
@@ -1164,7 +1164,7 @@ export default function ApiKeys() {
               ) : (
                 <div className="text-center py-12 text-surface-400">
                   <BarChart3 className="w-12 h-12 mx-auto mb-4" />
-                  <p>暂无数据</p>
+                  <p>{t.dashboard.noData}</p>
                 </div>
               )}
             </div>

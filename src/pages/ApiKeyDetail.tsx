@@ -137,7 +137,7 @@ export default function ApiKeyDetail() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || '获取数据失败');
+        throw new Error(errData.error || t.apiKeys.fetchDetailError);
       }
       const json = await res.json();
       setData(json);
@@ -227,7 +227,7 @@ export default function ApiKeyDetail() {
         <div className="flex items-center gap-3">
           {useMockData && (
             <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">
-              {lang === 'zh' ? '演示数据' : 'Demo Data'}
+              {t.apiKeys.demoData}
             </span>
           )}
           <button
