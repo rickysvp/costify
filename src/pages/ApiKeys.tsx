@@ -444,7 +444,7 @@ export default function ApiKeys() {
   const formatDate = (dateStr: string) => {
     if (!dateStr) return t.apiKeys.neverUsed;
     try {
-      return new Date(dateStr).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', {
+      return new Date(dateStr).toLocaleDateString(t.common.locale === 'zh-CN' ? 'zh-CN' : 'en-US', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',

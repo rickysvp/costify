@@ -271,6 +271,7 @@ export const translations = {
       add: '添加',
       optional: '可选',
       locale: 'zh-CN',
+      copy: '复制',
     },
     // Projects Page
     projects: {
@@ -304,6 +305,7 @@ export const translations = {
       memberCount: '成员数',
       budgetUsage: '预算使用率',
       budgetNormal: '正常',
+      budgetWarning: '预警',
       budgetNear: '接近预算',
       budgetOver: '超出预算',
       budgetNotSet: '未设置预算',
@@ -325,7 +327,6 @@ export const translations = {
       projectLabel: '项目',
       copyAndGoDetail: '复制并跳转详情',
       projectNotFound: '项目不存在',
-      updateSuccess: '项目已更新',
       noDescription: '暂无描述',
       maxTokensPerRequest: 'Max Tokens / 请求',
       totalTokens: '总 Token',
@@ -450,7 +451,6 @@ export const translations = {
       budgetUpdated: '预算已更新',
       memberAdded: '成员已添加',
       memberRemoved: '成员已移除',
-      viewStats: '查看统计',
       dailyTrend: '每日使用趋势',
       modelUsageDist: '模型使用分布',
       unnamed: '未命名',
@@ -458,6 +458,8 @@ export const translations = {
       newKeyInvalidated: '新的 API Key（旧 Key 已失效）',
       keyNoticeReset: '重置后旧 Key 将立即失效，所有使用旧 Key 的调用都会失败。请确保已更新您的应用配置。',
       pauseNotice: '暂停后，该 Key 将无法用于 API 调用，但可以随时重新启用。确定要暂停吗？',
+      revokeNotice: '吊销后，该 Key 将永久失效，无法恢复。所有使用该 Key 的调用都会失败。确定要吊销吗？',
+      keyNotice: '请立即复制，关闭后无法再次查看',
     },
     // Members Page
     members: {
@@ -472,6 +474,7 @@ export const translations = {
       removeMember: '移除成员',
       changeRole: '更改角色',
       noMembers: '暂无成员',
+      chooseMember: '选择成员',
     },
     // Settings Page
     settings: {
@@ -1183,6 +1186,7 @@ export const translations = {
       add: 'Add',
       optional: 'Optional',
       locale: 'en-US',
+      copy: 'Copy',
     },
     // Projects Page
     projects: {
@@ -1216,6 +1220,7 @@ export const translations = {
       memberCount: 'Members',
       budgetUsage: 'Budget Usage',
       budgetNormal: 'Normal',
+      budgetWarning: 'Warning',
       budgetNear: 'Near Budget',
       budgetOver: 'Over Budget',
       budgetNotSet: 'Budget Not Set',
@@ -1237,7 +1242,6 @@ export const translations = {
       projectLabel: 'Project',
       copyAndGoDetail: 'Copy and View Details',
       projectNotFound: 'Project not found',
-      updateSuccess: 'Project updated',
       noDescription: 'No description',
       maxTokensPerRequest: 'Max Tokens / Request',
       totalTokens: 'Total Tokens',
@@ -1362,7 +1366,6 @@ export const translations = {
       budgetUpdated: 'Budget updated',
       memberAdded: 'Member added',
       memberRemoved: 'Member removed',
-      viewStats: 'View Stats',
       dailyTrend: 'Daily usage trend',
       modelUsageDist: 'Model usage distribution',
       unnamed: 'Unnamed',
@@ -1370,6 +1373,8 @@ export const translations = {
       newKeyInvalidated: 'New API Key (Old Key invalidated)',
       keyNoticeReset: 'After reset, the old Key will be invalidated immediately. All calls using the old Key will fail. Ensure you have updated your application settings.',
       pauseNotice: 'After pausing, this Key cannot be used for API calls but can be reactivated at any time. Are you sure you want to pause?',
+      revokeNotice: 'After revocation, this Key will be permanently invalidated and cannot be recovered. All calls using this Key will fail. Are you sure you want to revoke?',
+      keyNotice: 'Please copy immediately; it cannot be viewed again after closing.',
     },
     // Members Page
     members: {
@@ -1384,6 +1389,7 @@ export const translations = {
       removeMember: 'Remove Member',
       changeRole: 'Change Role',
       noMembers: 'No Members',
+      chooseMember: 'Choose Member',
     },
     // Settings Page
     settings: {

@@ -312,7 +312,7 @@ export default function Billing() {
                             <span
                               className={`badge text-[10px] ${statusInfo.className}`}
                             >
-                              {t.billing?.[statusInfo.label.split('.')[0]]?.[statusInfo.label.split('.')[1]] || statusInfo.label}
+                              {(t.billing as any)?.[statusInfo.label.split('.')[0]]?.[statusInfo.label.split('.')[1]] || statusInfo.label}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-sm text-surface-500 font-mono">
@@ -427,7 +427,7 @@ export default function Billing() {
                           </div>
                         )}
                         <span className="text-sm font-medium text-surface-800 flex-1">
-                          {t.billing?.[method.label.split('.')[0]]?.[method.label.split('.')[1]] || method.label}
+                          {(t.billing as any)?.[method.label.split('.')[0]]?.[method.label.split('.')[1]] || method.label}
                         </span>
                         {rechargeMethod === method.key && (
                           <CheckCircle className="w-5 h-5 text-brand-600" />

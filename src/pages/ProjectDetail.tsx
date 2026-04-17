@@ -13,6 +13,15 @@ const ROUTING_LABELS = (t: any): Record<string, string> => ({
   quality: t.projects.quality
 });
 
+const AVAILABLE_MODELS = (t: any) => [
+  { id: 'gpt-4o', name: 'GPT-4o', description: t.apiMarket?.models?.['gpt-4o']?.description || 'Most powerful multimodal model', price: '$5/1M input' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: t.apiMarket?.models?.['gpt-4o-mini']?.description || 'Fast and affordable', price: '$0.15/1M input' },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: t.apiMarket?.models?.['gpt-3.5-turbo']?.description || 'Reliable general model', price: '$1/1M input' },
+  { id: 'claude-3-opus', name: 'Claude 3 Opus', description: t.apiMarket?.models?.['claude-3-opus']?.description || 'Top reasoning ability', price: '$15/1M input' },
+  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: t.apiMarket?.models?.['claude-3.5-sonnet']?.description || 'Balanced performance', price: '$3/1M input' },
+  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: t.apiMarket?.models?.['claude-3-haiku']?.description || 'Ultra fast response', price: '$0.25/1M input' },
+];
+
 const STATUS_LABELS = (t: any): Record<string, { label: string; color: string }> => ({
   active: { label: t.apiKeys.active || t.common.active, color: 'bg-emerald-100 text-emerald-700' },
   paused: { label: t.apiKeys.paused || t.common.paused, color: 'bg-amber-100 text-amber-700' },
@@ -518,11 +527,11 @@ export default function ProjectDetail() {
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-sm shadow-xl p-5">
-            <div className="flex items-center gap-3 mb-3"><div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><AlertTriangle className="w-5 h-5 text-red-600" /></div><div><h3 className="text-base font-semibold">{t.common.deleteConfirm}</h3><p className="text-xs text-surface-500">{t.projects.deleteConfirmMessagePre}</p></div></div>
+            <div className="flex items-center gap-3 mb-3"><div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"><AlertTriangle className="w-5 h-5 text-red-600" /></div><div><h3 className="text-base font-semibold">{t.common.confirm}</h3><p className="text-xs text-surface-500">{t.projects.deleteConfirmMessagePre}</p></div></div>
             <p className="text-sm text-surface-600 mb-4">{t.projects.deleteConfirmMessagePre} "{project.name}" {t.projects.deleteConfirmMessagePost}</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setDeleteConfirm(false)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
-              <button onClick={handleDelete} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.common.confirmDelete}</button>
+              <button onClick={handleDelete} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.common.confirm}</button>
             </div>
           </div>
         </div>
@@ -539,7 +548,7 @@ export default function ProjectDetail() {
                   <button onClick={() => copyToClipboard(newKeyModal.key)} className="p-1.5 rounded hover:bg-red-100">{copiedKey === newKeyModal.key ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-red-500" />}</button>
                 </div>
               </div>
-              <button onClick={() => { copyToClipboard(newKeyModal.key); setNewKeyModal({ open: false, key: '' }); }} className="w-full py-2 bg-brand-600 text-white rounded-lg text-sm hover:bg-brand-700">{t.common.copyAndClose || 'Copy & Close'}</button>
+              <button onClick={() => { copyToClipboard(newKeyModal.key); setNewKeyModal({ open: false, key: '' }); }} className="w-full py-2 bg-brand-600 text-white rounded-lg text-sm hover:bg-brand-700">{t.common.copy || 'Copy'} & {t.common.close}</button>
             </div>
           </div>
         </div>
@@ -711,7 +720,7 @@ export default function ProjectDetail() {
             <p className="text-sm text-surface-600 mb-4">{t.apiKeys.revokeNotice}</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setRevokeConfirm({ open: false, keyId: 0, keyName: '' })} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
-              <button onClick={handleRevokeKey} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.common.confirmDelete}</button>
+              <button onClick={handleRevokeKey} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.common.confirm}</button>
             </div>
           </div>
         </div>

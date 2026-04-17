@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PieChart as PieChartIcon,
-  BarChart as BarChartIcon,
   TrendingUp,
   AlertTriangle,
   RefreshCw,
@@ -26,7 +25,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell,
 } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
 import { API_BASE } from '../config';
@@ -139,11 +137,11 @@ export default function BudgetManagement() {
       case 'normal':
         return t.projects.budgetNormal;
       case 'warning':
-        return t.dashboard.warning;
+        return t.projects.budgetWarning || t.projects.budgetNormal;
       case 'exceeded':
         return t.projects.budgetOver;
       default:
-        return t.common.unknown;
+        return t.projects.budgetNormal;
     }
   };
 
