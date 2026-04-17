@@ -268,6 +268,9 @@ export const translations = {
       active: '活跃',
       paused: '已暂停',
       revoked: '已撤销',
+      add: '添加',
+      optional: '可选',
+      locale: 'zh-CN',
     },
     // Projects Page
     projects: {
@@ -332,6 +335,7 @@ export const translations = {
       adminRole: '管理员',
       memberRole: '成员',
       disabled: '已禁用',
+      keyNotice: '请立即复制，关闭后无法再次查看',
     },
     // ApiKeys Page
     apiKeys: {
@@ -904,6 +908,8 @@ export const translations = {
       balancedDetail: '根据任务复杂度智能选择模型：中等复杂度任务使用中端模型（如 Claude 3.5 Sonnet），简单任务降级，复杂任务升级。适合大多数通用场景。',
       qualityDesc: '优先保证输出质量，仅在明显冗余时节省。',
       qualityDetail: '默认使用高端模型（如 GPT-4o、Claude 3.5 Sonnet），仅对完全重复的请求启用缓存。适合对输出质量要求极高的场景，如法律文档生成、医疗咨询。',
+      routingSavings: '路由节省',
+      cacheSavings: '缓存节省',
     },
   },
   en: {
@@ -1174,6 +1180,9 @@ export const translations = {
       active: 'Active',
       paused: 'Paused',
       revoked: 'Revoked',
+      add: 'Add',
+      optional: 'Optional',
+      locale: 'en-US',
     },
     // Projects Page
     projects: {
@@ -1238,6 +1247,7 @@ export const translations = {
       adminRole: 'Admin',
       memberRole: 'Member',
       disabled: 'Disabled',
+      keyNotice: 'Please copy immediately; it cannot be viewed again after closing.',
     },
     // ApiKeys Page
     apiKeys: {
@@ -1810,6 +1820,8 @@ export const translations = {
       balancedDetail: 'Intelligently selects models based on task complexity: mid-range models (like Claude 3.5 Sonnet) for medium complexity, downgrading for simple tasks, upgrading for complex ones.',
       qualityDesc: 'Prioritize output quality, saving only where redundant.',
       qualityDetail: 'Uses high-end models (like GPT-4o, Claude 3.5 Sonnet) by default, enabling caching only for identical requests. Suitable for high-quality requirements like legal/medical docs.',
+      routingSavings: 'Routing Savings',
+      cacheSavings: 'Cache Savings',
     },
   },
 };
