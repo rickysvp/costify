@@ -13,6 +13,16 @@ import {
   Shield,
   Code2,
 } from 'lucide-react';
+import { API_BASE } from '../config';
+
+// Compute a displayable API base URL (absolute path)
+const getDisplayApiBase = () => {
+  if (typeof window === 'undefined') return 'http://localhost:3001/api';
+  if (API_BASE.startsWith('http')) return API_BASE;
+  return window.location.origin + API_BASE;
+};
+
+const DISPLAY_API_BASE = getDisplayApiBase();
 
 // ---------- 代码块组件 ----------
 function CodeBlock({ code, language }: { code: string; language: string }) {
@@ -104,7 +114,7 @@ function KVRow({ label, value, mono }: { label: string; value: string; mono?: bo
 }
 
 // ---------- 代码示例数据 ----------
-const curlExample = `curl http://localhost:3001/api/v1/chat/completions \\
+const curlExample = `curl ${DISPLAY_API_BASE}/v1/chat/completions \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer csk_your_api_key_here" \\
   -d '{
@@ -120,7 +130,7 @@ const curlExample = `curl http://localhost:3001/api/v1/chat/completions \\
 const jsExample = `import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'http://localhost:3001/api/v1',
+  baseURL: '${DISPLAY_API_BASE}/v1',
   apiKey: 'csk_your_api_key_here',
 });
 
@@ -149,7 +159,7 @@ main();`;
 const pythonExample = `from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:3001/api/v1",
+    base_url="${DISPLAY_API_BASE}/v1",
     api_key="csk_your_api_key_here",
 )
 
@@ -340,7 +350,7 @@ export default function Docs() {
       {activeSection === 'auth' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InfoCard icon={Key} title="认证信息">
-            <KVRow label="Base URL" value="http://localhost:3001/api/v1/chat/completions" mono />
+            <KVRow label="Base URL" value={`${DISPLAY_API_BASE}/v1/chat/completions`} mono />
             <KVRow label="认证方式" value="Bearer Token" />
             <KVRow label="Token 前缀" value="csk_" mono />
             <KVRow label="Header 名称" value="Authorization" />
@@ -372,7 +382,7 @@ export default function Docs() {
               <CodeBlock
                 language="bash"
                 code={`# 在请求头中携带 Bearer Token
-curl http://localhost:3001/api/v1/chat/completions \\
+curl ${DISPLAY_API_BASE}/v1/chat/completions \\
   -H "Authorization: Bearer csk_your_api_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{"model": "gpt-4o", "messages": [{"role": "user", "content": "Hi"}]}'`}

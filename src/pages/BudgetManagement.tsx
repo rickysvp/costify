@@ -15,6 +15,8 @@ import {
   ArrowRight,
   Shield,
   Target,
+  Edit3,
+  Wallet,
 } from 'lucide-react';
 import {
   BarChart,
@@ -101,12 +103,12 @@ export default function BudgetManagement() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || '获取数据失败');
+        throw new Error(errData.error || t.dashboard.loadFailed);
       }
       const json = await res.json();
       setData(json);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取数据失败');
+      setError(err instanceof Error ? err.message : t.dashboard.loadFailed);
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +143,7 @@ export default function BudgetManagement() {
       case 'exceeded':
         return t.projects.budgetOver;
       default:
-        return t.apiKeys.unknown || '未知';
+        return t.common.unknown;
     }
   };
 
@@ -178,7 +180,6 @@ export default function BudgetManagement() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-surface-900">{t.layout.budget}</h1>
@@ -190,7 +191,6 @@ export default function BudgetManagement() {
         </button>
       </div>
 
-      {/* 标签页 */}
       <div className="flex gap-2 border-b border-surface-200">
         {[
           { id: 'overview', label: t.budget.overviewTab, icon: PieChartIcon },
@@ -216,10 +216,8 @@ export default function BudgetManagement() {
         })}
       </div>
 
-      {/* 总览标签 */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* 企业预算概览 */}
           <div className="card p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-surface-800">{t.budget.orgBudgetTitle}</h3>
@@ -273,7 +271,6 @@ export default function BudgetManagement() {
             </div>
           </div>
 
-          {/* 节省统计 */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="card p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -306,10 +303,9 @@ export default function BudgetManagement() {
             </div>
           </div>
 
-          {/* 预算历史趋势 */}
           <div className="card">
             <div className="card-header">
-              <h3 className="text-sm font-semibold text-surface-800">预算执行历史</h3>
+              <h3 className="text-sm font-semibold text-surface-800">{t.budget.historyTitle}</h3>
             </div>
             <div className="p-4">
               <div className="h-64">
@@ -339,7 +335,6 @@ export default function BudgetManagement() {
         </div>
       )}
 
-      {/* 项目预算标签 */}
       {activeTab === 'projects' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -416,7 +411,6 @@ export default function BudgetManagement() {
         </div>
       )}
 
-      {/* 预算告警标签 */}
       {activeTab === 'alerts' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -480,7 +474,6 @@ export default function BudgetManagement() {
         </div>
       )}
 
-      {/* 预算设置标签 */}
       {activeTab === 'settings' && (
         <div className="space-y-6">
           <div className="card p-5">
