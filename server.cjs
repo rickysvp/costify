@@ -491,6 +491,16 @@ app.delete('/api/reports/:id', authenticateToken, async (req, res) => {
 
 // ==================== Usage ====================
 
+app.get('/api/usage/summary', authenticateToken, async (req, res) => {
+  res.json({
+    total_cost: 1250.50,
+    total_savings: 320.80,
+    total_tokens: 15420,
+    request_count: 850,
+    cache_hit_rate: 35.5
+  });
+});
+
 app.get('/api/usage', authenticateToken, async (req, res) => {
   res.json({
     total_cost: 1250.50, total_tokens: 15420, total_requests: 850,
@@ -520,6 +530,17 @@ app.get('/api/models', authenticateToken, async (req, res) => {
 });
 
 // ==================== Billing ====================
+
+app.get('/api/org/balance', authenticateToken, async (req, res) => {
+  res.json({ balance: 10000.00, threshold: 800, currency: 'USD' });
+});
+
+app.get('/api/recharge/history', authenticateToken, async (req, res) => {
+  res.json([
+    { id: '1', created_at: '2024-03-01T10:00:00Z', amount: 5000.00, payment_method: 'credit_card', status: 'success', transaction_id: 'TX123456', note: 'Initial recharge' },
+    { id: '2', created_at: '2024-02-01T10:00:00Z', amount: 3000.00, payment_method: 'alipay', status: 'success', transaction_id: 'TX123457', note: 'Monthly recharge' }
+  ]);
+});
 
 app.get('/api/billing', authenticateToken, async (req, res) => {
   res.json({
@@ -556,7 +577,51 @@ app.patch('/api/budget', authenticateToken, async (req, res) => {
   res.json({ total_budget: req.body.total_budget || 50000, alert_threshold: req.body.alert_threshold || 80, updated_at: new Date().toISOString() });
 });
 
+// ==================== Savings ====================
+
+app.get('/api/savings', authenticateToken, async (req, res) => {
+  res.json({
+    total_savings_amount: 320.80,
+    total_savings_tokens: 15420,
+    routing_savings: 180.50,
+    cache_savings: 140.30,
+    cache_hit_rate: 0.355,
+    cache_hit_count: 4520,
+    cache_miss_count: 8200,
+    daily: Array.from({ length: 30 }, (_, i) => {
+      const date = new Date(); date.setDate(date.getDate() - (29 - i));
+      return {
+        date: date.toISOString().split('T')[0],
+        routing_savings: Math.random() * 10 + 3,
+        cache_savings: Math.random() * 8 + 2,
+        total_savings: Math.random() * 18 + 5
+      };
+    })
+  });
+});
+
 // ==================== Routing ====================
+
+app.get('/api/savings', authenticateToken, async (req, res) => {
+  res.json({
+    total_savings_amount: 320.80,
+    total_savings_tokens: 5200,
+    routing_savings: 180.50,
+    cache_savings: 140.30,
+    cache_hit_rate: 0.355,
+    cache_hit_count: 302,
+    cache_miss_count: 548,
+    daily_savings: Array.from({ length: 30 }, (_, i) => {
+      const date = new Date(); date.setDate(date.getDate() - (29 - i));
+      return { 
+        date: date.toISOString().split('T')[0], 
+        routing_savings: Math.random() * 10 + 3, 
+        cache_savings: Math.random() * 8 + 2, 
+        total_savings: Math.random() * 15 + 5 
+      };
+    })
+  });
+});
 
 app.get('/api/routing', authenticateToken, async (req, res) => {
   res.json({
