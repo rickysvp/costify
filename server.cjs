@@ -62,6 +62,13 @@ let DEMO_MEMBERS = [
   { id: 2, name: 'Alice', email: 'alice@anytokn.io', role: 'member', org_id: 1, projects: [{ id: 1, name: '产品开发' }, { id: 3, name: '客户支持' }], monthly_spend: 430.00 }
 ];
 
+let DEMO_ORG = {
+  id: 1,
+  name: 'AnyTokn Demo',
+  balance_threshold: 80,
+  created_at: '2024-01-01T00:00:00Z'
+};
+
 let DEMO_REPORTS = [
   {
     id: 1,
@@ -133,8 +140,8 @@ app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const demoUser = DEMO_USERS.find(u => u.email === email && u.password === password);
     if (demoUser) {
-      const token = jwt.sign({ userId: demoUser.id, email: demoUser.email, role: demoUser.role, orgId: demoUser.org_id }, JWT_SECRET, { expiresIn: '24h' });
-      return res.json({ token, user: { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role, orgId: demoUser.org_id } });
+      const token = jwt.sign({ userId: demoUser.id, email: demoUser.email, role: demoUser.role, org_id: demoUser.org_id }, JWT_SECRET, { expiresIn: '24h' });
+      return res.json({ token, user: { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role, org_id: demoUser.org_id } });
     }
     try {
       const { data: user, error } = await supabase.from('users').select('*').eq('email', email).single();
@@ -142,7 +149,7 @@ app.post('/api/auth/login', async (req, res) => {
         const validPassword = await bcrypt.compare(password, user.password_hash);
         if (validPassword) {
           const token = jwt.sign({ userId: user.id, email: user.email, role: user.role, orgId: user.org_id }, JWT_SECRET, { expiresIn: '24h' });
-          return res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, orgId: user.org_id } });
+          return res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, org_id: user.org_id } });
         }
       }
     } catch (e) { console.log('Supabase login failed, using demo mode'); }
@@ -155,15 +162,23 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
     const demoUser = DEMO_USERS.find(u => u.id === req.user.userId);
     if (demoUser) {
       return res.json({
-        user: { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role, orgId: demoUser.org_id },
+        user: { id: demoUser.id, email: demoUser.email, name: demoUser.name, role: demoUser.role, org_id: demoUser.org_id },
         organization: { id: 1, name: 'AnyTokn Demo', balance: 10000.00, total_budget: 50000.00 }
       });
     }
     const { data: user, error } = await supabase.from('users').select('*').eq('id', req.user.userId).single();
     if (error || !user) return res.status(404).json({ error: 'User not found' });
     const { data: org } = await supabase.from('organizations').select('*').eq('id', user.org_id).single();
-    res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role, orgId: user.org_id }, organization: org });
+    res.json({ user: { id: user.id, email: user.email, name: user.name, role: user.role, org_id: user.org_id }, organization: org });
   } catch (error) { res.status(500).json({ error: 'Internal server error' }); }
+});
+
+// ==================== User Profile ====================
+
+app.put('/api/user/password', authenticateToken, async (req, res) => {
+  const { old_password, new_password } = req.body;
+  // In demo mode, we just return success
+  res.json({ success: true, message: 'Password updated successfully' });
 });
 
 // ==================== Dashboard ====================
@@ -727,6 +742,17 @@ app.get('/api/settings', authenticateToken, async (req, res) => {
 
 app.patch('/api/settings', authenticateToken, async (req, res) => {
   res.json({ ...req.body, updated_at: new Date().toISOString() });
+});
+
+app.get('/api/org', authenticateToken, async (req, res) => {
+  res.json({ org: DEMO_ORG });
+});
+
+app.put('/api/org', authenticateToken, async (req, res) => {
+  const { name, balance_threshold } = req.body;
+  if (name) DEMO_ORG.name = name;
+  if (balance_threshold !== undefined) DEMO_ORG.balance_threshold = balance_threshold;
+  res.json(DEMO_ORG);
 });
 
 // ==================== Alerts ====================
