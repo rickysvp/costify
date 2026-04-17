@@ -10,6 +10,7 @@ import {
   Target,
   Sparkles,
 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   AreaChart,
   Area,
@@ -62,7 +63,7 @@ function formatNumber(v: number): string {
 }
 
 // ---------- 路由策略说明 ----------
-const ROUTING_STRATEGIES = [
+const getRoutingStrategies = (t: any) => [
   {
     key: 'cost_saver',
     name: 'Cost Saver',
@@ -70,9 +71,8 @@ const ROUTING_STRATEGIES = [
     color: 'text-emerald-600',
     bg: 'bg-emerald-50',
     border: 'border-emerald-200',
-    description: '优先选择成本最低的模型，最大化节省开支。',
-    detail:
-      '将简单任务（如格式化、短文本生成）路由到低成本模型（如 GPT-4o-mini），仅在复杂任务时使用高端模型。适合对成本敏感、可容忍轻微质量下降的场景。',
+    description: t.routing.costSaverDesc,
+    detail: t.routing.costSaverDetail,
   },
   {
     key: 'balanced',
@@ -81,9 +81,8 @@ const ROUTING_STRATEGIES = [
     color: 'text-blue-600',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
-    description: '在成本与质量之间取得平衡。',
-    detail:
-      '根据任务复杂度智能选择模型：中等复杂度任务使用中端模型（如 Claude 3.5 Sonnet），简单任务降级，复杂任务升级。适合大多数通用场景。',
+    description: t.routing.balancedDesc,
+    detail: t.routing.balancedDetail,
   },
   {
     key: 'quality',
@@ -92,9 +91,8 @@ const ROUTING_STRATEGIES = [
     color: 'text-violet-600',
     bg: 'bg-violet-50',
     border: 'border-violet-200',
-    description: '优先保证输出质量，仅在明显冗余时节省。',
-    detail:
-      '默认使用高端模型（如 GPT-4o、Claude 3.5 Sonnet），仅对完全重复的请求启用缓存。适合对输出质量要求极高的场景，如法律文档生成、医疗咨询。',
+    description: t.routing.qualityDesc,
+    detail: t.routing.qualityDetail,
   },
 ];
 
@@ -102,7 +100,7 @@ const PIE_COLORS = ['#3b82f6', '#10b981'];
 
 // ---------- 组件 ----------
 export default function Routing() {
-
+  const { t } = useLanguage();
   const [summary, setSummary] = useState<SavingsSummary | null>(null);
   const [dailySavings, setDailySavings] = useState<DailySavings[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -137,7 +135,7 @@ export default function Routing() {
       setDailySavings(items);
     } catch (err) {
       console.error('获取节省数据失败:', err);
-      setError('加载数据失败，请稍后重试');
+      setError(t.dashboard.loadFailed);
     } finally {
       setIsLoading(false);
     }
@@ -151,8 +149,8 @@ export default function Routing() {
   const pieData =
     summary && (summary.routing_savings > 0 || summary.cache_savings > 0)
       ? [
-          { name: '路由节省', value: summary.routing_savings },
-          { name: '缓存节省', value: summary.cache_savings },
+          { name: t.routing.routingSavings, value: summary.routing_savings },
+          { name: t.routing.cacheSavings, value: summary.cache_savings },
         ]
       : [];
 
@@ -162,12 +160,12 @@ export default function Routing() {
       {/* 页面标题 */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-bold text-surface-900">路由优化</h1>
-          <p className="text-sm text-surface-500 mt-1">智能路由与缓存策略带来的成本节省分析</p>
+          <h1 className="text-xl font-bold text-surface-900">{t.routing.title}</h1>
+          <p className="text-sm text-surface-500 mt-1">{t.routing.subtitle}</p>
         </div>
         <button className="btn-ghost text-xs flex items-center gap-1.5" onClick={fetchData}>
           <RefreshCw className="w-3.5 h-3.5" />
-          刷新
+          {t.dashboard.refresh}
         </button>
       </div>
 
@@ -181,7 +179,7 @@ export default function Routing() {
       {isLoading ? (
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600" />
-          <span className="ml-3 text-sm text-surface-600">加载中...</span>
+          <span className="ml-3 text-sm text-surface-600">{t.common.loading}</span>
         </div>
       ) : (
         <>
@@ -190,25 +188,25 @@ export default function Routing() {
             <div className="card bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Zap className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-sm font-semibold text-surface-800">总节省金额</h3>
+                <h3 className="text-sm font-semibold text-surface-800">{t.routing.totalSavingsAmount}</h3>
               </div>
               <p className="text-3xl font-bold text-emerald-700">
                 {formatCurrency(summary?.total_savings_amount ?? 0)}
               </p>
               <p className="text-xs text-surface-600 mt-2">
-                通过智能路由与缓存策略节省
+                {t.routing.subtitle}
               </p>
             </div>
             <div className="card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingDown className="w-5 h-5 text-blue-600" />
-                <h3 className="text-sm font-semibold text-surface-800">总节省 Token</h3>
+                <h3 className="text-sm font-semibold text-surface-800">{t.routing.totalSavingsTokens}</h3>
               </div>
               <p className="text-3xl font-bold text-blue-700">
                 {formatNumber(summary?.total_savings_tokens ?? 0)}
               </p>
               <p className="text-xs text-surface-600 mt-2">
-                减少不必要的 Token 消耗
+                {t.dashboard.savingsDesc}
               </p>
             </div>
           </div>
@@ -219,7 +217,7 @@ export default function Routing() {
               <div className="card-header">
                 <div className="flex items-center gap-2">
                   <Route className="w-4 h-4 text-brand-600" />
-                  <h3 className="text-sm font-semibold text-surface-800">节省类型分布</h3>
+                  <h3 className="text-sm font-semibold text-surface-800">{t.routing.savingsTypeDist}</h3>
                 </div>
               </div>
               <div className="p-4">
@@ -247,7 +245,7 @@ export default function Routing() {
                           ))}
                         </Pie>
                         <Tooltip
-                          formatter={(value) => [formatCurrency(Number(value)), '金额']}
+                          formatter={(value) => [formatCurrency(Number(value)), t.common.amount]}
                         />
                         <Legend />
                       </PieChart>
@@ -255,7 +253,7 @@ export default function Routing() {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-64 text-sm text-surface-400">
-                    暂无数据
+                    {t.dashboard.noData}
                   </div>
                 )}
               </div>
@@ -266,7 +264,7 @@ export default function Routing() {
               <div className="card-header">
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-brand-600" />
-                  <h3 className="text-sm font-semibold text-surface-800">缓存命中率统计</h3>
+                  <h3 className="text-sm font-semibold text-surface-800">{t.routing.cacheHitRateStats}</h3>
                 </div>
               </div>
               <div className="p-5 space-y-5">
@@ -297,7 +295,7 @@ export default function Routing() {
                       <span className="text-2xl font-bold text-surface-900">
                         {((summary?.cache_hit_rate ?? 0) * 100).toFixed(1)}%
                       </span>
-                      <span className="text-xs text-surface-500">命中率</span>
+                      <span className="text-xs text-surface-500">{t.routing.cacheHitRate}</span>
                     </div>
                   </div>
                 </div>
@@ -308,18 +306,18 @@ export default function Routing() {
                     <p className="text-lg font-bold text-emerald-700">
                       {formatNumber(summary?.cache_hit_count ?? 0)}
                     </p>
-                    <p className="text-xs text-surface-600">缓存命中</p>
+                    <p className="text-xs text-surface-600">{t.routing.cacheHit}</p>
                   </div>
                   <div className="bg-red-50 rounded-lg p-3 text-center">
                     <p className="text-lg font-bold text-red-700">
                       {formatNumber(summary?.cache_miss_count ?? 0)}
                     </p>
-                    <p className="text-xs text-surface-600">缓存未命中</p>
+                    <p className="text-xs text-surface-600">{t.routing.cacheMiss}</p>
                   </div>
                 </div>
 
                 <p className="text-xs text-surface-500 text-center">
-                  缓存命中可节省约 90% 的 Token 消耗
+                  {t.routing.cacheBenefit}
                 </p>
               </div>
             </div>
@@ -330,7 +328,7 @@ export default function Routing() {
             <div className="card-header">
               <div className="flex items-center gap-2">
                 <TrendingDown className="w-4 h-4 text-brand-600" />
-                <h3 className="text-sm font-semibold text-surface-800">每日节省趋势</h3>
+                <h3 className="text-sm font-semibold text-surface-800">{t.routing.dailyTrend}</h3>
               </div>
             </div>
             <div className="p-4">
@@ -349,13 +347,13 @@ export default function Routing() {
                         formatter={(value, name) => [
                           formatCurrency(Number(value)),
                           name === 'routing_savings'
-                            ? '路由节省'
+                            ? t.routing.routingSavings
                             : name === 'cache_savings'
-                              ? '缓存节省'
-                              : '总节省',
+                              ? t.routing.cacheSavings
+                              : t.dashboard.savings,
                         ]}
                         labelFormatter={(label) =>
-                          new Date(String(label)).toLocaleDateString()
+                          new Date(String(label)).toLocaleDateString(t.common.locale || 'zh-CN')
                         }
                       />
                       <Area
@@ -365,7 +363,7 @@ export default function Routing() {
                         stroke="#3b82f6"
                         fill="#3b82f6"
                         fillOpacity={0.3}
-                        name="路由节省"
+                        name={t.routing.routingSavings}
                       />
                       <Area
                         type="monotone"
@@ -374,13 +372,13 @@ export default function Routing() {
                         stroke="#10b981"
                         fill="#10b981"
                         fillOpacity={0.3}
-                        name="缓存节省"
+                        name={t.routing.cacheSavings}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="flex items-center justify-center h-full text-sm text-surface-400">
-                    暂无数据
+                    {t.dashboard.noData}
                   </div>
                 )}
               </div>
@@ -391,10 +389,10 @@ export default function Routing() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Shield className="w-4 h-4 text-brand-600" />
-              <h3 className="text-sm font-semibold text-surface-800">路由策略说明</h3>
+              <h3 className="text-sm font-semibold text-surface-800">{t.routing.strategyGuide}</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {ROUTING_STRATEGIES.map((strategy) => {
+              {getRoutingStrategies(t).map((strategy) => {
                 const Icon = strategy.icon;
                 return (
                   <div

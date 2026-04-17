@@ -37,20 +37,22 @@ interface ProjectFormData {
   models: string[];
 }
 
-const AVAILABLE_MODELS = [
-  { id: 'gpt-4o', name: 'GPT-4o', description: '最强大的模型，适合复杂任务', price: '$5/1M input' },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: '性价比高，适合日常任务', price: '$0.15/1M input' },
-  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: '快速响应，适合简单任务', price: '$1/1M input' },
-  { id: 'claude-3-opus', name: 'Claude 3 Opus', description: 'Anthropic 最强模型', price: '$15/1M input' },
-  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: '平衡性能与成本', price: '$3/1M input' },
-  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: '快速且经济', price: '$0.25/1M input' },
+// This might need context-aware translation, but for now we'll keep names and prices static 
+// and handle descriptions in the UI if needed, or translate them here.
+const AVAILABLE_MODELS = (t: any) => [
+  { id: 'gpt-4o', name: 'GPT-4o', description: t.apiMarket.models['gpt-4o'].description, price: '$5/1M input' },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: t.apiMarket.models['gpt-4o-mini'].description, price: '$0.15/1M input' },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: t.apiMarket.models['gpt-3.5-turbo'].description, price: '$1/1M input' },
+  { id: 'claude-3-opus', name: 'Claude 3 Opus', description: t.apiMarket.models['claude-3-opus'].description, price: '$15/1M input' },
+  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: t.apiMarket.models['claude-3.5-sonnet'].description, price: '$3/1M input' },
+  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: t.apiMarket.models['claude-3-haiku'].description, price: '$0.25/1M input' },
 ];
 
-const ROUTING_PROFILES = [
+const ROUTING_PROFILES = (t: any) => [
   {
     id: 'cost_saver',
-    name: '成本优先',
-    description: '优先使用最经济的模型，仅在必要时升级',
+    name: t.projects.costSaver,
+    description: t.projects.costSaverDesc,
     icon: Zap,
     color: 'text-emerald-600',
     bg: 'bg-emerald-50',
@@ -58,8 +60,8 @@ const ROUTING_PROFILES = [
   },
   {
     id: 'balanced',
-    name: '平衡模式',
-    description: '根据请求复杂度智能选择模型',
+    name: t.projects.balanced,
+    description: t.projects.balancedDesc,
     icon: Gauge,
     color: 'text-blue-600',
     bg: 'bg-blue-50',
@@ -67,8 +69,8 @@ const ROUTING_PROFILES = [
   },
   {
     id: 'quality',
-    name: '质量优先',
-    description: '始终使用最强大的模型，确保最佳输出',
+    name: t.projects.quality,
+    description: t.projects.qualityDesc,
     icon: Shield,
     color: 'text-violet-600',
     bg: 'bg-violet-50',
@@ -141,6 +143,8 @@ export default function Projects() {
     apiKey: '',
     projectId: null,
   });
+  const currentModels = AVAILABLE_MODELS(t);
+  const currentRoutingProfiles = ROUTING_PROFILES(t);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -160,12 +164,12 @@ export default function Projects() {
       });
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || '获取项目列表失败');
+        throw new Error(errData.error || t.projects.fetchError);
       }
       const data = await response.json();
       setProjects(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取项目列表失败，请稍后重试');
+      setError(err instanceof Error ? err.message : t.projects.fetchError);
     } finally {
       setIsLoading(false);
     }
@@ -283,7 +287,7 @@ export default function Projects() {
           // API Key 生成失败不影响项目创建
         }
 
-        showToast('项目创建成功');
+        showToast(t.projects.createSuccess);
       } else if (editingProject) {
         response = await fetch(`${API_BASE}/projects/${editingProject.id}`, {
           method: 'PUT',
@@ -296,16 +300,16 @@ export default function Projects() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData?.error || '更新项目失败');
+          throw new Error(errorData?.error || t.projects.updateError);
         }
 
-        showToast('项目更新成功');
+        showToast(t.projects.updateSuccess);
       }
 
       closeModal();
       fetchProjects();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : '操作失败，请稍后重试');
+      setSubmitError(err instanceof Error ? err.message : t.projects.updateError);
     } finally {
       setIsSubmitting(false);
     }
@@ -329,7 +333,7 @@ export default function Projects() {
         throw new Error(errorData?.error || '删除失败');
       }
 
-      showToast('项目已删除');
+      showToast(t.projects.deleteSuccess);
       setDeleteConfirm({ open: false, project: null });
       fetchProjects();
     } catch (err) {
@@ -342,7 +346,7 @@ export default function Projects() {
   // ==================== 工具函数 ====================
 
   const getModelName = (modelId: string) => {
-    const model = AVAILABLE_MODELS.find((m) => m.id === modelId);
+    const model = currentModels.find((m) => m.id === modelId);
     return model ? model.name : modelId;
   };
 
@@ -351,7 +355,7 @@ export default function Projects() {
       await navigator.clipboard.writeText(text);
       setCopiedKey(text);
       setTimeout(() => setCopiedKey(null), 2000);
-      showToast('API Key 已复制到剪贴板');
+      showToast(t.projects.copySuccess);
     } catch {
       // fallback
     }
@@ -377,9 +381,9 @@ export default function Projects() {
   };
 
   const getBudgetLabel = (pct: number) => {
-    if (pct < 80) return '正常';
-    if (pct < 100) return '接近预算';
-    return '超出预算';
+    if (pct < 80) return t.projects.budgetNormal;
+    if (pct < 100) return t.projects.budgetNear;
+    return t.projects.budgetOver;
   };
 
   // ==================== 渲染 ====================
@@ -457,7 +461,7 @@ export default function Projects() {
             <p className="text-sm text-surface-500 mb-6">
               {isAdmin
                 ? t.dashboard.welcomeDesc
-                : '您还没有被分配到任何项目，请联系管理员'}
+                : t.projects.notAssigned}
             </p>
             {isAdmin && (
               <div className="space-y-3 max-w-sm mx-auto">
@@ -498,15 +502,15 @@ export default function Projects() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-surface-200">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">项目名称</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">路由策略</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">支持模型</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">本月花费</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">预算使用率</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">Key 数</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">成员数</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.projects.projectName}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.projects.routingPolicy}</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-surface-500">{t.projects.availableModels}</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.projects.monthSpend}</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.projects.budgetUsage}</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.projects.keyCount}</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.projects.memberCount}</th>
                   {isAdmin && (
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">操作</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-surface-500">{t.projects.actions}</th>
                   )}
                 </tr>
               </thead>
@@ -577,7 +581,7 @@ export default function Projects() {
                               />
                             </div>
                           ) : (
-                            <span className="text-[10px] text-surface-400">未设置预算</span>
+                            <span className="text-[10px] text-surface-400">{t.projects.budgetNotSet}</span>
                           )}
                         </div>
                       </td>
@@ -593,14 +597,14 @@ export default function Projects() {
                             <button
                               className="p-1.5 rounded-lg hover:bg-surface-100 transition-colors text-surface-500 hover:text-brand-600"
                               onClick={() => openEditModal(project)}
-                              title="编辑项目"
+                              title={t.projects.editProject}
                             >
                               <Edit className="w-4 h-4" />
                             </button>
                             <button
                               className="p-1.5 rounded-lg hover:bg-red-50 transition-colors text-surface-500 hover:text-red-600"
                               onClick={() => setDeleteConfirm({ open: true, project })}
-                              title="删除项目"
+                              title={t.projects.deleteProject}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -644,37 +648,37 @@ export default function Projects() {
                 {/* 项目名称 */}
                 <div>
                   <label className="block text-sm font-medium text-surface-700 mb-1">
-                    项目名称 <span className="text-red-500">*</span>
+                    {t.projects.projectName} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
-                    placeholder="输入项目名称"
+                    placeholder={t.projects.projectNamePlaceholder}
                     required
                   />
                 </div>
 
                 {/* 描述 */}
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">描述</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.projects.projectDesc}</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
                     rows={3}
-                    placeholder="输入项目描述（可选）"
+                    placeholder={t.projects.projectDescPlaceholder || 'Enter project description (optional)'}
                   />
                 </div>
 
                 {/* 路由策略 */}
                 <div>
                   <label className="block text-sm font-medium text-surface-700 mb-2">
-                    路由策略 <span className="text-red-500">*</span>
+                    {t.projects.routingPolicy} <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-1 gap-2">
-                    {ROUTING_PROFILES.map((profile) => {
+                    {currentRoutingProfiles.map((profile) => {
                       const Icon = profile.icon;
                       const isSelected = formData.routing_profile === profile.id;
                       return (
@@ -719,11 +723,11 @@ export default function Projects() {
                 {/* 支持的模型 */}
                 <div>
                   <label className="block text-sm font-medium text-surface-700 mb-1">
-                    支持的模型 <span className="text-red-500">*</span>
+                    {t.projects.availableModels} <span className="text-red-500">*</span>
                   </label>
-                  <p className="text-xs text-surface-500 mb-2">选择项目可以使用的模型，路由策略只会在启用的模型间选择</p>
+                  <p className="text-xs text-surface-500 mb-2">{t.projects.availableModelsDesc}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {AVAILABLE_MODELS.map((model) => {
+                    {currentModels.map((model) => {
                       const isSelected = formData.models.includes(model.id);
                       return (
                         <label key={model.id}
@@ -764,7 +768,7 @@ export default function Projects() {
 
                 {/* 默认模型 */}
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">默认模型</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.projects.defaultModel}</label>
                   <div className="relative">
                     <select
                       value={formData.default_model}
@@ -772,7 +776,7 @@ export default function Projects() {
                       className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 appearance-none bg-white"
                     >
                       {formData.models.map((modelId: string) => {
-                        const model = AVAILABLE_MODELS.find((m) => m.id === modelId);
+                        const model = currentModels.find((m) => m.id === modelId);
                         return model ? (
                           <option key={modelId} value={modelId}>
                             {model.name} - {model.price}
@@ -786,7 +790,7 @@ export default function Projects() {
 
                 {/* 月度预算 */}
                 <div>
-                  <label className="block text-sm font-medium text-surface-700 mb-1">月度预算（可选）</label>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.projects.monthlyBudget} ({t.common?.optional || 'Optional'})</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400">$</span>
                     <input
@@ -811,7 +815,7 @@ export default function Projects() {
                   onClick={closeModal}
                   disabled={isSubmitting}
                 >
-                  取消
+                  {t.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -821,7 +825,7 @@ export default function Projects() {
                   {isSubmitting && (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   )}
-                  {isSubmitting ? '处理中...' : modalMode === 'create' ? '创建' : '保存'}
+                  {isSubmitting ? t.common.loading : modalMode === 'create' ? t.common.create : t.common.save}
                 </button>
               </div>
             </form>
@@ -839,17 +843,17 @@ export default function Projects() {
                   <AlertTriangle className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-surface-900">确认删除</h3>
-                  <p className="text-sm text-surface-500">此操作无法撤销</p>
+                  <h3 className="text-lg font-semibold text-surface-900">{t.projects.deleteProject}</h3>
+                  <p className="text-sm text-surface-500">{t.projects.deleteWarning || 'This action cannot be undone'}</p>
                 </div>
               </div>
 
               <p className="text-sm text-surface-600 mb-6">
-                您确定要删除项目{' '}
+                {t.projects.deleteConfirmMessagePre || 'Are you sure you want to delete project'} {' '}
                 <span className="font-medium text-surface-900">
                   &ldquo;{deleteConfirm.project?.name}&rdquo;
                 </span>{' '}
-                吗？删除后，该项目下的所有 API Key 和使用记录都将被删除。
+                {t.projects.deleteConfirmMessagePost || '? All API keys and usage records under this project will be deleted.'}
               </p>
 
               <div className="flex items-center justify-end gap-3">
@@ -858,7 +862,7 @@ export default function Projects() {
                   onClick={() => setDeleteConfirm({ open: false, project: null })}
                   disabled={isDeleting}
                 >
-                  取消
+                  {t.common.cancel}
                 </button>
                 <button
                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
@@ -868,7 +872,7 @@ export default function Projects() {
                   {isDeleting && (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   )}
-                  {isDeleting ? '删除中...' : '确认删除'}
+                  {isDeleting ? t.common.loading : t.common.confirm}
                 </button>
               </div>
             </div>
@@ -902,9 +906,9 @@ export default function Projects() {
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-surface-900">
-                    项目：{apiKeyModal.projectName}
+                    {t.projects.projectLabel || 'Project'}: {apiKeyModal.projectName}
                   </h3>
-                  <p className="text-xs text-surface-500">请妥善保管您的 API Key</p>
+                  <p className="text-xs text-surface-500">{t.apiKeys.createSuccessDesc}</p>
                 </div>
               </div>
 
@@ -927,9 +931,7 @@ export default function Projects() {
               </div>
 
               <p className="text-sm text-surface-600 mb-6">
-                这是您项目的 API Key，用于调用 AI
-                模型。请将其添加到您的应用中，所有请求都将通过 AnyTokn
-                进行路由和监控。
+                {t.apiKeys.keyNotice || 'This is your project\'s API Key for calling AI models. Please add it to your application; all requests will be routed and monitored by AnyTokn.'}
               </p>
 
               <div className="flex items-center justify-end gap-3">
@@ -942,7 +944,7 @@ export default function Projects() {
                     }
                   }}
                 >
-                  关闭
+                  {t.common.close}
                 </button>
                 <button
                   className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
@@ -954,7 +956,7 @@ export default function Projects() {
                     }
                   }}
                 >
-                  复制并跳转详情
+                  {t.projects.copyAndGoDetail || 'Copy and View Details'}
                 </button>
               </div>
             </div>

@@ -632,13 +632,42 @@ app.post('/api/billing/recharge', authenticateToken, async (req, res) => {
 
 app.get('/api/budget', authenticateToken, async (req, res) => {
   res.json({
-    total_budget: 50000.00, used_budget: 12500.00, remaining_budget: 37500.00, usage_percentage: 25,
-    alerts_enabled: true, alert_threshold: 80,
-    projects: [
-      { id: 1, name: '产品开发', budget: 20000, used: 5200, percentage: 26 },
-      { id: 2, name: '市场营销', budget: 15000, used: 3800, percentage: 25 },
-      { id: 3, name: '客户支持', budget: 10000, used: 2500, percentage: 25 }
-    ]
+    org_budget: {
+      monthly_budget: 50000.00,
+      used_amount: 12500.00,
+      remaining: 37500.00,
+      used_percentage: 25,
+      alert_threshold: 80,
+      alert_enabled: true
+    },
+    project_budgets: [
+      { id: 1, name: 'Production App', monthly_budget: 20000, used_amount: 5200, remaining: 14800, used_percentage: 26, alert_threshold: 80, status: 'normal' },
+      { id: 2, name: 'Marketing Web', monthly_budget: 15000, used_amount: 3800, remaining: 11200, used_percentage: 25, alert_threshold: 80, status: 'normal' },
+      { id: 3, name: 'Customer Support', monthly_budget: 10000, used_amount: 2500, remaining: 7500, used_percentage: 25, alert_threshold: 80, status: 'normal' }
+    ],
+    budget_history: Array.from({ length: 6 }, (_, i) => {
+      const date = new Date(); date.setMonth(date.getMonth() - (5 - i));
+      const budget = 50000;
+      const actual = 10000 + Math.random() * 5000;
+      const savings = 2000 + Math.random() * 1000;
+      return {
+        month: date.toISOString().slice(0, 7),
+        budget,
+        actual,
+        savings
+      };
+    }),
+    budget_alerts: [
+      { id: 1, type: 'budget_threshold', message: 'Corporate budget usage reached 25%', threshold: 25, actual: 25, created_at: new Date(Date.now() - 3600000).toISOString(), status: 'read' },
+      { id: 2, type: 'project_threshold', message: 'Project "Production App" usage reached 20%', project_name: 'Production App', threshold: 20, actual: 26, created_at: new Date(Date.now() - 7200000).toISOString(), status: 'unread' }
+    ],
+    savings_stats: {
+      total_savings: 320.80,
+      routing_savings: 180.50,
+      cache_savings: 140.30,
+      model_downgrade_savings: 0,
+      savings_rate: 2.5
+    }
   });
 });
 
@@ -669,28 +698,6 @@ app.get('/api/savings', authenticateToken, async (req, res) => {
   });
 });
 
-// ==================== Routing ====================
-
-app.get('/api/savings', authenticateToken, async (req, res) => {
-  res.json({
-    total_savings_amount: 320.80,
-    total_savings_tokens: 5200,
-    routing_savings: 180.50,
-    cache_savings: 140.30,
-    cache_hit_rate: 0.355,
-    cache_hit_count: 302,
-    cache_miss_count: 548,
-    daily_savings: Array.from({ length: 30 }, (_, i) => {
-      const date = new Date(); date.setDate(date.getDate() - (29 - i));
-      return { 
-        date: date.toISOString().split('T')[0], 
-        routing_savings: Math.random() * 10 + 3, 
-        cache_savings: Math.random() * 8 + 2, 
-        total_savings: Math.random() * 15 + 5 
-      };
-    })
-  });
-});
 
 app.get('/api/routing', authenticateToken, async (req, res) => {
   res.json({
