@@ -774,7 +774,7 @@ const Footer = () => {
     resourcesItems: ['博客', '案例研究', '系统状态', '指南'],
     company: '公司',
     companyItems: ['关于', '联系', '招聘', '法律'],
-    copyright: '© 2026 Helicone AI. 保留所有权利。',
+    copyright: '© 2026 AnyTokn. 保留所有权利。',
     privacy: '隐私政策',
     terms: '服务条款',
     cookies: 'Cookie 政策'
@@ -788,7 +788,7 @@ const Footer = () => {
     resourcesItems: ['Blog', 'Case Studies', 'System Status', 'Guides'],
     company: 'Company',
     companyItems: ['About', 'Contact', 'Careers', 'Legal'],
-    copyright: '© 2026 Helicone AI. All rights reserved.',
+    copyright: '© 2026 AnyTokn. All rights reserved.',
     privacy: 'Privacy Policy',
     terms: 'Terms of Service',
     cookies: 'Cookie Policy'
