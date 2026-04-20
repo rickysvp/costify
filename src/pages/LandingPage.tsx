@@ -284,7 +284,7 @@ const IntegrationPanel = () => {
             </button>
           ))}
         </div>
-        <div className="p-16 flex flex-col items-center text-center space-y-8 animate-in fade-in slide-in-from-bottom-4">
+        <div className="p-16 flex flex-col items-center text-center space-y-8">
           <div className="space-y-4 max-w-2xl">
             <h3 className="text-2xl font-bold">{capabilities[activeCap].title}</h3>
             <p className="text-slate-400 text-lg leading-relaxed">{capabilities[activeCap].desc}</p>
