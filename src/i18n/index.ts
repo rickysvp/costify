@@ -9,6 +9,10 @@ export const translations = {
       docs: '文档',
       login: '登录',
       signup: '免费试用',
+      platform: '平台',
+      solutions: '解决方案',
+      engine: '优化引擎',
+      bookPilot: '预约试点',
     },
     // Hero Section
     hero: {
@@ -23,6 +27,13 @@ export const translations = {
         uptime: '99.9% 可用性',
         models: '50+ 模型支持',
       },
+      newBadge: '企业级 AI 成本效率',
+      newTitle: '控制 AI 成本，',
+      newTitleHighlight: '不牺牲质量',
+      newDescription: 'AnyTokn 是企业级高质量 Token 优化与成本控制系统。通过高质量感知压缩引擎、Token 调度与长期追踪优化，帮助企业在生成式 AI 生产工作流中系统性降低成本。',
+      newCta1: '预约试点',
+      newCta2: '联系团队',
+      dashboardLabel: '让每一笔 Token 支出更可见、更可控、更值得。',
     },
     // Features Section
     features: {
@@ -952,6 +963,10 @@ export const translations = {
       docs: 'Docs',
       login: 'Login',
       signup: 'Start Free',
+      platform: 'Platform',
+      solutions: 'Solutions',
+      engine: 'Optimization Engine',
+      bookPilot: 'Book a Pilot',
     },
     // Hero Section
     hero: {
@@ -966,6 +981,13 @@ export const translations = {
         uptime: '99.9% Uptime',
         models: '50+ Models',
       },
+      newBadge: 'Enterprise AI Cost Efficiency',
+      newTitle: 'Control AI cost without',
+      newTitleHighlight: 'compromising quality',
+      newDescription: 'AnyTokn is an enterprise-grade token optimization and cost control system for generative AI workflows. Reduce wasted token spend with quality-aware compression, token orchestration, and long-term optimization.',
+      newCta1: 'Book a Pilot',
+      newCta2: 'Speak with the Team',
+      dashboardLabel: 'Operational visibility for high-quality savings',
     },
     // Features Section
     features: {
