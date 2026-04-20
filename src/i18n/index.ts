@@ -7,12 +7,12 @@ export const translations = {
       features: '功能',
       pricing: '价格',
       docs: '文档',
-      login: '登录',
+      login: '联系团队',
       signup: '免费试用',
       platform: '平台',
       solutions: '解决方案',
       engine: '优化引擎',
-      bookPilot: '预约试点',
+      bookPilot: 'Login',
     },
     // Hero Section
     hero: {
@@ -961,12 +961,12 @@ export const translations = {
       features: 'Features',
       pricing: 'Pricing',
       docs: 'Docs',
-      login: 'Login',
+      login: 'Contact Team',
       signup: 'Start Free',
       platform: 'Platform',
       solutions: 'Solutions',
       engine: 'Optimization Engine',
-      bookPilot: 'Book a Pilot',
+      bookPilot: 'Login',
     },
     // Hero Section
     hero: {
