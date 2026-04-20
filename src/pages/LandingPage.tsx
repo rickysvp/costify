@@ -29,33 +29,33 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-indigo-200 shadow-sm">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-200 shadow-sm">
               <Zap className="text-white w-5 h-5 fill-white" />
             </div>
             <span className="font-bold text-xl tracking-tight text-slate-900">AnyTokn</span>
           </Link>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
-            <a href="#" className="hover:text-indigo-600 transition-colors">{t.nav.platform}</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">{t.nav.solutions}</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">{t.nav.engine}</a>
-            <a href="#" className="hover:text-indigo-600 transition-colors">{t.nav.pricing}</a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.platform}</a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.solutions}</a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.engine}</a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.pricing}</a>
             <button 
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-1 hover:text-indigo-600 transition-colors"
+              className="flex items-center gap-1 hover:text-emerald-600 transition-colors"
             >
               <Globe className="w-4 h-4" />
               <span>{lang === 'zh' ? 'EN' : '中文'}</span>
             </button>
             <Link 
               to="/login"
-              className="text-slate-600 hover:text-indigo-600 transition-colors"
+              className="text-slate-600 hover:text-emerald-600 transition-colors"
             >
               {t.nav.login}
             </Link>
             <Link 
               to="/login"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-bold transition-all shadow-sm shadow-indigo-100"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl font-bold transition-all shadow-sm shadow-emerald-100"
             >
               {t.nav.bookPilot}
             </Link>
@@ -86,7 +86,7 @@ const Navbar = () => {
           <Link to="/login" className="block w-full text-slate-900 py-2 font-medium text-center">
             {t.nav.login}
           </Link>
-          <Link to="/login" className="block w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-center">
+          <Link to="/login" className="block w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-center">
             {t.nav.bookPilot}
           </Link>
         </div>
@@ -104,7 +104,7 @@ const Hero = () => {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-sm font-bold tracking-tight"
+          className="inline-block px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-bold tracking-tight"
         >
           {t.hero.newBadge}
         </motion.div>
@@ -115,7 +115,7 @@ const Hero = () => {
           transition={{ duration: 0.6 }}
         >
           {t.hero.newTitle}<br />
-          <span className="text-indigo-600">{t.hero.newTitleHighlight}</span>
+          <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
         </motion.h1>
         <motion.p 
           className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed"
@@ -133,7 +133,7 @@ const Hero = () => {
         >
           <Link 
             to="/login"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
           >
             {t.hero.newCta1} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -207,9 +207,9 @@ const Hero = () => {
                 { label: lang === 'zh' ? '策略控制' : 'Policy controls', active: false },
                 { label: lang === 'zh' ? '节省可追踪' : 'Measurable savings', active: false },
               ].map((item, i) => (
-                <div key={i} className={`flex items-center gap-4 ${item.active ? 'text-indigo-600 bg-indigo-50/50 p-3 rounded-2xl -mx-3' : 'text-slate-400'}`}>
-                  <div className={`w-5 h-5 rounded-lg shrink-0 ${item.active ? 'bg-indigo-600' : 'bg-slate-200'}`} />
-                  <span className={`text-xs font-bold ${item.active ? 'text-indigo-700' : 'text-slate-400'}`}>{item.label}</span>
+                <div key={i} className={`flex items-center gap-4 ${item.active ? 'text-emerald-600 bg-emerald-50/50 p-3 rounded-2xl -mx-3' : 'text-slate-400'}`}>
+                  <div className={`w-5 h-5 rounded-lg shrink-0 ${item.active ? 'bg-emerald-600' : 'bg-slate-200'}`} />
+                  <span className={`text-xs font-bold ${item.active ? 'text-emerald-700' : 'text-slate-400'}`}>{item.label}</span>
                 </div>
               ))}
             </aside>
@@ -230,8 +230,8 @@ const Hero = () => {
                   {[1,2,3,4].map(i => (
                     <div key={i} className="p-6 bg-white border border-slate-100 rounded-3xl shadow-sm space-y-3">
                       <div className="flex justify-between">
-                        <div className="p-2 bg-indigo-50 rounded-xl">
-                          <div className="w-4 h-4 bg-indigo-500 rounded" />
+                        <div className="p-2 bg-emerald-50 rounded-xl">
+                          <div className="w-4 h-4 bg-emerald-500 rounded" />
                         </div>
                         <span className="text-green-500 text-xs font-bold">+12%</span>
                       </div>
@@ -244,7 +244,7 @@ const Hero = () => {
                   {[4,2,7,5,8,3,9,1,4,6,2,8,3,4,6,3,1,7,8,4].map((h, i) => (
                     <motion.div 
                       key={i} 
-                      className={`flex-1 rounded-t-xl transition-all ${i % 2 === 0 ? 'bg-indigo-500' : 'bg-indigo-200'}`} 
+                      className={`flex-1 rounded-t-xl transition-all ${i % 2 === 0 ? 'bg-emerald-500' : 'bg-emerald-200'}`} 
                       initial={{ height: 0 }}
                       animate={{ height: `${h * 10}%` }}
                       transition={{ duration: 0.8, delay: i * 0.05 }}
@@ -267,7 +267,7 @@ const IntegrationPanel = () => {
       title: "高质量感知压缩引擎",
       desc: "在不破坏关键语义和任务完成度的前提下，压缩低价值 Token 输入。",
       icon: <Zap className="w-5 h-5" />,
-      color: "text-indigo-400 bg-indigo-400/10"
+      color: "text-emerald-400 bg-emerald-400/10"
     },
     {
       title: "Token 调度引擎",
@@ -292,7 +292,7 @@ const IntegrationPanel = () => {
       title: "Quality-aware compression engine",
       desc: "Compress low-value context and redundant input while preserving the information that matters for task completion.",
       icon: <Zap className="w-5 h-5" />,
-      color: "text-indigo-400 bg-indigo-400/10"
+      color: "text-emerald-400 bg-emerald-400/10"
     },
     {
       title: "Token orchestration engine",
@@ -355,11 +355,11 @@ const IntegrationPanel = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500" />
              </div>
              <div className="text-left space-y-2">
-                <p className="text-indigo-400">{lang === 'zh' ? '# AnyTokn 优化已激活' : '# AnyTokn optimization active'}</p>
+                <p className="text-emerald-400">{lang === 'zh' ? '# AnyTokn 优化已激活' : '# AnyTokn optimization active'}</p>
                 <p><span className="text-emerald-400">await</span> anytokn.optimize({'{'}</p>
                 <p>&nbsp;&nbsp;workflowId: <span className="text-emerald-400">"enterprise-copilot-v2"</span>,</p>
                 <p>&nbsp;&nbsp;qualityConstraint: <span className="text-amber-400">0.98</span>,</p>
-                <p>&nbsp;&nbsp;priority: <span className="text-indigo-400">"high"</span></p>
+                <p>&nbsp;&nbsp;priority: <span className="text-emerald-400">"high"</span></p>
                 <p>{'})'};</p>
              </div>
           </div>
@@ -396,8 +396,8 @@ const Features = () => {
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         <div className="group bg-white border border-slate-100 rounded-[32px] p-10 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500">
           <div className="mb-8 space-y-4">
-            <div className="p-4 bg-indigo-50 w-fit rounded-2xl">
-              <Zap className="w-6 h-6 text-indigo-600 fill-indigo-600" />
+            <div className="p-4 bg-emerald-50 w-fit rounded-2xl">
+              <Zap className="w-6 h-6 text-emerald-600 fill-emerald-600" />
             </div>
             <h3 className="text-2xl font-bold tracking-tight">{content.cards[0].title}</h3>
             <p className="text-slate-500 leading-relaxed">{content.cards[0].desc}</p>
@@ -451,7 +451,7 @@ const Features = () => {
              {content.cards[2].items?.map((item: any, i: number) => (
                 <div key={i} className="bg-white p-3 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm">
                    <span className="text-xs font-bold text-slate-500">{item.label}</span>
-                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${i === 0 ? 'bg-indigo-500' : i === 1 ? 'bg-emerald-500' : 'bg-amber-500'}`}>{item.val}</span>
+                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${i === 0 ? 'bg-emerald-500' : i === 1 ? 'bg-emerald-500' : 'bg-amber-500'}`}>{item.val}</span>
                 </div>
              ))}
           </div>
@@ -486,7 +486,7 @@ const Solutions = () => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {solutions.map((sol, i) => (
-            <div key={i} className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 hover:border-indigo-200 transition-all group">
+            <div key={i} className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 hover:border-emerald-200 transition-all group">
               <h4 className="text-lg font-bold text-slate-900 mb-4">{sol.title}</h4>
               <p className="text-sm text-slate-500 leading-relaxed group-hover:text-slate-600">{sol.desc}</p>
             </div>
@@ -562,7 +562,7 @@ const Proof = () => {
                       <div className="h-3 w-24 bg-slate-100 rounded" />
                       <div className="h-8 w-40 bg-slate-900 rounded-xl" />
                    </div>
-                   <div className="h-12 w-32 bg-indigo-50 border border-indigo-100 rounded-xl" />
+                   <div className="h-12 w-32 bg-emerald-50 border border-emerald-100 rounded-xl" />
                 </div>
                 <div className="space-y-6">
                    {[65, 42, 88].map((w, i) => (
@@ -572,7 +572,7 @@ const Proof = () => {
                            <span>{w}%</span>
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                           <div className="h-full bg-indigo-500 transition-all" style={{ width: `${w}%` }} />
+                           <div className="h-full bg-emerald-500 transition-all" style={{ width: `${w}%` }} />
                         </div>
                      </div>
                    ))}
@@ -608,11 +608,11 @@ const Testimonial = () => {
         <h2 className="text-3xl font-bold tracking-tight text-slate-900">{content.title}</h2>
       </div>
       <div className="max-w-5xl mx-auto bg-slate-900 rounded-[48px] px-10 py-24 overflow-hidden relative shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
         
         <div className="flex flex-col items-center text-center space-y-12 relative z-10">
           <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-            <Zap className="w-8 h-8 text-indigo-400 fill-indigo-400" />
+            <Zap className="w-8 h-8 text-emerald-400 fill-emerald-400" />
           </div>
           <blockquote className="text-2xl md:text-4xl font-bold leading-tight text-white tracking-tight max-w-3xl">
             &ldquo;{content.quote}&rdquo;
@@ -649,7 +649,7 @@ const Stats = () => {
       </div>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-0">
         <div className="text-center space-y-4 px-8 border-slate-200 md:border-r">
-          <p className="text-6xl font-black tracking-tighter text-indigo-600">{content.stat1.value}</p>
+          <p className="text-6xl font-black tracking-tighter text-emerald-600">{content.stat1.value}</p>
           <div className="space-y-1">
             <p className="text-xl font-bold text-slate-900">{content.stat1.label}</p>
             <p className="text-slate-500">{content.stat1.desc}</p>
@@ -691,7 +691,7 @@ const Enterprise = () => {
 
   return (
     <section className="py-32 px-4 bg-slate-900 overflow-hidden text-white relative">
-       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
           <div className="space-y-8">
              <h2 className="text-4xl md:text-5xl font-bold tracking-tight">{content.title}</h2>
@@ -699,7 +699,7 @@ const Enterprise = () => {
              <div className="grid grid-cols-2 gap-4">
                 {content.items.map((item, i) => (
                   <div key={i} className="flex items-center gap-3 text-slate-300">
-                     <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                     <ShieldCheck className="w-5 h-5 text-emerald-400" />
                      <span className="text-sm font-medium">{item}</span>
                   </div>
                 ))}
@@ -713,7 +713,7 @@ const Enterprise = () => {
                       <span className="text-emerald-400">{content.status}</span>
                    </div>
                    <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
-                      <div className="h-full w-full bg-indigo-500" />
+                      <div className="h-full w-full bg-emerald-500" />
                    </div>
                    <div className="grid grid-cols-3 gap-4">
                       {[1,2,3].map(i => (
@@ -722,7 +722,7 @@ const Enterprise = () => {
                    </div>
                 </div>
              </div>
-             <div className="absolute -top-6 -right-6 p-4 bg-indigo-500 rounded-2xl shadow-xl shadow-indigo-500/20 rotate-12">
+             <div className="absolute -top-6 -right-6 p-4 bg-emerald-500 rounded-2xl shadow-xl shadow-emerald-500/20 rotate-12">
                 <ShieldCheck className="w-8 h-8 text-white" />
              </div>
           </div>
@@ -754,7 +754,7 @@ const FinalCTA = () => {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
              <Link 
                to="/login"
-               className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
+               className="bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
              >
                {content.cta1} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
              </Link>
@@ -808,17 +808,17 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24">
         <div className="col-span-2 md:col-span-1 space-y-8">
           <div className="flex items-center gap-3 text-slate-900">
-            <div className="p-1.5 bg-indigo-600 rounded-lg shadow-indigo-100 shadow-lg">
+            <div className="p-1.5 bg-emerald-600 rounded-lg shadow-emerald-100 shadow-lg">
               <Zap className="w-6 h-6 fill-white text-white" />
             </div>
             <span className="font-bold text-2xl tracking-tight">AnyTokn</span>
           </div>
           <p className="text-sm leading-relaxed max-w-xs font-medium">{content.tagline}</p>
           <div className="flex gap-5">
-            <Twitter className="w-5 h-5 hover:text-indigo-600 cursor-pointer transition-colors" />
-            <Github className="w-5 h-5 hover:text-indigo-600 cursor-pointer transition-colors" />
-            <Instagram className="w-5 h-5 hover:text-indigo-600 cursor-pointer transition-colors" />
-            <Linkedin className="w-5 h-5 hover:text-indigo-600 cursor-pointer transition-colors" />
+            <Twitter className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+            <Github className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+            <Instagram className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+            <Linkedin className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
           </div>
         </div>
         
@@ -826,7 +826,7 @@ const Footer = () => {
           <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{content.product}</h4>
           <ul className="space-y-3 text-sm font-medium">
             {content.productItems.map((item, i) => (
-              <li key={i}><a href="#" className="hover:text-indigo-600 transition-colors">{item}</a></li>
+              <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
             ))}
           </ul>
         </div>
@@ -835,7 +835,7 @@ const Footer = () => {
           <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{content.engineering}</h4>
           <ul className="space-y-3 text-sm font-medium">
             {content.engineeringItems.map((item, i) => (
-              <li key={i}><a href="#" className="hover:text-indigo-600 transition-colors">{item}</a></li>
+              <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
             ))}
           </ul>
         </div>
@@ -844,7 +844,7 @@ const Footer = () => {
           <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{content.resources}</h4>
           <ul className="space-y-3 text-sm font-medium">
             {content.resourcesItems.map((item, i) => (
-              <li key={i}><a href="#" className="hover:text-indigo-600 transition-colors">{item}</a></li>
+              <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
             ))}
           </ul>
         </div>
@@ -853,7 +853,7 @@ const Footer = () => {
           <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{content.company}</h4>
           <ul className="space-y-3 text-sm font-medium">
             {content.companyItems.map((item, i) => (
-              <li key={i}><a href="#" className="hover:text-indigo-600 transition-colors">{item}</a></li>
+              <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
             ))}
           </ul>
         </div>
@@ -862,9 +862,9 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto pt-10 border-t border-slate-100 text-[13px] flex flex-col md:flex-row justify-between items-center gap-6">
         <p className="font-medium">{content.copyright}</p>
         <div className="flex gap-10 font-bold">
-          <a href="#" className="hover:text-indigo-600 transition-colors">{content.privacy}</a>
-          <a href="#" className="hover:text-indigo-600 transition-colors">{content.terms}</a>
-          <a href="#" className="hover:text-indigo-600 transition-colors">{content.cookies}</a>
+          <a href="#" className="hover:text-emerald-600 transition-colors">{content.privacy}</a>
+          <a href="#" className="hover:text-emerald-600 transition-colors">{content.terms}</a>
+          <a href="#" className="hover:text-emerald-600 transition-colors">{content.cookies}</a>
         </div>
       </div>
     </footer>
