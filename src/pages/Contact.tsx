@@ -4,13 +4,8 @@ import { motion } from "motion/react";
 import { 
   Menu, 
   X, 
-  ArrowRight,
   Zap,
   Globe,
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
   Send,
   CheckCircle,
   MessageSquare,
@@ -125,54 +120,6 @@ const Hero = () => {
         >
           {content.subtitle}
         </motion.p>
-      </div>
-    </section>
-  );
-};
-
-const ContactInfo = () => {
-  const { lang } = useLanguage();
-
-  const content = lang === 'zh' ? {
-    title: '联系方式',
-    items: [
-      { icon: <Mail className="w-6 h-6" />, label: '电子邮件', value: 'contact@anytokn.com', desc: '工作日 24 小时内回复' },
-      { icon: <Phone className="w-6 h-6" />, label: '电话', value: '+86 400-888-8888', desc: '工作日 9:00-18:00' },
-      { icon: <MapPin className="w-6 h-6" />, label: '地址', value: '北京市朝阳区科技园区', desc: '欢迎预约参观' },
-      { icon: <Clock className="w-6 h-6" />, label: '工作时间', value: '周一至周五', desc: '9:00 - 18:00 (GMT+8)' },
-    ]
-  } : {
-    title: 'Contact Information',
-    items: [
-      { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'contact@anytokn.com', desc: 'Reply within 24 hours on weekdays' },
-      { icon: <Phone className="w-6 h-6" />, label: 'Phone', value: '+1 (555) 123-4567', desc: 'Mon-Fri 9:00-18:00' },
-      { icon: <MapPin className="w-6 h-6" />, label: 'Address', value: 'San Francisco, CA', desc: 'By appointment only' },
-      { icon: <Clock className="w-6 h-6" />, label: 'Working Hours', value: 'Monday - Friday', desc: '9:00 - 18:00 (PST)' },
-    ]
-  };
-
-  return (
-    <section className="py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center text-slate-900 mb-16">{content.title}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {content.items.map((item, i) => (
-            <motion.div
-              key={i}
-              className="p-8 bg-white rounded-[24px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-            >
-              <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
-                {item.icon}
-              </div>
-              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">{item.label}</h3>
-              <p className="text-lg font-bold text-slate-900 mb-2">{item.value}</p>
-              <p className="text-sm text-slate-500">{item.desc}</p>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -493,7 +440,6 @@ export default function Contact() {
       <Navbar />
       <main>
         <Hero />
-        <ContactInfo />
         <ContactForm />
         <WhyContact />
       </main>
