@@ -6,148 +6,104 @@ import {
   ArrowRight,
   Shield,
   TrendingDown,
-  PieChart,
   Zap,
   Check,
   Menu,
   X,
-  Sparkles,
   BarChart3,
   Lock,
   Users,
-  ArrowUpRight,
   Target,
-  BadgeCheck,
-  Play,
+  Code2,
+  Layers,
+  Sparkles,
+  ChevronRight,
+  Terminal,
+  Cpu,
+  LineChart,
+  Wallet,
+  Bell,
 } from 'lucide-react';
 import { type Language } from '../i18n';
-
-// Enterprise Badge Component
-const EnterpriseBadge = () => (
-  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
-    <BadgeCheck className="w-4 h-4 text-emerald-600" />
-    <span className="text-sm font-medium text-emerald-700">Enterprise-Grade</span>
-  </div>
-);
-
-// Stats Card Component
-const StatsCard = ({ value, label, trend }: { value: string; label: string; trend?: string }) => (
-  <div className="p-6 rounded-2xl bg-white border border-neutral-200 shadow-sm">
-    <div className="text-3xl md:text-4xl font-bold text-black mb-1">{value}</div>
-    <div className="text-sm text-neutral-500 mb-2">{label}</div>
-    {trend && (
-      <div className="flex items-center gap-1 text-sm text-emerald-600">
-        <TrendingDown className="w-4 h-4" />
-        <span>{trend}</span>
-      </div>
-    )}
-  </div>
-);
 
 // Feature Card Component
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  metric?: string;
 }
 
-const FeatureCard = ({ icon, title, description, metric }: FeatureCardProps) => (
-  <div className="group relative p-8 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-300 hover:shadow-xl transition-all duration-300">
-    <div className="w-14 h-14 rounded-xl bg-neutral-100 flex items-center justify-center mb-5 group-hover:bg-black group-hover:text-white transition-colors">
+const FeatureCard = ({ icon, title, description }: FeatureCardProps) => (
+  <div className="group p-6 rounded-xl bg-white border border-slate-200 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
+    <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
       {icon}
     </div>
-    <h3 className="text-xl font-semibold text-black mb-3">{title}</h3>
-    <p className="text-neutral-600 leading-relaxed mb-4">{description}</p>
-    {metric && (
-      <div className="flex items-center gap-2 text-sm font-medium text-emerald-600">
-        <ArrowUpRight className="w-4 h-4" />
-        <span>{metric}</span>
+    <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+    <p className="text-sm text-slate-600 leading-relaxed">{description}</p>
+  </div>
+);
+
+// Code Block Component
+const CodeBlock = () => (
+  <div className="bg-slate-900 rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex items-center gap-2 px-4 py-3 bg-slate-800 border-b border-slate-700">
+      <div className="flex gap-1.5">
+        <div className="w-3 h-3 rounded-full bg-red-500" />
+        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+        <div className="w-3 h-3 rounded-full bg-green-500" />
       </div>
-    )}
-  </div>
-);
-
-// Trust Badge Component
-const TrustBadge = ({ text }: { text: string }) => (
-  <div className="flex items-center gap-2 text-sm text-neutral-600">
-    <Check className="w-4 h-4 text-emerald-500" />
-    <span>{text}</span>
-  </div>
-);
-
-// Pricing Card Component - Currently not used
-/*
-interface PricingCardProps {
-  name: string;
-  price: string;
-  period?: string;
-  description: string;
-  features: string[];
-  cta: string;
-  popular?: boolean;
-}
-
-const PricingCard = ({ name, price, period, description, features, cta, popular }: PricingCardProps) => (
-  <div className={`relative p-8 rounded-2xl border ${popular ? 'border-black shadow-2xl' : 'border-neutral-200'} bg-white`}>
-    {popular && (
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-        <span className="bg-black text-white text-xs font-semibold px-4 py-1.5 rounded-full">
-          最受欢迎
-        </span>
+      <div className="flex gap-4 ml-4 text-xs text-slate-400">
+        <span className="text-blue-400 border-b-2 border-blue-400 pb-3">TypeScript</span>
+        <span>Python</span>
+        <span>cURL</span>
       </div>
-    )}
-    <div className="mb-6">
-      <h3 className="text-lg font-semibold text-black mb-2">{name}</h3>
-      <p className="text-sm text-neutral-500">{description}</p>
     </div>
-    <div className="mb-6">
-      <span className="text-4xl font-bold text-black">{price}</span>
-      {period && <span className="text-neutral-500 ml-1">{period}</span>}
+    <div className="p-4 text-sm font-mono overflow-x-auto">
+      <pre className="text-slate-300">
+        <code>{`import OpenAI from "openai";
+
+const client = new OpenAI({
+  baseURL: "https://api.anytokn.io/v1",
+  apiKey: process.env.ANYTOKN_API_KEY
+});
+
+const response = await client.chat.completions.create({
+  model: "gpt-4o",
+  messages: [{ role: "user", content: "Hello!" }]
+});`}</code>
+      </pre>
     </div>
-    <ul className="space-y-3 mb-8">
-      {features.map((feature, i) => (
-        <li key={i} className="flex items-start gap-3 text-sm text-neutral-600">
-          <Check className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
-          <span>{feature}</span>
-        </li>
-      ))}
-    </ul>
-    <button className={`w-full py-3.5 rounded-xl font-semibold transition-colors ${
-      popular
-        ? 'bg-black text-white hover:bg-neutral-800'
-        : 'border border-neutral-200 text-black hover:bg-neutral-50'
-    }`}>
-      {cta}
-    </button>
   </div>
 );
-*/
+
+// Stat Card Component
+const StatCard = ({ value, label }: { value: string; label: string }) => (
+  <div className="text-center">
+    <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">{value}</div>
+    <div className="text-sm text-slate-500">{label}</div>
+  </div>
+);
 
 // Testimonial Card Component
-const TestimonialCard = ({ quote, author, role, company, metric }: { quote: string; author: string; role: string; company: string; metric: string }) => (
-  <div className="p-8 rounded-2xl bg-neutral-50 border border-neutral-100">
-    <div className="flex items-center gap-1 mb-4">
-      {[...Array(5)].map((_, i) => (
-        <Sparkles key={i} className="w-4 h-4 text-black fill-black" />
-      ))}
-    </div>
-    <p className="text-lg text-neutral-700 mb-6 leading-relaxed">&ldquo;{quote}&rdquo;</p>
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-neutral-200 flex items-center justify-center text-sm font-bold text-black">
-          {author[0]}
-        </div>
-        <div>
-          <p className="font-semibold text-black">{author}</p>
-          <p className="text-sm text-neutral-500">{role} · {company}</p>
-        </div>
+const TestimonialCard = ({ quote, author, role, company }: { quote: string; author: string; role: string; company: string }) => (
+  <div className="p-6 rounded-xl bg-slate-50 border border-slate-100">
+    <p className="text-slate-700 mb-6 leading-relaxed">&ldquo;{quote}&rdquo;</p>
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-semibold text-blue-600">
+        {author[0]}
       </div>
-      <div className="text-right">
-        <p className="text-2xl font-bold text-emerald-600">{metric}</p>
-        <p className="text-xs text-neutral-500">成本节省</p>
+      <div>
+        <p className="font-semibold text-slate-900 text-sm">{author}</p>
+        <p className="text-xs text-slate-500">{role} · {company}</p>
       </div>
     </div>
+  </div>
+);
+
+// Logo Component
+const Logo = ({ name }: { name: string }) => (
+  <div className="text-slate-400 font-semibold text-sm hover:text-slate-600 transition-colors cursor-default">
+    {name}
   </div>
 );
 
@@ -164,141 +120,94 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: <BarChart3 className="w-7 h-7" />,
-      title: lang === 'zh' ? '智能质量评估系统' : 'Intelligent Quality Assessment',
-      description: lang === 'zh'
-        ? '基于多维度质量评分模型，实时监控输出质量。确保在任何成本优化策略下，服务质量始终保持在企业级标准之上。'
-        : 'Multi-dimensional quality scoring model for real-time output monitoring. Ensures service quality always exceeds enterprise standards under any cost optimization strategy.',
-      metric: lang === 'zh' ? '质量评分 98%+' : '98%+ quality score',
+      icon: <BarChart3 className="w-6 h-6" />,
+      title: lang === 'zh' ? '智能 LLM 路由' : 'Smart LLM Routing',
+      description: lang === 'zh' 
+        ? '基于成本和质量的智能路由，自动选择最优模型组合，在不影响输出质量的前提下降低成本。'
+        : 'Intelligent routing based on cost and quality, automatically selecting the optimal model combination.',
     },
     {
-      icon: <Zap className="w-7 h-7" />,
-      title: lang === 'zh' ? '质量优先模型路由' : 'Quality-First Model Routing',
+      icon: <Code2 className="w-6 h-6" />,
+      title: lang === 'zh' ? 'Agent 调试' : 'Agent Debugging',
       description: lang === 'zh'
-        ? '以满足质量阈值为前提，智能选择成本最优模型。质量不达标时自动升级模型，确保用户体验不受影响的前提下实现成本优化。'
-        : 'Intelligently selects cost-optimal models while meeting quality thresholds. Automatically upgrades models when quality is substandard, ensuring cost optimization without compromising user experience.',
-      metric: lang === 'zh' ? '质量达标率 99.9%' : '99.9% quality compliance',
+        ? '完整的调用链路追踪，可视化时间线和错误日志，快速定位问题根源。'
+        : 'Complete call chain tracing with visualized timelines and error logs for quick root cause analysis.',
     },
     {
-      icon: <Target className="w-7 h-7" />,
-      title: lang === 'zh' ? '高质量语义缓存' : 'High-Quality Semantic Caching',
+      icon: <Layers className="w-6 h-6" />,
+      title: lang === 'zh' ? '完整可观测性' : 'Complete Visibility',
       description: lang === 'zh'
-        ? '仅缓存高质量历史结果，通过语义相似度匹配复用。在确保输出质量一致性的前提下，显著降低重复请求成本。'
-        : 'Only caches high-quality historical results for semantic similarity matching. Significantly reduces duplicate request costs while ensuring output quality consistency.',
-      metric: lang === 'zh' ? '质量一致性 100%' : '100% quality consistency',
-    },
-    {
-      icon: <PieChart className="w-7 h-7" />,
-      title: lang === 'zh' ? '质量成本平衡分析' : 'Quality-Cost Balance Analysis',
-      description: lang === 'zh'
-        ? '追踪每次请求的质量评分与成本关系，识别高性价比调用模式。帮助企业在保证质量的前提下，找到最优成本结构。'
-        : 'Tracks quality scores and cost relationships per request to identify high-value calling patterns. Helps enterprises find optimal cost structure while ensuring quality.',
-      metric: lang === 'zh' ? '性价比提升 40%+' : '40%+ value improvement',
-    },
-    {
-      icon: <Shield className="w-7 h-7" />,
-      title: lang === 'zh' ? '质量保障预算管控' : 'Quality-Assured Budget Control',
-      description: lang === 'zh'
-        ? '设置质量红线预算，当成本优化可能影响质量时自动预警。确保预算控制不以牺牲服务质量为代价。'
-        : 'Sets quality baseline budgets with automatic alerts when cost optimization may affect quality. Ensures budget control never compromises service quality.',
-      metric: lang === 'zh' ? '质量零妥协' : 'Zero quality compromise',
-    },
-    {
-      icon: <Users className="w-7 h-7" />,
-      title: lang === 'zh' ? '团队质量协同' : 'Team Quality Collaboration',
-      description: lang === 'zh'
-        ? '团队级质量指标监控，确保组织内所有成员的 AI 调用都符合质量标准。统一质量评估体系，保障企业级服务一致性。'
-        : 'Team-level quality metrics monitoring ensures all members\' AI calls meet quality standards. Unified quality assessment system guarantees enterprise service consistency.',
-      metric: lang === 'zh' ? '团队质量达标率 100%' : '100% team quality compliance',
+        ? '全面的分析仪表板，实时监控成本、质量、延迟等关键指标。'
+        : 'Comprehensive analytics dashboard for real-time monitoring of cost, quality, and latency metrics.',
     },
   ];
 
   const testimonials = [
     {
       quote: lang === 'zh'
-        ? '在确保输出质量不打折的前提下，AnyTokn 帮助我们将 AI 成本降低了 42%。质量评分始终保持在 98% 以上，ROI 非常显著。'
-        : 'While ensuring no compromise in output quality, AnyTokn helped us reduce AI costs by 42%. Quality scores consistently remain above 98%, with remarkable ROI.',
+        ? 'AnyTokn 帮助我们将 AI 成本降低了 40%，同时保持了高质量的输出。这是我们 codebase 中最具影响力的一行代码变更。'
+        : 'AnyTokn helped us reduce AI costs by 40% while maintaining high-quality output. The most impactful one-line change to our codebase.',
       author: lang === 'zh' ? '张明' : 'Michael Zhang',
       role: 'CTO',
       company: 'TechFlow AI',
-      metric: lang === 'zh' ? '质量 98%+' : 'Quality 98%+',
     },
     {
       quote: lang === 'zh'
-        ? '最重要的是我们的服务质量完全没有下降。客户满意度反而提升了 15%，同时成本降低了 38%，这是真正的降本增效。'
-        : 'Most importantly, our service quality remained intact. Customer satisfaction actually improved by 15% while costs dropped 38% - true efficiency gains.',
+        ? '路由优化功能让我们的响应速度提升了 30%，成本却降低了 35%。ROI 非常显著。'
+        : 'The routing optimization improved our response time by 30% while reducing costs by 35%. Remarkable ROI.',
       author: lang === 'zh' ? '李华' : 'Sarah Li',
       role: 'VP Engineering',
       company: 'DataMind',
-      metric: lang === 'zh' ? '满意度 +15%' : 'Satisfaction +15%',
-    },
-    {
-      quote: lang === 'zh'
-        ? '质量优先的路由策略让我们在降低成本 35% 的同时，响应质量指标反而提升了。终于找到了质量与成本的最佳平衡点。'
-        : 'Quality-first routing strategy allowed us to reduce costs by 35% while improving response quality metrics. Finally found the optimal balance between quality and cost.',
-      author: lang === 'zh' ? '王芳' : 'David Wang',
-      role: 'Tech Lead',
-      company: 'CloudScale',
-      metric: lang === 'zh' ? '质量提升' : 'Quality Up',
     },
   ];
 
-  const enterpriseFeatures = [
-    'SOC 2 Type II 认证',
-    'GDPR 合规',
-    'ISO 27001 认证',
-    '99.99% SLA 保障',
-    '专属客户成功经理',
-    '7x24 技术支持',
-  ];
+  const logos = ['together.ai', 'GA WOLF', 'CLAY', 'Flevine', 'PadPitch', 'Suprin'];
 
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100' : 'bg-white'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
-              <span className="text-xl font-bold text-black">AnyTokn</span>
+              <span className="text-xl font-bold text-slate-900">AnyTokn</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                {lang === 'zh' ? '核心功能' : 'Features'}
+              <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                {lang === 'zh' ? '功能' : 'Features'}
               </a>
-              <a href="#enterprise" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                {lang === 'zh' ? '企业级' : 'Enterprise'}
+              <a href="#docs" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                {lang === 'zh' ? '文档' : 'Docs'}
               </a>
-              <a href="#pricing" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
+              <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
                 {lang === 'zh' ? '价格' : 'Pricing'}
+              </a>
+              <a href="#resources" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                {lang === 'zh' ? '资源' : 'Resources'}
               </a>
             </nav>
 
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-                className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-black transition-colors"
+                className="hidden md:flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
               >
                 <Globe className="w-4 h-4" />
                 <span>{lang === 'zh' ? 'EN' : '中文'}</span>
               </button>
 
-              <div className="hidden md:flex items-center gap-3">
-                <Link to="/login" className="text-sm font-medium text-neutral-600 hover:text-black transition-colors">
-                  {lang === 'zh' ? '登录' : 'Login'}
-                </Link>
-                <Link
-                  to="/login"
-                  className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
-                >
-                  {lang === 'zh' ? '免费试用' : 'Start Free'}
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {lang === 'zh' ? '登录' : 'Log in'}
+              </Link>
 
               <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -307,12 +216,12 @@ export default function LandingPage() {
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-neutral-100">
+            <div className="md:hidden py-4 border-t border-slate-100">
               <nav className="flex flex-col gap-4">
-                <a href="#features" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '核心功能' : 'Features'}</a>
-                <a href="#enterprise" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '企业级' : 'Enterprise'}</a>
-                <a href="#pricing" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '价格' : 'Pricing'}</a>
-                <Link to="/login" className="text-sm font-medium text-neutral-600">{lang === 'zh' ? '登录' : 'Login'}</Link>
+                <a href="#features" className="text-sm font-medium text-slate-600">{lang === 'zh' ? '功能' : 'Features'}</a>
+                <a href="#docs" className="text-sm font-medium text-slate-600">{lang === 'zh' ? '文档' : 'Docs'}</a>
+                <a href="#pricing" className="text-sm font-medium text-slate-600">{lang === 'zh' ? '价格' : 'Pricing'}</a>
+                <Link to="/login" className="text-sm font-medium text-slate-600">{lang === 'zh' ? '登录' : 'Login'}</Link>
               </nav>
             </div>
           )}
@@ -320,89 +229,86 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 md:pt-40 pb-20 md:pb-32 bg-gradient-to-b from-neutral-50 via-white to-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <EnterpriseBadge />
-            
-            <h1 className="mt-8 text-4xl md:text-6xl lg:text-7xl font-bold text-black leading-tight mb-6">
-              {lang === 'zh' ? '企业级 Token' : 'Enterprise Token'}
-              <br />
-              <span className="text-emerald-600">{lang === 'zh' ? '高质量成本优化引擎' : 'Quality Cost Optimization Engine'}</span>
-            </h1>
+      <section className="pt-32 pb-20 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
+            {lang === 'zh' ? '构建与扩展' : 'Build & Scale'}
+            <br />
+            {lang === 'zh' ? '可靠的 AI 应用' : 'Reliable AI Apps'}
+          </h1>
 
-            <p className="text-lg md:text-xl text-neutral-600 max-w-3xl mx-auto mb-10">
-              {lang === 'zh'
-                ? '在确保高质量输出的前提下，通过AI驱动的高精度智能优化引擎，及全链路数据洞察，结合客户业务场景实现让每个Token支出都转化为最大业务价值。'
-                : 'While ensuring high-quality output, through AI-driven high-precision intelligent optimization engine and full-link data insights, combined with customer business scenarios, transform every Token expenditure into maximum business value.'}
-            </p>
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-8">
+            {lang === 'zh'
+              ? 'AI 可观测性、管理和路由的基础平台。信任您的 AI 技术栈。'
+              : 'The essential platform for AI observability, management, and routing. Trust your AI stack.'}
+          </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link
-                to="/login"
-                className="w-full sm:w-auto px-8 py-4 bg-black text-white font-semibold rounded-xl hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
-              >
-                {lang === 'zh' ? '立即降本增效' : 'Reduce Costs Now'}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <a
-                href="#demo"
-                className="w-full sm:w-auto px-8 py-4 border border-neutral-200 text-black font-semibold rounded-xl hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
-              >
-                <Play className="w-4 h-4" />
-                {lang === 'zh' ? '观看演示' : 'Watch Demo'}
-              </a>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-500">
-              <TrustBadge text={lang === 'zh' ? '无需信用卡' : 'No credit card required'} />
-              <TrustBadge text={lang === 'zh' ? '免费技术支持' : 'Free technical support'} />
-              <TrustBadge text={lang === 'zh' ? '随时取消' : 'Cancel anytime'} />
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <Link
+              to="/login"
+              className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              {lang === 'zh' ? '免费开始' : 'Start for free'}
+            </Link>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
-            <StatsCard value="35%" label={lang === 'zh' ? '平均成本降低' : 'Avg Cost Reduction'} trend={lang === 'zh' ? '最高达 50%' : 'Up to 50%'} />
-            <StatsCard value="500+" label={lang === 'zh' ? '企业客户' : 'Enterprise Clients'} />
-            <StatsCard value="$50M+" label={lang === 'zh' ? '为客户节省' : 'Saved for Clients'} />
-            <StatsCard value="99.99%" label={lang === 'zh' ? 'SLA 保障' : 'SLA Uptime'} />
+          {/* Dashboard Preview */}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl blur-3xl" />
+            <div className="relative bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 text-center text-xs text-slate-400">AnyTokn Dashboard</div>
+              </div>
+              <div className="p-6 grid grid-cols-3 gap-4">
+                <div className="col-span-2 bg-slate-50 rounded-lg p-4">
+                  <div className="text-sm font-medium text-slate-600 mb-2">Cost Overview</div>
+                  <div className="h-24 bg-white rounded border border-slate-200 flex items-end p-2 gap-1">
+                    {[40, 65, 45, 80, 55, 70, 60, 85, 50, 75, 45, 90].map((h, i) => (
+                      <div key={i} className="flex-1 bg-blue-500 rounded-t" style={{ height: `${h}%` }} />
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <div className="text-xs text-slate-500">Requests</div>
+                    <div className="text-xl font-bold text-slate-900">22.8K</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <div className="text-xs text-slate-500">Tokens</div>
+                    <div className="text-xl font-bold text-slate-900">6.35M</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <div className="text-xs text-slate-500">Cost</div>
+                    <div className="text-xl font-bold text-slate-900">$12.5K</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Logo Cloud */}
-      <section className="py-12 border-y border-neutral-100 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <p className="text-center text-sm text-neutral-500 mb-8">
-            {lang === 'zh' ? '被全球领先企业信赖' : 'Trusted by leading enterprises worldwide'}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-50">
-            {['Fortune 500', '独角兽企业', '上市公司', '政府机构', '金融机构', '科技公司'].map((name) => (
-              <div key={name} className="text-lg font-semibold text-neutral-400">{name}</div>
-            ))}
+      {/* Code Section */}
+      <section className="py-20 bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <CodeBlock />
+          <div className="text-center mt-6">
+            <button className="px-4 py-2 bg-white/10 text-white text-sm rounded-lg hover:bg-white/20 transition-colors">
+              {lang === 'zh' ? '查看全部 100+ 模型' : 'View all 100+ models'}
+            </button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block px-4 py-2 rounded-full bg-neutral-100 text-sm font-semibold text-neutral-700 mb-4">
-              {lang === 'zh' ? '核心能力' : 'Core Capabilities'}
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4">
-              {lang === 'zh' ? '全方位 AI 成本管理' : 'Comprehensive AI Cost Management'}
-            </h2>
-            <p className="text-lg text-neutral-600">
-              {lang === 'zh'
-                ? '从成本分析到自动优化，为企业提供端到端的 AI 资源管理解决方案'
-                : 'From cost analysis to automatic optimization, providing end-to-end AI resource management solutions for enterprises'}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <FeatureCard key={i} {...feature} />
             ))}
@@ -410,165 +316,102 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Enterprise Section */}
-      <section id="enterprise" className="py-20 md:py-32 bg-neutral-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-block px-4 py-2 rounded-full bg-white/10 text-sm font-semibold text-white/80 mb-6">
-                {lang === 'zh' ? '企业级安全与合规' : 'Enterprise Security & Compliance'}
-              </span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-                {lang === 'zh' ? '为大型企业' : 'Built for'}
-                <br />
-                <span className="text-emerald-400">{lang === 'zh' ? '安全而生' : 'Enterprise Security'}</span>
-              </h2>
-              <p className="text-lg text-white/70 mb-8">
-                {lang === 'zh'
-                  ? 'SOC 2 Type II、GDPR、ISO 27001 认证。端到端加密，细粒度权限控制，完整审计日志。'
-                  : 'SOC 2 Type II, GDPR, ISO 27001 certified. End-to-end encryption, granular access control, complete audit logs.'}
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {enterpriseFeatures.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-white/80">
-                    <Shield className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
-              >
-                {lang === 'zh' ? '联系销售' : 'Contact Sales'}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-blue-500/20 rounded-3xl blur-3xl" />
-              <div className="relative bg-white/5 border border-white/10 rounded-2xl p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                    <Lock className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">{lang === 'zh' ? '安全认证' : 'Security Certifications'}</p>
-                    <p className="text-sm text-white/50">{lang === 'zh' ? '已通过全部认证' : 'All certifications passed'}</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {['SOC 2 Type II', 'ISO 27001', 'GDPR', 'HIPAA'].map((cert) => (
-                    <div key={cert} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
-                      <span className="text-white/80">{cert}</span>
-                      <Check className="w-5 h-5 text-emerald-400" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 md:py-32 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-black mb-4">
-              {lang === 'zh' ? '客户成功案例' : 'Customer Success Stories'}
-            </h2>
-            <p className="text-lg text-neutral-600">
-              {lang === 'zh' ? '看看其他企业如何使用 AnyTokn 优化 AI 成本' : 'See how other enterprises use AnyTokn to optimize AI costs'}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, i) => (
-              <TestimonialCard key={i} {...testimonial} />
+      {/* Logo Cloud */}
+      <section className="py-12 border-y border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            {logos.map((name) => (
+              <Logo key={name} name={name} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 md:py-32 bg-black">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {lang === 'zh' ? '质量与成本兼得' : 'Quality & Cost Together'}
-          </h2>
-          <p className="text-lg text-white/60 mb-10 max-w-2xl mx-auto">
-            {lang === 'zh'
-              ? '加入 500+ 企业，在确保输出质量的前提下，实现 AI 成本优化。质量零妥协，成本更优。'
-              : 'Join 500+ enterprises in optimizing AI costs while ensuring output quality. Zero quality compromise, better costs.'}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/login"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-neutral-100 transition-colors"
-            >
-              {lang === 'zh' ? '立即降本增效' : 'Reduce Costs Now'}
-            </Link>
-            <a
-              href="#contact"
-              className="w-full sm:w-auto px-8 py-4 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors"
-            >
-              {lang === 'zh' ? '预约演示' : 'Book Demo'}
-            </a>
+      {/* Testimonial Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4 md:px-6">
+          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-slate-100">
+            <div className="flex items-start gap-6">
+              <div className="w-16 h-16 rounded-full bg-slate-200 flex-shrink-0" />
+              <div>
+                <p className="text-lg md:text-xl text-slate-700 mb-4 leading-relaxed">
+                  {lang === 'zh'
+                    ? '对我们 codebase 来说，这是最具影响力的一行代码变更。'
+                    : 'The most impactful one-line change I\'ve seen applied to our codebase.'}
+                </p>
+                <p className="font-semibold text-slate-900">Nishant Shukla</p>
+                <p className="text-sm text-slate-500">Sr. Director of AI at QA Wolf</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <StatCard value="9.5 Billion" label={lang === 'zh' ? '处理的请求' : 'requests processed'} />
+            <StatCard value="2.3 Trillion" label={lang === 'zh' ? '每月 Token' : 'tokens a month'} />
+            <StatCard value="60.7 Million" label={lang === 'zh' ? '追踪的用户' : 'users tracked'} />
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-16 bg-neutral-50 border-t border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+      <footer className="py-16 bg-slate-900 text-white">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '产品' : 'Product'}</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm">{lang === 'zh' ? '集成' : 'Integrations'}</h4>
               <ul className="space-y-2">
-                <li><a href="#features" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '功能' : 'Features'}</a></li>
-                <li><a href="#pricing" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '价格' : 'Pricing'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">API</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '关于' : 'About'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '集成' : 'Integrations'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '联系' : 'Contact'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '资源' : 'Resources'}</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm">{lang === 'zh' ? '博客' : 'Blogs'}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '文档' : 'Docs'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Blog</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">Changelog</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Helicone Downtimes</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Blog AI Fire Koe</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Helicone Skateboards</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Term in Geometry</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '公司' : 'Company'}</h4>
+              <h4 className="font-semibold text-white mb-4 text-sm">{lang === 'zh' ? '资源' : 'Resources'}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '关于' : 'About'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '招聘' : 'Careers'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '联系' : 'Contact'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '关于' : 'About'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '资源' : 'Resources'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '隐私政策' : 'Privacy Policy'}</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">{lang === 'zh' ? '条款与条件' : 'Terms & Conditions'}</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-black mb-4">{lang === 'zh' ? '法律' : 'Legal'}</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '隐私' : 'Privacy'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '条款' : 'Terms'}</a></li>
-                <li><a href="#" className="text-sm text-neutral-600 hover:text-black">{lang === 'zh' ? '安全' : 'Security'}</a></li>
-              </ul>
+              <h4 className="font-semibold text-white mb-4 text-sm">{lang === 'zh' ? '联系' : 'Connect'}</h4>
+              <div className="flex gap-4">
+                <a href="#" className="text-slate-400 hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+                <a href="#" className="text-slate-400 hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-neutral-200">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-6 h-6 bg-black rounded-md flex items-center justify-center">
+          <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between">
+            <p className="text-sm text-slate-500">
+              © Copyright 2024 AnyTokn
+            </p>
+            <div className="flex items-center gap-2 mt-4 md:mt-0">
+              <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
                 <Hexagon className="w-3 h-3 text-white" strokeWidth={2.5} />
               </div>
-              <span className="font-semibold text-black">AnyTokn</span>
+              <span className="font-semibold text-white">AnyTokn</span>
             </div>
-            <p className="text-sm text-neutral-500">
-              {lang === 'zh' ? '© 2024 AnyTokn. 保留所有权利。' : '© 2024 AnyTokn. All rights reserved.'}
-            </p>
           </div>
         </div>
       </footer>
