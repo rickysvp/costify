@@ -22,6 +22,7 @@ import UserDetail from './pages/UserDetail';
 import BudgetManagement from './pages/BudgetManagement';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><Layout><Projects /></Layout></ProtectedRoute>} />
           <Route path="/projects/:id" element={<ProtectedRoute><Layout><ProjectDetail /></Layout></ProtectedRoute>} />

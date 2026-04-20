@@ -48,7 +48,7 @@ const Navbar = () => {
               <span>{lang === 'zh' ? 'EN' : '中文'}</span>
             </button>
             <Link 
-              to="/login"
+              to="/contact"
               className="text-slate-600 hover:text-emerald-600 transition-colors"
             >
               {t.nav.login}
@@ -83,7 +83,7 @@ const Navbar = () => {
             <Globe className="w-5 h-5" />
             <span>{lang === 'zh' ? 'Switch to English' : '切换到中文'}</span>
           </button>
-          <Link to="/login" className="block w-full text-slate-900 py-2 font-medium text-center">
+          <Link to="/contact" className="block w-full text-slate-900 py-2 font-medium text-center">
             {t.nav.login}
           </Link>
           <Link to="/login" className="block w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-center">
