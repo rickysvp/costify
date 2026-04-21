@@ -95,74 +95,132 @@ const Navbar = () => {
   );
 };
 
+// AI Model Logo Components
+const OpenAILogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.896zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/>
+  </svg>
+);
+
+const ClaudeLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+  </svg>
+);
+
+const GeminiLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+  </svg>
+);
+
+const LlamaLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+  </svg>
+);
+
+const MistralLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <path d="M12 2L2 22h20L12 2zm0 3.5L18.5 20h-13L12 5.5z"/>
+  </svg>
+);
+
+const DeepSeekLogo = () => (
+  <svg viewBox="0 0 24 24" className="w-8 h-8" fill="currentColor">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M12 6v6l4 2" stroke="white" strokeWidth="2" fill="none"/>
+  </svg>
+);
+
 const Hero = () => {
   const { lang, t } = useLanguage();
 
-  const modelLogos = [
-    { name: 'OpenAI', seed: 'openai', top: '5%', left: '2%', delay: 0, duration: 4 },
-    { name: 'Claude', seed: 'anthropic', top: '15%', left: '8%', delay: 0.5, duration: 5 },
-    { name: 'Gemini', seed: 'google', top: '8%', right: '5%', delay: 0.3, duration: 4.5 },
-    { name: 'Groq', seed: 'groq', top: '20%', right: '2%', delay: 0.7, duration: 3.5 },
-    { name: 'Llama', seed: 'llama', top: '45%', left: '0%', delay: 0.2, duration: 6 },
-    { name: 'Mistral', seed: 'mistral', top: '50%', right: '1%', delay: 0.4, duration: 5.5 },
-    { name: 'Cohere', seed: 'cohere', top: '35%', left: '5%', delay: 0.6, duration: 4 },
-    { name: 'DeepSeek', seed: 'deepseek', top: '40%', right: '6%', delay: 0.8, duration: 5 },
-    { name: 'Qwen', seed: 'qwen', top: '60%', left: '3%', delay: 0.1, duration: 4.5 },
-    { name: 'Kimi', seed: 'kimi', top: '55%', right: '4%', delay: 0.9, duration: 3.8 },
+  const leftLogos = [
+    { Icon: OpenAILogo, name: 'GPT', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { Icon: ClaudeLogo, name: 'Claude', color: 'text-orange-600', bg: 'bg-orange-50' },
+    { Icon: GeminiLogo, name: 'Gemini', color: 'text-blue-600', bg: 'bg-blue-50' },
+  ];
+
+  const rightLogos = [
+    { Icon: LlamaLogo, name: 'Llama', color: 'text-indigo-600', bg: 'bg-indigo-50' },
+    { Icon: MistralLogo, name: 'Mistral', color: 'text-purple-600', bg: 'bg-purple-50' },
+    { Icon: DeepSeekLogo, name: 'DeepSeek', color: 'text-cyan-600', bg: 'bg-cyan-50' },
   ];
 
   return (
-    <section className="pt-32 pb-20 px-4 relative overflow-hidden">
-      {/* Floating Model Logos - Hero Section */}
-      <div className="absolute inset-0 pointer-events-none">
-        {modelLogos.map((model, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            style={{
-              top: model.top,
-              left: model.left,
-              right: model.right,
-            }}
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1,
-              y: [0, -10, 0],
-            }}
-            transition={{
-              opacity: { delay: model.delay, duration: 0.5 },
-              scale: { delay: model.delay, duration: 0.5 },
-              y: { 
-                delay: model.delay + 0.5, 
-                duration: model.duration, 
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }}
-          >
-            <div className="p-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-100 flex flex-col items-center gap-1">
-              <img 
-                src={`https://picsum.photos/seed/${model.seed}/32/32`} 
-                className="w-6 h-6 rounded" 
-                referrerPolicy="no-referrer" 
-              />
-              <span className="text-[9px] whitespace-nowrap font-bold text-slate-700">{model.name}</span>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    <section className="pt-32 pb-20 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-center gap-4 md:gap-8">
+          {/* Left Side Logos */}
+          <div className="hidden md:flex flex-col gap-3">
+            {leftLogos.map((logo, i) => (
+              <motion.div
+                key={i}
+                className={`flex items-center gap-2 px-3 py-2 ${logo.bg} rounded-xl border border-slate-100 shadow-sm`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <div className={logo.color}>
+                  <logo.Icon />
+                </div>
+                <span className="text-xs font-bold text-slate-700">{logo.name}</span>
+              </motion.div>
+            ))}
+          </div>
 
-      <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
-        <motion.h1 
-          className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {t.hero.newTitle}<br />
-          <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
-        </motion.h1>
+          {/* Center Title */}
+          <div className="text-center space-y-6 max-w-3xl">
+            <motion.h1 
+              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              {t.hero.newTitle}<br />
+              <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
+            </motion.h1>
+            
+            {/* Mobile Logos */}
+            <div className="flex md:hidden justify-center gap-2 flex-wrap">
+              {[...leftLogos, ...rightLogos].map((logo, i) => (
+                <motion.div
+                  key={i}
+                  className={`flex items-center gap-1 px-2 py-1 ${logo.bg} rounded-lg border border-slate-100`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <div className={`${logo.color} w-5 h-5`}>
+                    <logo.Icon />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-700">{logo.name}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Side Logos */}
+          <div className="hidden md:flex flex-col gap-3">
+            {rightLogos.map((logo, i) => (
+              <motion.div
+                key={i}
+                className={`flex items-center gap-2 px-3 py-2 ${logo.bg} rounded-xl border border-slate-100 shadow-sm`}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <span className="text-xs font-bold text-slate-700">{logo.name}</span>
+                <div className={logo.color}>
+                  <logo.Icon />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
         <motion.p 
           className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
