@@ -98,9 +98,62 @@ const Navbar = () => {
 const Hero = () => {
   const { lang, t } = useLanguage();
 
+  const modelLogos = [
+    { name: 'OpenAI', seed: 'openai', top: '5%', left: '2%', delay: 0, duration: 4 },
+    { name: 'Claude', seed: 'anthropic', top: '15%', left: '8%', delay: 0.5, duration: 5 },
+    { name: 'Gemini', seed: 'google', top: '8%', right: '5%', delay: 0.3, duration: 4.5 },
+    { name: 'Groq', seed: 'groq', top: '20%', right: '2%', delay: 0.7, duration: 3.5 },
+    { name: 'Llama', seed: 'llama', top: '45%', left: '0%', delay: 0.2, duration: 6 },
+    { name: 'Mistral', seed: 'mistral', top: '50%', right: '1%', delay: 0.4, duration: 5.5 },
+    { name: 'Cohere', seed: 'cohere', top: '35%', left: '5%', delay: 0.6, duration: 4 },
+    { name: 'DeepSeek', seed: 'deepseek', top: '40%', right: '6%', delay: 0.8, duration: 5 },
+    { name: 'Qwen', seed: 'qwen', top: '60%', left: '3%', delay: 0.1, duration: 4.5 },
+    { name: 'Kimi', seed: 'kimi', top: '55%', right: '4%', delay: 0.9, duration: 3.8 },
+  ];
+
   return (
-    <section className="pt-32 pb-20 px-4">
-      <div className="max-w-4xl mx-auto text-center space-y-6">
+    <section className="pt-32 pb-20 px-4 relative overflow-hidden">
+      {/* Floating Model Logos - Hero Section */}
+      <div className="absolute inset-0 pointer-events-none">
+        {modelLogos.map((model, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              top: model.top,
+              left: model.left,
+              right: model.right,
+            }}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: [0, -10, 0],
+            }}
+            transition={{
+              opacity: { delay: model.delay, duration: 0.5 },
+              scale: { delay: model.delay, duration: 0.5 },
+              y: { 
+                delay: model.delay + 0.5, 
+                duration: model.duration, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+          >
+            <div className="p-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-slate-100 flex flex-col items-center gap-1">
+              <img 
+                src={`https://picsum.photos/seed/${model.seed}/32/32`} 
+                className="w-6 h-6 rounded" 
+                referrerPolicy="no-referrer" 
+              />
+              <span className="text-[9px] whitespace-nowrap font-bold text-slate-700">{model.name}</span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="max-w-4xl mx-auto text-center space-y-6 relative z-10">
         <motion.h1 
           className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900"
           initial={{ opacity: 0, y: 20 }}
