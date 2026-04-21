@@ -136,90 +136,85 @@ const DeepSeekLogo = () => (
 const Hero = () => {
   const { lang, t } = useLanguage();
 
-  const leftLogos = [
-    { Icon: OpenAILogo, name: 'GPT', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { Icon: ClaudeLogo, name: 'Claude', color: 'text-orange-600', bg: 'bg-orange-50' },
-    { Icon: GeminiLogo, name: 'Gemini', color: 'text-blue-600', bg: 'bg-blue-50' },
-  ];
-
-  const rightLogos = [
-    { Icon: LlamaLogo, name: 'Llama', color: 'text-indigo-600', bg: 'bg-indigo-50' },
-    { Icon: MistralLogo, name: 'Mistral', color: 'text-purple-600', bg: 'bg-purple-50' },
-    { Icon: DeepSeekLogo, name: 'DeepSeek', color: 'text-cyan-600', bg: 'bg-cyan-50' },
+  // Scattered floating logos around the title
+  const floatingLogos = [
+    { Icon: OpenAILogo, name: 'GPT', color: 'text-emerald-600', bg: 'bg-emerald-50', top: '-15%', left: '5%', size: 'w-10 h-10', delay: 0 },
+    { Icon: ClaudeLogo, name: 'Claude', color: 'text-orange-600', bg: 'bg-orange-50', top: '10%', left: '-8%', size: 'w-9 h-9', delay: 0.2 },
+    { Icon: GeminiLogo, name: 'Gemini', color: 'text-blue-600', bg: 'bg-blue-50', bottom: '20%', left: '2%', size: 'w-8 h-8', delay: 0.4 },
+    { Icon: LlamaLogo, name: 'Llama', color: 'text-indigo-600', bg: 'bg-indigo-50', top: '-10%', right: '8%', size: 'w-10 h-10', delay: 0.1 },
+    { Icon: MistralLogo, name: 'Mistral', color: 'text-purple-600', bg: 'bg-purple-50', top: '25%', right: '-5%', size: 'w-9 h-9', delay: 0.3 },
+    { Icon: DeepSeekLogo, name: 'DeepSeek', color: 'text-cyan-600', bg: 'bg-cyan-50', bottom: '15%', right: '3%', size: 'w-8 h-8', delay: 0.5 },
   ];
 
   return (
     <section className="pt-32 pb-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-center gap-4 md:gap-8">
-          {/* Left Side Logos */}
-          <div className="hidden md:flex flex-col gap-3">
-            {leftLogos.map((logo, i) => (
-              <motion.div
-                key={i}
-                className={`flex items-center gap-2 px-3 py-2 ${logo.bg} rounded-xl border border-slate-100 shadow-sm`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className={logo.color}>
-                  <logo.Icon />
-                </div>
-                <span className="text-xs font-bold text-slate-700">{logo.name}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Center Title */}
-          <div className="text-center space-y-6 max-w-3xl">
-            <motion.h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+      <div className="max-w-4xl mx-auto text-center space-y-6 relative">
+        {/* Floating scattered logos */}
+        <div className="absolute inset-0 pointer-events-none hidden md:block">
+          {floatingLogos.map((logo, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{
+                top: logo.top,
+                left: logo.left,
+                right: logo.right,
+                bottom: logo.bottom,
+              }}
+              initial={{ opacity: 0, scale: 0.5, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                y: [0, -8, 0, -5, 0],
+              }}
+              transition={{
+                opacity: { delay: logo.delay, duration: 0.5 },
+                scale: { delay: logo.delay, duration: 0.5 },
+                y: { 
+                  delay: logo.delay + 0.5, 
+                  duration: 4 + Math.random() * 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              }}
             >
-              {t.hero.newTitle}<br />
-              <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
-            </motion.h1>
-            
-            {/* Mobile Logos */}
-            <div className="flex md:hidden justify-center gap-2 flex-wrap">
-              {[...leftLogos, ...rightLogos].map((logo, i) => (
-                <motion.div
-                  key={i}
-                  className={`flex items-center gap-1 px-2 py-1 ${logo.bg} rounded-lg border border-slate-100`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <div className={`${logo.color} w-5 h-5`}>
-                    <logo.Icon />
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-700">{logo.name}</span>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Side Logos */}
-          <div className="hidden md:flex flex-col gap-3">
-            {rightLogos.map((logo, i) => (
-              <motion.div
-                key={i}
-                className={`flex items-center gap-2 px-3 py-2 ${logo.bg} rounded-xl border border-slate-100 shadow-sm`}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <span className="text-xs font-bold text-slate-700">{logo.name}</span>
-                <div className={logo.color}>
+              <div className={`${logo.bg} rounded-xl border border-slate-100 shadow-lg p-2 flex flex-col items-center gap-1`}>
+                <div className={`${logo.color} ${logo.size}`}>
                   <logo.Icon />
                 </div>
-              </motion.div>
-            ))}
-          </div>
+                <span className="text-[9px] font-bold text-slate-700 whitespace-nowrap">{logo.name}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Title */}
+        <motion.h1 
+          className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 relative z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          {t.hero.newTitle}<br />
+          <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
+        </motion.h1>
+        
+        {/* Mobile scattered logos */}
+        <div className="flex md:hidden justify-center gap-2 flex-wrap relative z-10">
+          {floatingLogos.slice(0, 4).map((logo, i) => (
+            <motion.div
+              key={i}
+              className={`${logo.bg} rounded-lg border border-slate-100 shadow-sm p-1.5 flex items-center gap-1`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <div className={`${logo.color} w-5 h-5`}>
+                <logo.Icon />
+              </div>
+              <span className="text-[10px] font-bold text-slate-700">{logo.name}</span>
+            </motion.div>
+          ))}
         </div>
         <motion.p 
           className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed"
