@@ -236,12 +236,6 @@ const Hero = () => {
           >
             {t.hero.newCta1} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link 
-            to="/login"
-            className="bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg shadow-sm flex items-center gap-2 transition-all w-full sm:w-auto justify-center"
-          >
-            {t.hero.newCta2}
-          </Link>
         </motion.div>
       </div>
 
