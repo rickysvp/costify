@@ -25,41 +25,45 @@ const Navbar = () => {
   const { lang, setLang, t } = useLanguage();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-18 py-4">
+          {/* Logo */}
           <Link to="/" className="flex items-center">
-            <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-lg" />
+            <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-xl shadow-sm" />
           </Link>
           
-          <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
-            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.platform}</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.solutions}</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.engine}</a>
-            <a href="#" className="hover:text-emerald-600 transition-colors">{t.nav.pricing}</a>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-1">
             <button 
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-1 hover:text-emerald-600 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
             >
               <Globe className="w-4 h-4" />
-              <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+              <span className="uppercase text-xs tracking-wider">{lang === 'zh' ? 'EN' : '中文'}</span>
             </button>
+            
             <Link 
               to="/contact"
-              className="text-slate-600 hover:text-emerald-600 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
             >
               {t.nav.login}
             </Link>
+            
             <Link 
               to="/login"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl font-bold transition-all shadow-sm shadow-emerald-100"
+              className="ml-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5"
             >
               {t.nav.bookPilot}
             </Link>
           </div>
 
+          {/* Mobile Menu Button */}
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600">
+            <button 
+              onClick={() => setIsOpen(!isOpen)} 
+              className="p-2 text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
+            >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -68,25 +72,37 @@ const Navbar = () => {
       
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-6 space-y-4">
-          <a href="#" className="block text-lg font-medium text-slate-900 line-height-none">{t.nav.platform}</a>
-          <a href="#" className="block text-lg font-medium text-slate-900 line-height-none">{t.nav.solutions}</a>
-          <a href="#" className="block text-lg font-medium text-slate-900 line-height-none">{t.nav.engine}</a>
-          <a href="#" className="block text-lg font-medium text-slate-900 line-height-none">{t.nav.pricing}</a>
-          <button 
-            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-            className="flex items-center gap-2 text-lg font-medium text-slate-900"
-          >
-            <Globe className="w-5 h-5" />
-            <span>{lang === 'zh' ? 'Switch to English' : '切换到中文'}</span>
-          </button>
-          <Link to="/contact" className="block w-full text-slate-900 py-2 font-medium text-center">
-            {t.nav.login}
-          </Link>
-          <Link to="/login" className="block w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-center">
-            {t.nav.bookPilot}
-          </Link>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="md:hidden bg-white border-t border-slate-100 shadow-xl"
+        >
+          <div className="px-4 py-6 space-y-2">
+            <div className="space-y-2">
+              <button 
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                className="flex items-center gap-2 w-full px-4 py-3 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-xl transition-all"
+              >
+                <Globe className="w-5 h-5" />
+                <span>{lang === 'zh' ? 'Switch to English' : '切换到中文'}</span>
+              </button>
+              
+              <Link 
+                to="/contact" 
+                className="block px-4 py-3 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-xl transition-all"
+              >
+                {t.nav.login}
+              </Link>
+              
+              <Link 
+                to="/login" 
+                className="block w-full text-center bg-emerald-600 text-white py-3.5 rounded-xl font-semibold text-base mt-4 shadow-lg shadow-emerald-200"
+              >
+                {t.nav.bookPilot}
+              </Link>
+            </div>
+          </div>
+        </motion.div>
       )}
     </nav>
   );
@@ -268,79 +284,191 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Dashboard Mockup */}
+        {/* Dashboard Mockup - 基于真实管理后台 */}
         <motion.div 
           className="bg-white rounded-[32px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <div className="bg-white border-b border-slate-100 px-6 py-4 flex items-center space-x-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-200" />
-            <div className="flex-1 px-8">
-              <div className="w-full max-w-md bg-slate-50 border border-slate-100 rounded-xl py-1.5 px-4 flex items-center gap-2">
-                <Search className="w-4 h-4 text-slate-400" />
-                <div className="h-2 w-32 bg-slate-200 rounded-full" />
-              </div>
+          {/* 顶部导航栏 */}
+          <div className="bg-white border-b border-slate-100 px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img src="/anytokn.png" alt="AnyTokn" className="h-7 w-auto rounded-lg" />
+              <div className="h-4 w-px bg-slate-200" />
+              <span className="text-sm font-semibold text-slate-600">{lang === 'zh' ? '成本控制台' : 'Cost Console'}</span>
             </div>
-            <div className="flex gap-2">
-              <div className="w-10 h-10 rounded-full bg-slate-100 border-2 border-white shadow-sm" />
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live
+              </div>
+              <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white shadow-sm" />
             </div>
           </div>
-          <div className="flex h-[550px]">
-            <aside className="w-64 border-r border-slate-100 p-8 shrink-0 hidden md:block space-y-6">
-              {[
-                { label: lang === 'zh' ? '成本可视化' : 'Spend visibility', active: true },
-                { label: lang === 'zh' ? '高质量优化' : 'Quality-aware optimization', active: false },
-                { label: lang === 'zh' ? '策略控制' : 'Policy controls', active: false },
-                { label: lang === 'zh' ? '节省可追踪' : 'Measurable savings', active: false },
-              ].map((item, i) => (
-                <div key={i} className={`flex items-center gap-4 ${item.active ? 'text-emerald-600 bg-emerald-50/50 p-3 rounded-2xl -mx-3' : 'text-slate-400'}`}>
-                  <div className={`w-5 h-5 rounded-lg shrink-0 ${item.active ? 'bg-emerald-600' : 'bg-slate-200'}`} />
-                  <span className={`text-xs font-bold ${item.active ? 'text-emerald-700' : 'text-slate-400'}`}>{item.label}</span>
+
+          <div className="flex h-[580px]">
+            {/* 左侧导航 */}
+            <aside className="w-56 border-r border-slate-100 bg-slate-50/50 p-4 shrink-0 hidden md:block">
+              <div className="space-y-1">
+                {[
+                  { icon: '□', label: lang === 'zh' ? '总览' : 'Overview', active: true },
+                  { icon: '◎', label: lang === 'zh' ? '项目' : 'Projects', active: false },
+                  { icon: '◐', label: lang === 'zh' ? '预算管理' : 'Budget', active: false },
+                  { icon: '◇', label: lang === 'zh' ? '优化引擎' : 'Optimization', active: false },
+                  { icon: '○', label: lang === 'zh' ? 'API 密钥' : 'API Keys', active: false },
+                  { icon: '△', label: lang === 'zh' ? '设置' : 'Settings', active: false },
+                ].map((item, i) => (
+                  <div key={i} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${item.active ? 'bg-white text-emerald-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-white/60'}`}>
+                    <span className="text-base">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+              
+              {/* 快速统计 */}
+              <div className="mt-8 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{lang === 'zh' ? '本月节省' : 'Saved This Month'}</p>
+                <p className="text-2xl font-bold text-emerald-600">$12,847</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-xs text-emerald-500 font-medium">↓ 34%</span>
+                  <span className="text-xs text-slate-400">{lang === 'zh' ? '较上月' : 'vs last month'}</span>
                 </div>
-              ))}
+              </div>
             </aside>
-            <main className="flex-1 p-10 space-y-10 overflow-hidden">
-               <div className="flex justify-between items-center">
-                  <div className="space-y-2">
-                    <div className="h-6 w-64 bg-slate-100 rounded-lg" />
-                    <div className="h-3 w-40 bg-slate-50 rounded-full" />
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-2 text-xs font-semibold text-slate-500">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <span>Cloud Live</span>
+
+            {/* 主内容区 */}
+            <main className="flex-1 p-6 space-y-6 overflow-hidden bg-slate-50/30">
+              {/* 页面标题 */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">{lang === 'zh' ? '成本总览' : 'Cost Overview'}</h2>
+                  <p className="text-sm text-slate-500 mt-0.5">{lang === 'zh' ? '实时监控您的 AI Token 消耗' : 'Real-time monitoring of your AI token usage'}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition-colors">
+                    {lang === 'zh' ? '导出报告' : 'Export'}
+                  </button>
+                  <button className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm shadow-emerald-200">
+                    {lang === 'zh' ? '添加项目' : 'Add Project'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 核心指标卡片 */}
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { label: lang === 'zh' ? '总消耗' : 'Total Spend', value: '$48,293', change: '+12%', trend: 'up', color: 'emerald' },
+                  { label: lang === 'zh' ? 'Token 用量' : 'Token Usage', value: '2.4B', change: '+8%', trend: 'up', color: 'blue' },
+                  { label: lang === 'zh' ? '请求次数' : 'Requests', value: '1.2M', change: '+23%', trend: 'up', color: 'purple' },
+                  { label: lang === 'zh' ? '节省金额' : 'Saved', value: '$12,847', change: '+34%', trend: 'down', color: 'amber' },
+                ].map((card, i) => (
+                  <motion.div 
+                    key={i} 
+                    className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * i }}
+                  >
+                    <p className="text-xs font-medium text-slate-500 mb-2">{card.label}</p>
+                    <div className="flex items-end justify-between">
+                      <p className="text-2xl font-bold text-slate-900">{card.value}</p>
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${card.trend === 'down' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600'}`}>
+                        {card.change}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* 图表区域 */}
+              <div className="grid grid-cols-3 gap-4">
+                {/* 主图表 */}
+                <div className="col-span-2 p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-sm font-semibold text-slate-900">{lang === 'zh' ? '消耗趋势' : 'Spend Trend'}</h3>
+                    <div className="flex gap-1">
+                      {['7D', '30D', '90D'].map((period, i) => (
+                        <button key={i} className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${i === 1 ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>
+                          {period}
+                        </button>
+                      ))}
                     </div>
                   </div>
-               </div>
-               <div className="grid grid-cols-4 gap-6">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="p-6 bg-white border border-slate-100 rounded-3xl shadow-sm space-y-3">
-                      <div className="flex justify-between">
-                        <div className="p-2 bg-emerald-50 rounded-xl">
-                          <div className="w-4 h-4 bg-emerald-500 rounded" />
+                  <div className="h-48 flex items-end gap-2">
+                    {[35, 45, 30, 55, 40, 60, 50, 70, 45, 65, 55, 75, 60, 80, 50, 70, 65, 85, 55, 75].map((h, i) => (
+                      <motion.div 
+                        key={i} 
+                        className="flex-1 rounded-t-md bg-gradient-to-t from-emerald-500 to-emerald-400"
+                        initial={{ height: 0 }}
+                        animate={{ height: `${h}%` }}
+                        transition={{ duration: 0.6, delay: i * 0.02 }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-3 text-xs text-slate-400">
+                    <span>Jan 1</span>
+                    <span>Jan 7</span>
+                    <span>Jan 14</span>
+                    <span>Jan 21</span>
+                    <span>Jan 28</span>
+                  </div>
+                </div>
+
+                {/* 模型分布 */}
+                <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                  <h3 className="text-sm font-semibold text-slate-900 mb-4">{lang === 'zh' ? '模型分布' : 'Model Distribution'}</h3>
+                  <div className="space-y-4">
+                    {[
+                      { name: 'GPT-4', percent: 45, color: 'bg-emerald-500' },
+                      { name: 'Claude 3', percent: 28, color: 'bg-blue-500' },
+                      { name: 'Gemini', percent: 15, color: 'bg-purple-500' },
+                      { name: 'Others', percent: 12, color: 'bg-slate-300' },
+                    ].map((model, i) => (
+                      <div key={i}>
+                        <div className="flex justify-between text-xs mb-1.5">
+                          <span className="font-medium text-slate-700">{model.name}</span>
+                          <span className="text-slate-500">{model.percent}%</span>
                         </div>
-                        <span className="text-green-500 text-xs font-bold">+12%</span>
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <motion.div 
+                            className={`h-full ${model.color} rounded-full`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${model.percent}%` }}
+                            transition={{ duration: 0.8, delay: 0.2 + i * 0.1 }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-2 w-16 bg-slate-50 rounded-full" />
-                      <div className="h-6 w-24 bg-slate-900 rounded-lg" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 最近活动 */}
+              <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">{lang === 'zh' ? '最近活动' : 'Recent Activity'}</h3>
+                <div className="space-y-3">
+                  {[
+                    { action: lang === 'zh' ? 'API 调用' : 'API Call', project: 'Customer Support Bot', cost: '$124.50', time: '2m ago', status: 'success' },
+                    { action: lang === 'zh' ? '预算警报' : 'Budget Alert', project: 'Marketing AI', cost: '$2,000', time: '15m ago', status: 'warning' },
+                    { action: lang === 'zh' ? '路由优化' : 'Route Optimized', project: 'Data Analysis', cost: '-$45.20', time: '1h ago', status: 'success' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${item.status === 'success' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                        <div>
+                          <p className="text-sm font-medium text-slate-900">{item.action}</p>
+                          <p className="text-xs text-slate-500">{item.project}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm font-semibold ${item.cost.startsWith('-') ? 'text-emerald-600' : 'text-slate-900'}`}>{item.cost}</p>
+                        <p className="text-xs text-slate-400">{item.time}</p>
+                      </div>
                     </div>
                   ))}
-               </div>
-               <div className="h-72 bg-slate-50 border border-slate-100 rounded-3xl flex items-end p-8 gap-3">
-                  {[4,2,7,5,8,3,9,1,4,6,2,8,3,4,6,3,1,7,8,4].map((h, i) => (
-                    <motion.div 
-                      key={i} 
-                      className={`flex-1 rounded-t-xl transition-all ${i % 2 === 0 ? 'bg-emerald-500' : 'bg-emerald-200'}`} 
-                      initial={{ height: 0 }}
-                      animate={{ height: `${h * 10}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.05 }}
-                    />
-                  ))}
-               </div>
+                </div>
+              </div>
             </main>
           </div>
         </motion.div>
