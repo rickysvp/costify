@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Building2, BarChart3, Settings,
-  ChevronDown, Bell, Hexagon, Menu,
+  ChevronDown, Bell, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
   FileText, Store, Wallet, Globe
 } from 'lucide-react';
@@ -85,9 +85,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="px-4 py-4 border-b border-neutral-100">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <Hexagon className="w-4 h-4 text-white" strokeWidth={2.5} />
-            </div>
+            <img src="/anytokn.png" alt="AnyTokn" className="w-10 h-10 rounded-lg" />
             <div>
               <h1 className="text-sm font-bold text-black tracking-tight">AnyTokn</h1>
               <p className="text-xs text-neutral-500">AI Token Management</p>

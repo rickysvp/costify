@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Hexagon, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 
 import { API_BASE } from '../config';
 
@@ -53,9 +53,7 @@ export default function Login() {
         <div className="max-w-md text-white">
           <div className="flex items-center justify-between mb-12">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
-                <Hexagon className="w-8 h-8 text-black" strokeWidth={2.5} />
-              </div>
+              <img src="/anytokn.png" alt="AnyTokn" className="w-16 h-16 rounded-xl" />
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">AnyTokn</h1>
                 <p className="text-white/60 text-sm">AI Token Management</p>
@@ -105,9 +103,7 @@ export default function Login() {
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between mb-10">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-                <Hexagon className="w-5 h-5 text-white" strokeWidth={2.5} />
-              </div>
+              <img src="/anytokn.png" alt="AnyTokn" className="w-12 h-12 rounded-lg" />
               <div>
                 <h1 className="text-xl font-bold text-black">AnyTokn</h1>
                 <p className="text-xs text-neutral-500">AI Token Management</p>

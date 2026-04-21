@@ -28,11 +28,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-200 shadow-sm">
-              <Zap className="text-white w-5 h-5 fill-white" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">AnyTokn</span>
+          <Link to="/" className="flex items-center">
+            <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-lg" />
           </Link>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
@@ -900,12 +897,9 @@ const Footer = () => {
     <footer className="bg-slate-50 text-slate-500 py-24 px-4 border-t border-slate-200">
       <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24">
         <div className="col-span-2 md:col-span-1 space-y-8">
-          <div className="flex items-center gap-3 text-slate-900">
-            <div className="p-1.5 bg-emerald-600 rounded-lg shadow-emerald-100 shadow-lg">
-              <Zap className="w-6 h-6 fill-white text-white" />
+          <div className="flex items-center text-slate-900">
+              <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-lg" />
             </div>
-            <span className="font-bold text-2xl tracking-tight">AnyTokn</span>
-          </div>
           <p className="text-sm leading-relaxed max-w-xs font-medium">{content.tagline}</p>
           <div className="flex gap-5">
             <Twitter className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />

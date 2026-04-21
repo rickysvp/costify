@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import { 
   Menu, 
   X, 
-  Zap,
   Globe,
   CheckCircle,
   ArrowRight,
@@ -15,6 +14,10 @@ import {
   Clock,
   Users,
   Sparkles,
+  Github, 
+  Twitter, 
+  Instagram, 
+  Linkedin,
 } from "lucide-react";
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -26,11 +29,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center shadow-emerald-200 shadow-sm">
-              <Zap className="text-white w-5 h-5 fill-white" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">AnyTokn</span>
+          <Link to="/" className="flex items-center">
+            <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-lg" />
           </Link>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
@@ -89,7 +89,7 @@ const ContactPage = () => {
   });
 
   const content = lang === 'zh' ? {
-    title: '与我们的专家交流',
+    title: '联系我们',
     subtitle: '了解 AnyTokn 如何帮助您的企业优化 AI 成本',
     badge: '免费专属演示',
     formTitle: '预约演示',
@@ -97,7 +97,7 @@ const ContactPage = () => {
     name: '姓名',
     email: '工作邮箱',
     company: '公司名称',
-    title: '职位',
+    jobTitle: '职位',
     teamSize: '团队规模',
     teamSizeOptions: ['1-10人', '11-50人', '51-200人', '201-500人', '500人以上'],
     monthlySpend: '月度AI支出',
@@ -126,7 +126,7 @@ const ContactPage = () => {
     name: 'Full Name',
     email: 'Work Email',
     company: 'Company Name',
-    title: 'Job Title',
+    jobTitle: 'Job Title',
     teamSize: 'Team Size',
     teamSizeOptions: ['1-10', '11-50', '51-200', '201-500', '500+'],
     monthlySpend: 'Monthly AI Spend',
@@ -184,14 +184,6 @@ const ContactPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-sm font-bold mb-6"
-            >
-              <Sparkles className="w-4 h-4" />
-              {content.badge}
-            </motion.div>
             <motion.h1 
               className="text-4xl md:text-5xl font-bold text-slate-900 mb-4"
               initial={{ opacity: 0, y: 20 }}
@@ -300,7 +292,7 @@ const ContactPage = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1.5">{content.title}</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">{content.jobTitle}</label>
                       <input
                         type="text"
                         value={formData.title}
@@ -358,6 +350,101 @@ const ContactPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-slate-50 text-slate-500 py-24 px-4 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-16 mb-24">
+          <div className="col-span-2 md:col-span-1 space-y-8">
+            <div className="flex items-center text-slate-900">
+              <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-lg" />
+            </div>
+            <p className="text-sm leading-relaxed max-w-xs font-medium">
+              {lang === 'zh' 
+                ? 'AnyTokn 帮助企业在不牺牲输出质量的前提下，系统性减少低价值 Token 消耗。'
+                : 'AnyTokn helps enterprises reduce wasted token spend without compromising output quality.'}
+            </p>
+            <div className="flex gap-5">
+              <Twitter className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+              <Github className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+              <Instagram className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+              <Linkedin className="w-5 h-5 hover:text-emerald-600 cursor-pointer transition-colors" />
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              {lang === 'zh' ? '产品' : 'Product'}
+            </h4>
+            <ul className="space-y-3 text-sm font-medium">
+              {(lang === 'zh' 
+                ? ['文档', '定价方案', '支持模型', '开源']
+                : ['Documentation', 'Pricing Plans', 'Supported Models', 'Open Source']
+              ).map((item, i) => (
+                <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              {lang === 'zh' ? '工程' : 'Engineering'}
+            </h4>
+            <ul className="space-y-3 text-sm font-medium">
+              {(lang === 'zh' 
+                ? ['API 参考', 'SDK', '安全', '更新日志']
+                : ['API Reference', 'SDKs', 'Security', 'Changelog']
+              ).map((item, i) => (
+                <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              {lang === 'zh' ? '资源' : 'Resources'}
+            </h4>
+            <ul className="space-y-3 text-sm font-medium">
+              {(lang === 'zh' 
+                ? ['博客', '案例研究', '系统状态', '指南']
+                : ['Blog', 'Case Studies', 'System Status', 'Guides']
+              ).map((item, i) => (
+                <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+              {lang === 'zh' ? '公司' : 'Company'}
+            </h4>
+            <ul className="space-y-3 text-sm font-medium">
+              {(lang === 'zh' 
+                ? ['关于', '联系', '招聘', '法律']
+                : ['About', 'Contact', 'Careers', 'Legal']
+              ).map((item, i) => (
+                <li key={i}><a href="#" className="hover:text-emerald-600 transition-colors">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto pt-10 border-t border-slate-100 text-[13px] flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="font-medium">
+            {lang === 'zh' ? '© 2026 AnyTokn. 保留所有权利。' : '© 2026 AnyTokn. All rights reserved.'}
+          </p>
+          <div className="flex gap-10 font-bold">
+            <a href="#" className="hover:text-emerald-600 transition-colors">
+              {lang === 'zh' ? '隐私政策' : 'Privacy Policy'}
+            </a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">
+              {lang === 'zh' ? '服务条款' : 'Terms of Service'}
+            </a>
+            <a href="#" className="hover:text-emerald-600 transition-colors">
+              {lang === 'zh' ? 'Cookie 政策' : 'Cookie Policy'}
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
