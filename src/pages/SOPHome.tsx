@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ExternalLink, Github, Twitter, Globe, MessageCircle } from 'lucide-react';
+import { ExternalLink, Github, Twitter, Globe, MessageCircle } from 'lucide-react';
 
 interface SOPNode {
   id: string;

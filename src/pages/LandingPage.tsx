@@ -822,7 +822,7 @@ const Enterprise = () => {
 };
 
 const FinalCTA = () => {
-  const { lang, t } = useLanguage();
+  const { lang } = useLanguage();
 
   const content = lang === 'zh' ? {
     title: '把 Token 从不断膨胀的成本项，变成可持续优化的生产资源',
