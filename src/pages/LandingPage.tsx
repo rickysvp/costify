@@ -101,13 +101,6 @@ const Hero = () => {
   return (
     <section className="pt-32 pb-20 px-4">
       <div className="max-w-4xl mx-auto text-center space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-bold tracking-tight"
-        >
-          {t.hero.newBadge}
-        </motion.div>
         <motion.h1 
           className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900"
           initial={{ opacity: 0, y: 20 }}
