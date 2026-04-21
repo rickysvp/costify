@@ -218,4 +218,104 @@ const TreeNode = ({ node, level = 0, isLast = false }: { node: SOPNode; level?: 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded transition-colors"
               >
-                <LinkIcon name={link.name.toLower
+                <LinkIcon name={link.name.toLowerCase()} />
+                <span>{link.name}</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 子节点 */}
+      {hasChildren && (
+        <div className="ml-8 relative">
+          {node.children!.map((child, index) => (
+            <TreeNode 
+              key={child.id} 
+              node={child} 
+              level={level + 1}
+              isLast={index === node.children!.length - 1}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SOPHome = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div 
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              <img src="/anytokn.png" alt="AnyTokn" className="h-8 w-auto" />
+              <span className="text-xl font-bold text-gray-900">AnyTokn</span>
+            </div>
+            <nav className="flex items-center gap-6">
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                控制台
+              </button>
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                登录
+              </button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">独立开发 SOP</h1>
+          <p className="text-gray-600">从想法到产品的完整流程指南</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <div className="space-y-4">
+            {sopData.map((node, index) => (
+              <TreeNode 
+                key={node.id} 
+                node={node} 
+                level={0}
+                isLast={index === sopData.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">© 2024 AnyTokn. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600">
+                <Github className="w-5 h-5" />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-600">
+                <Twitter className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default SOPHome;
