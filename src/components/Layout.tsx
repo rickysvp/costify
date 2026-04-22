@@ -84,12 +84,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <aside className={`sidebar w-60 bg-white border-r border-neutral-200 flex flex-col flex-shrink-0 ${sidebarOpen ? 'open' : ''}`}>
         {/* Logo */}
         <div className="px-4 py-4 border-b border-neutral-100">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
-            <img src="/anytokn.png" alt="AnyTokn" className="w-10 h-10 rounded-lg" />
-            <div>
-              <h1 className="text-sm font-bold text-black tracking-tight">AnyTokn</h1>
-              <p className="text-xs text-neutral-500">AI Token Management</p>
-            </div>
+          <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <img src="/anytokn.png" alt="AnyTokn" className="h-10 w-auto rounded-xl shadow-sm" />
           </div>
         </div>
 

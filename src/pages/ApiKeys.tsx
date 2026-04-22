@@ -116,6 +116,7 @@ interface CreateKeyForm {
   name: string;
   user_id: number | null;
   monthly_budget?: number;
+  description?: string;
 }
 
 // ---------- Component ----------
@@ -151,6 +152,7 @@ export default function ApiKeys() {
     type: 'project',
     name: '',
     user_id: null,
+    description: '',
   });
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -260,6 +262,7 @@ export default function ApiKeys() {
         key_type: createForm.type,
         project_id: createForm.project_id,
         monthly_budget: createForm.monthly_budget,
+        description: createForm.description,
       };
       if (createForm.type === 'user' && createForm.user_id) {
         payload.user_id = createForm.user_id;
@@ -407,7 +410,7 @@ export default function ApiKeys() {
 
   const closeCreateModal = () => {
     setShowCreateModal(false);
-    setCreateForm({ project_id: null, type: 'project', name: '', user_id: null });
+    setCreateForm({ project_id: null, type: 'project', name: '', user_id: null, description: '' });
     setCreateError(null);
     setNewKeyDisplay(null);
     setCopiedNewKey(false);
@@ -875,6 +878,17 @@ export default function ApiKeys() {
                     onChange={(e) => setCreateForm({ ...createForm, monthly_budget: parseFloat(e.target.value) || undefined })}
                   />
                   <p className="text-xs text-surface-400 mt-1">{t.apiKeys.budgetHint}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 mb-1">{t.apiKeys.descriptionLabel || '备注'}</label>
+                  <textarea
+                    className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+                    rows={3}
+                    placeholder={t.apiKeys.descriptionPlaceholder || '请描述此 API Key 的用途，例如：生产环境 Web 应用调用'}
+                    value={createForm.description || ''}
+                    onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })}
+                  />
+                  <p className="text-xs text-surface-400 mt-1">{t.apiKeys.descriptionHint || '备注信息可帮助你识别和管理 API Key'}</p>
                 </div>
                 <div className="flex justify-end gap-3 pt-4">
                   <button type="button" onClick={closeCreateModal} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>

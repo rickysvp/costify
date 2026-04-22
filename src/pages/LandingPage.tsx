@@ -160,8 +160,8 @@ const Hero = () => {
   ];
 
   return (
-    <section className="pt-32 pb-20 px-4">
-      <div className="max-w-4xl mx-auto text-center space-y-6 relative">
+    <section className="pt-48 pb-20 px-4">
+      <div className="max-w-4xl mx-auto text-center space-y-8 relative">
         {/* Floating scattered logos */}
         <div className="absolute inset-0 pointer-events-none hidden md:block">
           {floatingLogos.map((logo, i) => (
@@ -208,8 +208,14 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          {t.hero.newTitle}<br />
-          <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
+          {t.hero.newTitleHighlight ? (
+            <>
+              {t.hero.newTitle}<br />
+              <span className="text-emerald-600">{t.hero.newTitleHighlight}</span>
+            </>
+          ) : (
+            <span className="text-emerald-600">{t.hero.newTitle}</span>
+          )}
         </motion.h1>
         
         {/* Mobile scattered logos */}
@@ -538,7 +544,7 @@ const IntegrationPanel = () => {
     <section className="py-32 px-4 bg-[#0d1117] text-white">
       <div className="max-w-6xl mx-auto text-center mb-16 space-y-4">
         <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-          {lang === 'zh' ? '一套面向高质量节省的系统能力' : 'A high-quality savings system for production AI'}
+          {lang === 'zh' ? '一套面向企业级高质量Token优化引擎' : 'An Enterprise-Grade High-Quality Token Optimization Engine'}
         </h2>
         <p className="text-slate-400 max-w-3xl mx-auto text-lg leading-relaxed">
           {lang === 'zh' 

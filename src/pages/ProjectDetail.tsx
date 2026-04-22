@@ -55,6 +55,8 @@ export default function ProjectDetail() {
   const [revokeConfirm, setRevokeConfirm] = useState<{ open: boolean; keyId: number; keyName: string }>({ open: false, keyId: 0, keyName: '' });
   const [pauseConfirm, setPauseConfirm] = useState<{ open: boolean; keyId: number; keyName: string }>({ open: false, keyId: 0, keyName: '' });
   const [newKeyAfterReset, setNewKeyAfterReset] = useState('');
+  const [createKeyModal, setCreateKeyModal] = useState<{ open: boolean; name: string; description: string }>({ open: false, name: '', description: '' });
+  const [isCreatingKey, setIsCreatingKey] = useState(false);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ show: true, message, type });
@@ -110,19 +112,29 @@ export default function ProjectDetail() {
   };
 
   const handleGenerateKey = async () => {
+    if (!createKeyModal.name.trim()) return;
+    setIsCreatingKey(true);
     try {
       const res = await fetch(`${API_BASE}/api-keys`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ project_id: parseInt(id!), name: `key-${Date.now()}`, key_type: 'project' })
+        body: JSON.stringify({
+          project_id: parseInt(id!),
+          name: createKeyModal.name.trim(),
+          key_type: 'project',
+          description: createKeyModal.description.trim() || undefined
+        })
       });
       if (!res.ok) throw new Error(t.common.error);
       const data = await res.json();
+      setCreateKeyModal({ open: false, name: '', description: '' });
       setNewKeyModal({ open: true, key: data.key });
       showToast(t.apiKeys.keyGenerated);
       fetchData();
     } catch (err) {
       showToast(t.common.error, 'error');
+    } finally {
+      setIsCreatingKey(false);
     }
   };
 
@@ -327,7 +339,7 @@ export default function ProjectDetail() {
             <h3 className="text-sm font-semibold text-surface-800">API Keys</h3>
             <span className="text-xs text-surface-400">({project.api_keys?.length || 0})</span>
           </div>
-          {isAdmin && <button onClick={handleGenerateKey} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-medium hover:bg-brand-700"><Plus className="w-3.5 h-3.5" /> {t.projects.createProject}</button>}
+          {isAdmin && <button onClick={() => setCreateKeyModal({ open: true, name: '', description: '' })} className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white rounded-lg text-xs font-medium hover:bg-brand-700"><Plus className="w-3.5 h-3.5" /> {t.apiKeys.createKey || '创建 API Key'}</button>}
         </div>
         {project.api_keys?.length > 0 ? (
           <div className="overflow-x-auto">
@@ -532,6 +544,70 @@ export default function ProjectDetail() {
             <div className="flex justify-end gap-2">
               <button onClick={() => setDeleteConfirm(false)} className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg">{t.common.cancel}</button>
               <button onClick={handleDelete} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t.common.confirm}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 创建 API Key 弹窗 */}
+      {createKeyModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between px-5 py-3 border-b">
+              <h2 className="text-base font-semibold">{t.apiKeys.createKey || '创建 API Key'}</h2>
+              <button onClick={() => setCreateKeyModal({ open: false, name: '', description: '' })}>
+                <X className="w-4 h-4 text-surface-400" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-surface-700 mb-1">
+                  {t.apiKeys.keyNameLabel || 'Key 名称'} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  placeholder={t.apiKeys.keyNamePlaceholder || '例如：生产环境 Key'}
+                  value={createKeyModal.name}
+                  onChange={(e) => setCreateKeyModal({ ...createKeyModal, name: e.target.value })}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-surface-700 mb-1">
+                  {t.apiKeys.descriptionLabel || '备注'}
+                </label>
+                <textarea
+                  className="w-full border border-surface-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+                  rows={3}
+                  placeholder={t.apiKeys.descriptionPlaceholder || '请描述此 API Key 的用途，例如：生产环境 Web 应用调用'}
+                  value={createKeyModal.description}
+                  onChange={(e) => setCreateKeyModal({ ...createKeyModal, description: e.target.value })}
+                />
+                <p className="text-xs text-surface-400 mt-1">{t.apiKeys.descriptionHint || '备注信息可帮助你识别和管理 API Key'}</p>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setCreateKeyModal({ open: false, name: '', description: '' })}
+                  className="px-4 py-2 text-sm hover:bg-surface-100 rounded-lg"
+                >
+                  {t.common.cancel}
+                </button>
+                <button
+                  onClick={handleGenerateKey}
+                  disabled={!createKeyModal.name.trim() || isCreatingKey}
+                  className="px-4 py-2 text-sm bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isCreatingKey ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      {t.common.creating || '创建中...'}
+                    </>
+                  ) : (
+                    t.common.create
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

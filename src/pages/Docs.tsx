@@ -12,6 +12,14 @@ import {
   BarChart3,
   Shield,
   Code2,
+  Compass,
+  LayoutDashboard,
+  Users,
+  Wallet,
+  Settings,
+  ArrowRight,
+  Sparkles,
+  Building2,
 } from 'lucide-react';
 import { API_BASE } from '../config';
 
@@ -243,9 +251,10 @@ const anytoknMetadata = [
 
 // ---------- 主组件 ----------
 export default function Docs() {
-  const [activeSection, setActiveSection] = useState('quickstart');
+  const [activeSection, setActiveSection] = useState('onboarding');
 
   const sections = [
+    { id: 'onboarding', label: '新人导览', icon: Compass },
     { id: 'quickstart', label: '快速开始', icon: Zap },
     { id: 'auth', label: '认证方式', icon: Key },
     { id: 'params', label: '请求参数', icon: Code2 },
@@ -283,6 +292,232 @@ export default function Docs() {
           );
         })}
       </div>
+
+      {/* 新人导览 */}
+      {activeSection === 'onboarding' && (
+        <div className="space-y-6">
+          {/* 欢迎卡片 */}
+          <div className="card p-6 bg-gradient-to-br from-brand-50 to-surface-50 border-brand-100">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-6 h-6 text-brand-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-surface-900 mb-2">欢迎使用 AnyTokn Dashboard</h3>
+                <p className="text-sm text-surface-600 leading-relaxed">
+                  本指南将带你快速了解 Dashboard 的核心功能，帮助你高效管理 AI Token 资源、优化成本并监控使用情况。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 导览步骤 */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-surface-800 flex items-center gap-2">
+              <Compass className="w-4 h-4 text-brand-600" />
+              5 分钟快速上手
+            </h3>
+
+            {/* 步骤 1: 了解仪表盘 */}
+            <div className="card overflow-hidden">
+              <div className="flex items-start gap-4 p-5">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <LayoutDashboard className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge-blue text-[10px]">第 1 步</span>
+                    <h4 className="text-sm font-semibold text-surface-800">认识仪表盘</h4>
+                  </div>
+                  <p className="text-xs text-surface-600 mb-3">
+                    Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-surface-50">
+                      <p className="text-xs font-medium text-surface-700">💰 成本概览</p>
+                      <p className="text-[10px] text-surface-500 mt-1">查看本月支出、预算使用率、节省金额</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-surface-50">
+                      <p className="text-xs font-medium text-surface-700">📊 使用趋势</p>
+                      <p className="text-[10px] text-surface-500 mt-1">Token 消耗趋势图，识别使用高峰</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 步骤 2: 创建项目 */}
+            <div className="card overflow-hidden">
+              <div className="flex items-start gap-4 p-5">
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge-emerald text-[10px]">第 2 步</span>
+                    <h4 className="text-sm font-semibold text-surface-800">创建你的第一个项目</h4>
+                  </div>
+                  <p className="text-xs text-surface-600 mb-3">
+                    项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪和权限管理。
+                  </p>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-100">
+                    <ArrowRight className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs text-emerald-700">前往「项目中心」→「项目列表」创建项目</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 步骤 3: 获取 API Key */}
+            <div className="card overflow-hidden">
+              <div className="flex items-start gap-4 p-5">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                  <Key className="w-5 h-5 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge-purple text-[10px]">第 3 步</span>
+                    <h4 className="text-sm font-semibold text-surface-800">获取 API Key</h4>
+                  </div>
+                  <p className="text-xs text-surface-600 mb-3">
+                    API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算和权限。
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-surface-600">
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>在「API 管理」→「API Keys」页面创建</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-surface-600">
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Key 格式以 <code className="font-mono bg-surface-100 px-1 rounded">csk_</code> 开头</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-surface-600">
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>创建后请立即保存，Key 只显示一次</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 步骤 4: 接入代码 */}
+            <div className="card overflow-hidden">
+              <div className="flex items-start gap-4 p-5">
+                <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Code2 className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge-amber text-[10px]">第 4 步</span>
+                    <h4 className="text-sm font-semibold text-surface-800">接入你的应用</h4>
+                  </div>
+                  <p className="text-xs text-surface-600 mb-3">
+                    AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。
+                  </p>
+                  <div className="p-3 rounded-lg bg-surface-900">
+                    <code className="text-[10px] font-mono text-surface-300">
+                      baseURL: &quot;{DISPLAY_API_BASE}/v1&quot;
+                    </code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 步骤 5: 监控与优化 */}
+            <div className="card overflow-hidden">
+              <div className="flex items-start gap-4 p-5">
+                <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                  <BarChart3 className="w-5 h-5 text-rose-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="badge-rose text-[10px]">第 5 步</span>
+                    <h4 className="text-sm font-semibold text-surface-800">监控使用情况</h4>
+                  </div>
+                  <p className="text-xs text-surface-600 mb-3">
+                    定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="p-2 rounded-lg bg-surface-50 text-center">
+                      <p className="text-xs font-medium text-surface-700">数据分析</p>
+                      <p className="text-[10px] text-surface-500">查看详细报表</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-surface-50 text-center">
+                      <p className="text-xs font-medium text-surface-700">成本中心</p>
+                      <p className="text-[10px] text-surface-500">预算与路由</p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-surface-50 text-center">
+                      <p className="text-xs font-medium text-surface-700">告警设置</p>
+                      <p className="text-[10px] text-surface-500">异常及时通知</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 核心功能速览 */}
+          <div className="card p-5">
+            <h3 className="text-sm font-semibold text-surface-800 mb-4 flex items-center gap-2">
+              <Zap className="w-4 h-4 text-brand-600" />
+              核心功能速览
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { icon: LayoutDashboard, label: '仪表盘', desc: '数据总览', color: 'blue' },
+                { icon: Building2, label: '项目中心', desc: '资源管理', color: 'emerald' },
+                { icon: Key, label: 'API 管理', desc: '密钥与计费', color: 'purple' },
+                { icon: BarChart3, label: '数据分析', desc: '使用报告', color: 'rose' },
+                { icon: Wallet, label: '成本中心', desc: '预算控制', color: 'amber' },
+                { icon: Users, label: '成员管理', desc: '权限分配', color: 'cyan' },
+                { icon: Globe, label: 'API 市场', desc: '模型选择', color: 'violet' },
+                { icon: Settings, label: '系统设置', desc: '偏好配置', color: 'slate' },
+              ].map((item, idx) => {
+                const Icon = item.icon;
+                const colorClasses: Record<string, string> = {
+                  blue: 'bg-blue-50 text-blue-600',
+                  emerald: 'bg-emerald-50 text-emerald-600',
+                  purple: 'bg-purple-50 text-purple-600',
+                  rose: 'bg-rose-50 text-rose-600',
+                  amber: 'bg-amber-50 text-amber-600',
+                  cyan: 'bg-cyan-50 text-cyan-600',
+                  violet: 'bg-violet-50 text-violet-600',
+                  slate: 'bg-slate-50 text-slate-600',
+                };
+                return (
+                  <div key={idx} className="p-3 rounded-lg bg-surface-50 hover:bg-surface-100 transition-colors">
+                    <div className={`w-8 h-8 rounded-lg ${colorClasses[item.color]} flex items-center justify-center mb-2`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <p className="text-xs font-medium text-surface-800">{item.label}</p>
+                    <p className="text-[10px] text-surface-500">{item.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 下一步提示 */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-brand-50 border border-brand-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-surface-800">准备好开始了吗？</p>
+                <p className="text-xs text-surface-600">查看「快速开始」获取详细的代码示例</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setActiveSection('quickstart')}
+              className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition-colors"
+            >
+              查看快速开始
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 快速开始 */}
       {activeSection === 'quickstart' && (

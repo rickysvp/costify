@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   Wallet, TrendingUp, TrendingDown, PiggyBank, Activity,
   Zap, ArrowRight, Plus, Building2, AlertCircle,
-  RefreshCw
+  RefreshCw, Compass, Sparkles, LayoutDashboard, Key,
+  BarChart3, Users, Globe, Settings, Check,
+  Code2
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -110,6 +112,240 @@ const MODEL_DISPLAY: Record<string, string> = {
 
 // ==================== 组件 ====================
 
+// 获取显示用的 API Base URL
+const getDisplayApiBase = () => {
+  if (typeof window === 'undefined') return 'http://localhost:3001/api';
+  if (API_BASE.startsWith('http')) return API_BASE;
+  return window.location.origin + API_BASE;
+};
+
+const DISPLAY_API_BASE = getDisplayApiBase();
+
+// 新人导览组件
+function OnboardingGuide({ onComplete }: { onComplete: () => void }) {
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const steps = [
+    {
+      icon: LayoutDashboard,
+      title: '认识仪表盘',
+      desc: 'Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。',
+      color: 'blue',
+      features: ['💰 成本概览 - 查看本月支出、预算使用率', '📊 使用趋势 - Token 消耗趋势图'],
+    },
+    {
+      icon: Building2,
+      title: '创建项目',
+      desc: '项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪。',
+      color: 'emerald',
+      action: { label: '前往创建项目', path: '/projects' },
+    },
+    {
+      icon: Key,
+      title: '获取 API Key',
+      desc: 'API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算。',
+      color: 'purple',
+      tips: ['在「API 管理」→「API Keys」页面创建', 'Key 格式以 csk_ 开头', '创建后请立即保存'],
+    },
+    {
+      icon: Code2,
+      title: '接入应用',
+      desc: 'AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。',
+      color: 'amber',
+      code: `baseURL: "${DISPLAY_API_BASE}/v1"`,
+    },
+    {
+      icon: BarChart3,
+      title: '监控与优化',
+      desc: '定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。',
+      color: 'rose',
+      features: ['数据分析 - 查看详细报表', '成本中心 - 预算与路由', '告警设置 - 异常及时通知'],
+    },
+  ];
+
+  const current = steps[currentStep];
+  const Icon = current.icon;
+
+  const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-200', light: 'bg-emerald-50' },
+    purple: { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-200', light: 'bg-purple-50' },
+    amber: { bg: 'bg-amber-100', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
+    rose: { bg: 'bg-rose-100', text: 'text-rose-600', border: 'border-rose-200', light: 'bg-rose-50' },
+  };
+
+  const colors = colorClasses[current.color];
+
+  return (
+    <div className="p-6 space-y-6 max-w-4xl mx-auto">
+      {/* 欢迎标题 */}
+      <div className="text-center mb-8">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-100 to-brand-200 flex items-center justify-center mx-auto mb-4">
+          <Sparkles className="w-8 h-8 text-brand-600" />
+        </div>
+        <h1 className="text-2xl font-bold text-surface-900 mb-2">欢迎使用 AnyTokn</h1>
+        <p className="text-sm text-surface-500">完成以下 5 个步骤，快速上手 Dashboard</p>
+      </div>
+
+      {/* 进度条 */}
+      <div className="flex items-center justify-center gap-2 mb-6">
+        {steps.map((_, idx) => (
+          <div
+            key={idx}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              idx <= currentStep ? 'w-8 bg-brand-500' : 'w-2 bg-surface-200'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* 步骤卡片 */}
+      <div className="card overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-start gap-5">
+            <div className={`w-14 h-14 rounded-xl ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+              <Icon className={`w-7 h-7 ${colors.text}`} />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`badge ${colors.light} ${colors.text} text-[10px]`}>
+                  步骤 {currentStep + 1} / {steps.length}
+                </span>
+              </div>
+              <h3 className="text-lg font-semibold text-surface-900 mb-2">{current.title}</h3>
+              <p className="text-sm text-surface-600 mb-4">{current.desc}</p>
+
+              {/* 特性列表 */}
+              {current.features && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  {current.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-3 rounded-lg bg-surface-50">
+                      <Check className="w-4 h-4 text-emerald-500" />
+                      <span className="text-xs text-surface-700">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 提示列表 */}
+              {current.tips && (
+                <div className="space-y-2 mb-4">
+                  {current.tips.map((tip, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-xs text-surface-600">
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>{tip}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 代码示例 */}
+              {current.code && (
+                <div className="p-3 rounded-lg bg-surface-900 mb-4">
+                  <code className="text-xs font-mono text-surface-300">{current.code}</code>
+                </div>
+              )}
+
+              {/* 操作按钮 */}
+              {current.action && (
+                <button
+                  onClick={() => navigate(current.action!.path)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg ${colors.light} ${colors.text} text-xs font-medium hover:opacity-80 transition-opacity`}
+                >
+                  {current.action.label}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 底部按钮 */}
+        <div className="flex items-center justify-between px-6 py-4 bg-surface-50 border-t border-surface-100">
+          <button
+            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+            disabled={currentStep === 0}
+            className="px-4 py-2 text-xs font-medium text-surface-600 hover:text-surface-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            上一步
+          </button>
+
+          <div className="flex items-center gap-3">
+            {currentStep === steps.length - 1 ? (
+              <button
+                onClick={onComplete}
+                className="px-6 py-2 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition-colors"
+              >
+                完成导览，进入 Dashboard
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className="flex items-center gap-1.5 px-6 py-2 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition-colors"
+              >
+                下一步
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 跳过导览 */}
+      <div className="text-center">
+        <button
+          onClick={onComplete}
+          className="text-xs text-surface-400 hover:text-surface-600 transition-colors"
+        >
+          跳过导览，直接进入 Dashboard
+        </button>
+      </div>
+
+      {/* 核心功能速览 */}
+      <div className="card p-5">
+        <h3 className="text-sm font-semibold text-surface-800 mb-4 flex items-center gap-2">
+          <Compass className="w-4 h-4 text-brand-600" />
+          核心功能一览
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { icon: LayoutDashboard, label: '仪表盘', desc: '数据总览', color: 'blue' },
+            { icon: Building2, label: '项目中心', desc: '资源管理', color: 'emerald' },
+            { icon: Key, label: 'API 管理', desc: '密钥与计费', color: 'purple' },
+            { icon: BarChart3, label: '数据分析', desc: '使用报告', color: 'rose' },
+            { icon: Wallet, label: '成本中心', desc: '预算控制', color: 'amber' },
+            { icon: Users, label: '成员管理', desc: '权限分配', color: 'cyan' },
+            { icon: Globe, label: 'API 市场', desc: '模型选择', color: 'violet' },
+            { icon: Settings, label: '系统设置', desc: '偏好配置', color: 'slate' },
+          ].map((item, idx) => {
+            const ItemIcon = item.icon;
+            const itemColors: Record<string, string> = {
+              blue: 'bg-blue-50 text-blue-600',
+              emerald: 'bg-emerald-50 text-emerald-600',
+              purple: 'bg-purple-50 text-purple-600',
+              rose: 'bg-rose-50 text-rose-600',
+              amber: 'bg-amber-50 text-amber-600',
+              cyan: 'bg-cyan-50 text-cyan-600',
+              violet: 'bg-violet-50 text-violet-600',
+              slate: 'bg-slate-50 text-slate-600',
+            };
+            return (
+              <div key={idx} className="p-3 rounded-lg bg-surface-50">
+                <div className={`w-8 h-8 rounded-lg ${itemColors[item.color]} flex items-center justify-center mb-2`}>
+                  <ItemIcon className="w-4 h-4" />
+                </div>
+                <p className="text-xs font-medium text-surface-800">{item.label}</p>
+                <p className="text-[10px] text-surface-500">{item.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -117,6 +353,7 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const fetchDashboard = async () => {
     setIsLoading(true);
@@ -128,6 +365,13 @@ export default function Dashboard() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
+        // Token 过期或无效，清除登录状态并跳转到登录页
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('costio_token');
+          localStorage.removeItem('costio_user');
+          navigate('/login');
+          return;
+        }
         throw new Error(errData.error || '获取数据失败');
       }
       const json = await res.json();
@@ -139,9 +383,27 @@ export default function Dashboard() {
     }
   };
 
+  // 检查是否需要显示新人导览（前3次访问）
   useEffect(() => {
-    fetchDashboard();
+    const visitCount = parseInt(localStorage.getItem('dashboard_visit_count') || '0');
+    if (visitCount < 3) {
+      setShowOnboarding(true);
+    }
+    // 增加访问次数
+    localStorage.setItem('dashboard_visit_count', String(visitCount + 1));
   }, []);
+
+  useEffect(() => {
+    if (!showOnboarding) {
+      fetchDashboard();
+    }
+  }, [showOnboarding]);
+
+  // 完成导览
+  const handleCompleteOnboarding = () => {
+    setShowOnboarding(false);
+    fetchDashboard();
+  };
 
   // 格式化金额
   const fmt = (n: number) => `$${n.toFixed(2)}`;
@@ -190,6 +452,11 @@ export default function Dashboard() {
       </div>
     );
   };
+
+  // ==================== 新人导览 ====================
+  if (showOnboarding) {
+    return <OnboardingGuide onComplete={handleCompleteOnboarding} />;
+  }
 
   // ==================== 加载状态 ====================
   if (isLoading) {
