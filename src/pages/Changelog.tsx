@@ -613,6 +613,19 @@ export default function Changelog() {
                     <span className="text-surface-500">需求数量</span>
                     <span className="text-surface-700">{version.requirements.length}</span>
                   </div>
+                  {version.docLink && (
+                    <div className="pt-2 mt-2 border-t border-surface-100">
+                      <a 
+                        href={version.docLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-1"
+                      >
+                        <FileText className="w-3 h-3" />
+                        查看文档
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
