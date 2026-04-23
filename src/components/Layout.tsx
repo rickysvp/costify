@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText, Store, Wallet, Globe
+  FileText, Store, Wallet, Globe, GitCommit
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -22,6 +22,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   // 导航分组配置
   const navGroups = [
+    {
+      title: '产品管理',
+      items: [
+        { path: '/changelog', label: '版本迭代', icon: GitCommit },
+      ]
+    },
     {
       title: t.layout.overview,
       items: [

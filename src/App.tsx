@@ -20,6 +20,7 @@ import ApiMarket from './pages/ApiMarket';
 import ApiKeyDetail from './pages/ApiKeyDetail';
 import UserDetail from './pages/UserDetail';
 import BudgetManagement from './pages/BudgetManagement';
+import Changelog from './pages/Changelog';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
@@ -50,6 +51,7 @@ function App() {
           <Route path="/api-keys/:id" element={<ProtectedRoute requireAdmin><Layout><ApiKeyDetail /></Layout></ProtectedRoute>} />
           <Route path="/users/:id" element={<ProtectedRoute><Layout><UserDetail /></Layout></ProtectedRoute>} />
           <Route path="/budget" element={<ProtectedRoute requireAdmin><Layout><BudgetManagement /></Layout></ProtectedRoute>} />
+          <Route path="/changelog" element={<ProtectedRoute><Layout><Changelog /></Layout></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

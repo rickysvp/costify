@@ -88,6 +88,14 @@ const db = {
     return memoryDB.users.find(u => u.id === parseInt(id));
   },
 
+  async updateUser(id, updateData) {
+    await initDemoData();
+    const idx = memoryDB.users.findIndex(u => u.id === parseInt(id));
+    if (idx === -1) return null;
+    memoryDB.users[idx] = { ...memoryDB.users[idx], ...updateData, updated_at: new Date().toISOString() };
+    return memoryDB.users[idx];
+  },
+
   // 项目相关
   async getAllProjects(orgId = 1) {
     await initDemoData();

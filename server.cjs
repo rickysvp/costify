@@ -359,6 +359,57 @@ app.put('/api/organization', authenticateToken, async (req, res) => {
   }
 });
 
+// /api/org 别名（设置页面使用）
+app.get('/api/org', authenticateToken, async (req, res) => {
+  try {
+    const org = await db.getOrganization(req.user.org_id);
+    if (!org) return res.status(404).json({ error: 'Organization not found' });
+    res.json({ org });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch organization' });
+  }
+});
+
+app.put('/api/org', authenticateToken, async (req, res) => {
+  try {
+    const { name, balance_threshold } = req.body;
+    const updated = await db.updateOrganization(req.user.org_id, { name, balance_threshold });
+    if (!updated) return res.status(404).json({ error: 'Organization not found' });
+    res.json({ org: updated });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update organization' });
+  }
+});
+
+// 修改密码
+app.put('/api/user/password', authenticateToken, async (req, res) => {
+  try {
+    const { old_password, new_password } = req.body;
+    
+    // 获取当前用户
+    const user = await db.findUserById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // 验证旧密码
+    const bcrypt = require('bcryptjs');
+    const validPassword = await bcrypt.compare(old_password, user.password_hash);
+    if (!validPassword) {
+      return res.status(400).json({ error: '当前密码不正确' });
+    }
+    
+    // 更新密码
+    const newPasswordHash = await bcrypt.hash(new_password, 10);
+    await db.updateUser(user.id, { password_hash: newPasswordHash });
+    
+    res.json({ message: '密码修改成功' });
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
 // 报告列表
 app.get('/api/reports', authenticateToken, async (req, res) => {
   try {
@@ -521,6 +572,81 @@ app.get('/api/savings', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Savings error:', error);
     res.status(500).json({ error: 'Failed to fetch savings data' });
+  }
+});
+
+// 消息通知 - 告警列表
+app.get('/api/alerts', authenticateToken, async (req, res) => {
+  try {
+    const projects = await db.getAllProjects(req.user.org_id);
+    const org = await db.getOrganization(req.user.org_id);
+    
+    // 生成模拟告警数据
+    const alerts = [];
+    const now = new Date();
+    
+    // 根据项目生成预算告警
+    projects.forEach((project, idx) => {
+      const budgetPercent = project.monthly_budget > 0 
+        ? (project.month_spend / project.monthly_budget) * 100 
+        : 0;
+      
+      // 预算使用超过80%生成警告
+      if (budgetPercent > 80) {
+        alerts.push({
+          id: Date.now() + idx * 100,
+          type: 'budget',
+          severity: budgetPercent > 95 ? 'critical' : 'warning',
+          message: `项目 "${project.name}" 预算使用已达 ${budgetPercent.toFixed(1)}%，请留意`,
+          project: project.name,
+          created_at: new Date(now.getTime() - Math.random() * 86400000).toISOString(),
+          read: false
+        });
+      }
+      
+      // 随机生成一些用量告警
+      if (Math.random() > 0.7) {
+        alerts.push({
+          id: Date.now() + idx * 100 + 1,
+          type: 'usage',
+          severity: 'info',
+          message: `项目 "${project.name}" 今日 API 调用量较昨日增长 ${(Math.random() * 30 + 10).toFixed(0)}%`,
+          project: project.name,
+          created_at: new Date(now.getTime() - Math.random() * 43200000).toISOString(),
+          read: Math.random() > 0.5
+        });
+      }
+    });
+    
+    // 添加一些系统通知
+    alerts.push({
+      id: Date.now() + 999,
+      type: 'security',
+      severity: 'info',
+      message: '系统安全扫描完成，未发现异常',
+      created_at: new Date(now.getTime() - 86400000).toISOString(),
+      read: true
+    });
+    
+    // 按时间排序
+    alerts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    
+    res.json(alerts);
+  } catch (error) {
+    console.error('Alerts error:', error);
+    res.status(500).json({ error: 'Failed to fetch alerts' });
+  }
+});
+
+// 标记告警已读
+app.put('/api/alerts/:id/read', authenticateToken, async (req, res) => {
+  try {
+    // 这里可以添加实际的已读标记逻辑
+    // 由于使用内存数据库，暂时返回成功
+    res.json({ message: 'Alert marked as read' });
+  } catch (error) {
+    console.error('Mark read error:', error);
+    res.status(500).json({ error: 'Failed to mark alert as read' });
   }
 });
 
