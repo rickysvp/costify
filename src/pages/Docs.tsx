@@ -281,8 +281,8 @@ export default function Docs() {
               key={s.id}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                 activeSection === s.id
-                  ? 'bg-brand-100 text-brand-700'
-                  : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
+                  ? 'bg-black text-white shadow-md'
+                  : 'bg-white text-surface-600 hover:bg-surface-50 border border-surface-200'
               }`}
               onClick={() => setActiveSection(s.id)}
             >
@@ -320,27 +320,47 @@ export default function Docs() {
 
             {/* 步骤 1: 了解仪表盘 */}
             <div className="card overflow-hidden">
-              <div className="flex items-start gap-4 p-5">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <LayoutDashboard className="w-5 h-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge-blue text-[10px]">第 1 步</span>
-                    <h4 className="text-sm font-semibold text-surface-800">认识仪表盘</h4>
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <LayoutDashboard className="w-5 h-5 text-blue-600" />
                   </div>
-                  <p className="text-xs text-surface-600 mb-3">
-                    Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-lg bg-surface-50">
-                      <p className="text-xs font-medium text-surface-700">💰 成本概览</p>
-                      <p className="text-[10px] text-surface-500 mt-1">查看本月支出、预算使用率、节省金额</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="badge-blue text-[10px]">第 1 步</span>
+                      <h4 className="text-sm font-semibold text-surface-800">认识仪表盘</h4>
                     </div>
-                    <div className="p-3 rounded-lg bg-surface-50">
-                      <p className="text-xs font-medium text-surface-700">📊 使用趋势</p>
-                      <p className="text-[10px] text-surface-500 mt-1">Token 消耗趋势图，识别使用高峰</p>
-                    </div>
+                    <p className="text-xs text-surface-600 mb-3">
+                      Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。
+                    </p>
+                  </div>
+                </div>
+                {/* 图片和链接 */}
+                <div className="mt-4">
+                  <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
+                    <img 
+                      src="/onboarding/dashboard-preview.png" 
+                      alt="仪表盘预览"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f5f5f5/404040?text=Dashboard+Preview';
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="/dashboard" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      查看仪表盘
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a 
+                      href="/docs/quickstart" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      查看快速开始
+                    </a>
                   </div>
                 </div>
               </div>
@@ -348,21 +368,47 @@ export default function Docs() {
 
             {/* 步骤 2: 创建项目 */}
             <div className="card overflow-hidden">
-              <div className="flex items-start gap-4 p-5">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge-emerald text-[10px]">第 2 步</span>
-                    <h4 className="text-sm font-semibold text-surface-800">创建你的第一个项目</h4>
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-emerald-600" />
                   </div>
-                  <p className="text-xs text-surface-600 mb-3">
-                    项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪和权限管理。
-                  </p>
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 border border-emerald-100">
-                    <ArrowRight className="w-4 h-4 text-emerald-600" />
-                    <span className="text-xs text-emerald-700">前往「项目中心」→「项目列表」创建项目</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="badge-emerald text-[10px]">第 2 步</span>
+                      <h4 className="text-sm font-semibold text-surface-800">创建你的第一个项目</h4>
+                    </div>
+                    <p className="text-xs text-surface-600 mb-3">
+                      项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪和权限管理。
+                    </p>
+                  </div>
+                </div>
+                {/* 图片和链接 */}
+                <div className="mt-4">
+                  <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
+                    <img 
+                      src="/onboarding/projects-preview.png" 
+                      alt="项目管理"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f0fdf4/166534?text=Project+Management';
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="/projects" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      创建项目
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a 
+                      href="/docs#quickstart" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      查看项目文档
+                    </a>
                   </div>
                 </div>
               </div>
@@ -370,31 +416,47 @@ export default function Docs() {
 
             {/* 步骤 3: 获取 API Key */}
             <div className="card overflow-hidden">
-              <div className="flex items-start gap-4 p-5">
-                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                  <Key className="w-5 h-5 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge-purple text-[10px]">第 3 步</span>
-                    <h4 className="text-sm font-semibold text-surface-800">获取 API Key</h4>
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <Key className="w-5 h-5 text-purple-600" />
                   </div>
-                  <p className="text-xs text-surface-600 mb-3">
-                    API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算和权限。
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-surface-600">
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>在「API 管理」→「API Keys」页面创建</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="badge-purple text-[10px]">第 3 步</span>
+                      <h4 className="text-sm font-semibold text-surface-800">获取 API Key</h4>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-surface-600">
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>Key 格式以 <code className="font-mono bg-surface-100 px-1 rounded">csk_</code> 开头</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-surface-600">
-                      <Check className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>创建后请立即保存，Key 只显示一次</span>
-                    </div>
+                    <p className="text-xs text-surface-600 mb-3">
+                      API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算和权限。
+                    </p>
+                  </div>
+                </div>
+                {/* 图片和链接 */}
+                <div className="mt-4">
+                  <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
+                    <img 
+                      src="/onboarding/apikeys-preview.png" 
+                      alt="API Key 管理"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f3e8ff/7c3aed?text=API+Key+Management';
+                      }}
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="/api-keys" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      管理 API Keys
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a 
+                      href="/docs/auth" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      查看认证文档
+                    </a>
                   </div>
                 </div>
               </div>
@@ -402,22 +464,52 @@ export default function Docs() {
 
             {/* 步骤 4: 接入代码 */}
             <div className="card overflow-hidden">
-              <div className="flex items-start gap-4 p-5">
-                <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                  <Code2 className="w-5 h-5 text-amber-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge-amber text-[10px]">第 4 步</span>
-                    <h4 className="text-sm font-semibold text-surface-800">接入你的应用</h4>
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Code2 className="w-5 h-5 text-amber-600" />
                   </div>
-                  <p className="text-xs text-surface-600 mb-3">
-                    AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。
-                  </p>
-                  <div className="p-3 rounded-lg bg-surface-900">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="badge-amber text-[10px]">第 4 步</span>
+                      <h4 className="text-sm font-semibold text-surface-800">接入你的应用</h4>
+                    </div>
+                    <p className="text-xs text-surface-600 mb-3">
+                      AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。
+                    </p>
+                  </div>
+                </div>
+                {/* 图片和链接 */}
+                <div className="mt-4">
+                  <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
+                    <img 
+                      src="/onboarding/integration-preview.png" 
+                      alt="API 接入"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/fffbeb/d97706?text=API+Integration';
+                      }}
+                    />
+                  </div>
+                  <div className="p-3 rounded-lg bg-surface-900 mb-3">
                     <code className="text-[10px] font-mono text-surface-300">
                       baseURL: &quot;{DISPLAY_API_BASE}/v1&quot;
                     </code>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="/docs/quickstart" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700 transition-colors"
+                    >
+                      查看接入指南
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a 
+                      href="/docs/params" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      查看 API 文档
+                    </a>
                   </div>
                 </div>
               </div>
@@ -425,19 +517,34 @@ export default function Docs() {
 
             {/* 步骤 5: 监控与优化 */}
             <div className="card overflow-hidden">
-              <div className="flex items-start gap-4 p-5">
-                <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
-                  <BarChart3 className="w-5 h-5 text-rose-600" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="badge-rose text-[10px]">第 5 步</span>
-                    <h4 className="text-sm font-semibold text-surface-800">监控使用情况</h4>
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 text-rose-600" />
                   </div>
-                  <p className="text-xs text-surface-600 mb-3">
-                    定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="badge-rose text-[10px]">第 5 步</span>
+                      <h4 className="text-sm font-semibold text-surface-800">监控使用情况</h4>
+                    </div>
+                    <p className="text-xs text-surface-600 mb-3">
+                      定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。
+                    </p>
+                  </div>
+                </div>
+                {/* 图片和链接 */}
+                <div className="mt-4">
+                  <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
+                    <img 
+                      src="/onboarding/analytics-preview.png" 
+                      alt="数据分析"
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/fff1f2/e11d48?text=Analytics+%26+Reports';
+                      }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-3">
                     <div className="p-2 rounded-lg bg-surface-50 text-center">
                       <p className="text-xs font-medium text-surface-700">数据分析</p>
                       <p className="text-[10px] text-surface-500">查看详细报表</p>
@@ -450,6 +557,27 @@ export default function Docs() {
                       <p className="text-xs font-medium text-surface-700">告警设置</p>
                       <p className="text-[10px] text-surface-500">异常及时通知</p>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <a 
+                      href="/reports" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 text-white text-xs font-medium rounded-lg hover:bg-rose-700 transition-colors"
+                    >
+                      查看报告
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </a>
+                    <a 
+                      href="/routing" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      路由配置
+                    </a>
+                    <a 
+                      href="/settings" 
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
+                    >
+                      告警设置
+                    </a>
                   </div>
                 </div>
               </div>

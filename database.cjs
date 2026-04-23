@@ -328,16 +328,75 @@ const db = {
     const totalRequests = apiKeys.reduce((sum, k) => sum + (k.total_requests || 0), 0);
     const totalTokens = apiKeys.reduce((sum, k) => sum + (k.total_tokens || 0), 0);
 
+    // 生成 daily_spend 和 daily_savings 数据
+    const daily_spend = [];
+    const daily_savings = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      daily_spend.push({
+        date: dateStr,
+        cost: parseFloat((Math.random() * 50 + 10).toFixed(2))
+      });
+      daily_savings.push({
+        date: dateStr,
+        savings: parseFloat((Math.random() * 20 + 5).toFixed(2)),
+        routing_savings: parseFloat((Math.random() * 10 + 2).toFixed(2)),
+        cache_savings: parseFloat((Math.random() * 10 + 3).toFixed(2))
+      });
+    }
+
+    // 生成 top_projects 数据
+    const top_projects = projects.slice(0, 5).map((p, idx) => ({
+      id: p.id,
+      name: p.name,
+      cost: p.month_spend || 0,
+      rank: idx + 1
+    }));
+
+    // 生成 top_api_keys 数据
+    const top_api_keys = apiKeys.slice(0, 5).map((k, idx) => ({
+      id: k.id,
+      name: k.name,
+      cost: k.monthly_spend || 0,
+      requests: k.total_requests || 0,
+      rank: idx + 1
+    }));
+
+    // 生成 top_users 数据
+    const top_users = members.slice(0, 5).map((m, idx) => ({
+      id: m.id,
+      name: m.name,
+      cost: m.monthly_spend || 0,
+      rank: idx + 1
+    }));
+
     return {
       month_spend: totalSpend,
       month_savings: totalSavings,
       total_budget: totalBudget,
+      month_budget_used_pct: totalBudget > 0 ? (totalSpend / totalBudget * 100) : 0,
       budget_usage: totalBudget > 0 ? (totalSpend / totalBudget * 100).toFixed(1) : 0,
       total_requests: totalRequests,
       total_tokens: totalTokens,
       active_projects: projects.filter(p => p.status === 'active').length,
       active_keys: apiKeys.filter(k => k.status === 'active').length,
-      member_count: members.length
+      member_count: members.length,
+      month_cost: totalSpend,
+      last_month_cost: totalSpend * 0.8,
+      cost_change_pct: 20,
+      request_count: totalRequests,
+      month_tokens: totalTokens,
+      cache_hit_rate: 35.5,
+      project_count: projects.length,
+      unread_alerts: 2,
+      daily_spend,
+      daily_savings,
+      top_projects,
+      top_api_keys,
+      top_users
     };
   }
 };

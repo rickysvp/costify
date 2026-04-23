@@ -116,8 +116,14 @@ export default function BudgetManagement() {
     fetchData();
   }, []);
 
-  const fmt = (n: number) => `$${n.toFixed(2)}`;
-  const fmtPct = (n: number) => `${n.toFixed(1)}%`;
+  const fmt = (n: number | undefined | null) => {
+    if (n === undefined || n === null) return '$0.00';
+    return `$${n.toFixed(2)}`;
+  };
+  const fmtPct = (n: number | undefined | null) => {
+    if (n === undefined || n === null) return '0.0%';
+    return `${n.toFixed(1)}%`;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
