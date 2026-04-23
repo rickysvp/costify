@@ -492,11 +492,11 @@ export default function Changelog() {
                                 <Target className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
                                 <span>
                                   {beforeText}
-                                  <a 
-                                    href={linkUrl} 
-                                    target="_blank" 
+                                  <a
+                                    href={linkUrl}
+                                    target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-brand-600 hover:text-brand-700 hover:underline"
+                                    className="text-blue-600 hover:text-blue-800 underline font-medium"
                                   >
                                     {linkText}
                                   </a>
