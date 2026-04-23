@@ -452,11 +452,11 @@ export default function Docs() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-emerald text-[10px]">第 2 步</span>
-                      <h4 className="text-sm font-semibold text-surface-800">创建你的第一个项目</h4>
+                      <span className="badge-emerald text-[10px]">{i18n.onboarding.steps[1].step}</span>
+                      <h4 className="text-sm font-semibold text-surface-800">{i18n.onboarding.steps[1].title}</h4>
                     </div>
                     <p className="text-xs text-surface-600 mb-3">
-                      项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪和权限管理。
+                      {i18n.onboarding.steps[1].desc}
                     </p>
                   </div>
                 </div>
@@ -465,10 +465,12 @@ export default function Docs() {
                   <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
                     <img 
                       src="/onboarding/projects-preview.png" 
-                      alt="项目管理"
+                      alt={isEn ? "Project Management" : "项目管理"}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f0fdf4/166534?text=Project+Management';
+                        (e.target as HTMLImageElement).src = isEn 
+                          ? 'https://placehold.co/600x300/f0fdf4/166534?text=Project+Management'
+                          : 'https://placehold.co/600x300/f0fdf4/166534?text=项目管理';
                       }}
                     />
                   </div>
@@ -477,14 +479,14 @@ export default function Docs() {
                       href="/projects" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition-colors"
                     >
-                      创建项目
+                      {i18n.onboarding.steps[1].action}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                     <a 
                       href="/docs#quickstart" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      查看项目文档
+                      {i18n.onboarding.steps[1].doc}
                     </a>
                   </div>
                 </div>
@@ -500,11 +502,11 @@ export default function Docs() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-purple text-[10px]">第 3 步</span>
-                      <h4 className="text-sm font-semibold text-surface-800">获取 API Key</h4>
+                      <span className="badge-purple text-[10px]">{i18n.onboarding.steps[2].step}</span>
+                      <h4 className="text-sm font-semibold text-surface-800">{i18n.onboarding.steps[2].title}</h4>
                     </div>
                     <p className="text-xs text-surface-600 mb-3">
-                      API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算和权限。
+                      {i18n.onboarding.steps[2].desc}
                     </p>
                   </div>
                 </div>
@@ -513,10 +515,12 @@ export default function Docs() {
                   <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
                     <img 
                       src="/onboarding/apikeys-preview.png" 
-                      alt="API Key 管理"
+                      alt={isEn ? "API Key Management" : "API Key 管理"}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f3e8ff/7c3aed?text=API+Key+Management';
+                        (e.target as HTMLImageElement).src = isEn 
+                          ? 'https://placehold.co/600x300/f3e8ff/7c3aed?text=API+Key+Management'
+                          : 'https://placehold.co/600x300/f3e8ff/7c3aed?text=API+Key+管理';
                       }}
                     />
                   </div>
@@ -525,14 +529,14 @@ export default function Docs() {
                       href="/api-keys" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition-colors"
                     >
-                      管理 API Keys
+                      {i18n.onboarding.steps[2].action}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                     <a 
                       href="/docs/auth" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      查看认证文档
+                      {i18n.onboarding.steps[2].doc}
                     </a>
                   </div>
                 </div>
@@ -548,11 +552,11 @@ export default function Docs() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-amber text-[10px]">第 4 步</span>
-                      <h4 className="text-sm font-semibold text-surface-800">接入你的应用</h4>
+                      <span className="badge-amber text-[10px]">{i18n.onboarding.steps[3].step}</span>
+                      <h4 className="text-sm font-semibold text-surface-800">{i18n.onboarding.steps[3].title}</h4>
                     </div>
                     <p className="text-xs text-surface-600 mb-3">
-                      AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。
+                      {i18n.onboarding.steps[3].desc}
                     </p>
                   </div>
                 </div>
@@ -561,10 +565,12 @@ export default function Docs() {
                   <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
                     <img 
                       src="/onboarding/integration-preview.png" 
-                      alt="API 接入"
+                      alt={isEn ? "API Integration" : "API 接入"}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/fffbeb/d97706?text=API+Integration';
+                        (e.target as HTMLImageElement).src = isEn 
+                          ? 'https://placehold.co/600x300/fffbeb/d97706?text=API+Integration'
+                          : 'https://placehold.co/600x300/fffbeb/d97706?text=API+接入';
                       }}
                     />
                   </div>
@@ -578,14 +584,14 @@ export default function Docs() {
                       href="/docs/quickstart" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 text-white text-xs font-medium rounded-lg hover:bg-amber-700 transition-colors"
                     >
-                      查看接入指南
+                      {i18n.onboarding.steps[3].action}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                     <a 
                       href="/docs/params" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      查看 API 文档
+                      {i18n.onboarding.steps[3].doc}
                     </a>
                   </div>
                 </div>
@@ -601,11 +607,11 @@ export default function Docs() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-rose text-[10px]">第 5 步</span>
-                      <h4 className="text-sm font-semibold text-surface-800">监控使用情况</h4>
+                      <span className="badge-rose text-[10px]">{i18n.onboarding.steps[4].step}</span>
+                      <h4 className="text-sm font-semibold text-surface-800">{i18n.onboarding.steps[4].title}</h4>
                     </div>
                     <p className="text-xs text-surface-600 mb-3">
-                      定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。
+                      {i18n.onboarding.steps[4].desc}
                     </p>
                   </div>
                 </div>
@@ -614,25 +620,27 @@ export default function Docs() {
                   <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
                     <img 
                       src="/onboarding/analytics-preview.png" 
-                      alt="数据分析"
+                      alt={isEn ? "Analytics & Reports" : "数据分析"}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/fff1f2/e11d48?text=Analytics+%26+Reports';
+                        (e.target as HTMLImageElement).src = isEn 
+                          ? 'https://placehold.co/600x300/fff1f2/e11d48?text=Analytics+%26+Reports'
+                          : 'https://placehold.co/600x300/fff1f2/e11d48?text=数据分析';
                       }}
                     />
                   </div>
                   <div className="grid grid-cols-3 gap-2 mb-3">
                     <div className="p-2 rounded-lg bg-surface-50 text-center">
-                      <p className="text-xs font-medium text-surface-700">数据分析</p>
-                      <p className="text-[10px] text-surface-500">查看详细报表</p>
+                      <p className="text-xs font-medium text-surface-700">{isEn ? 'Analytics' : '数据分析'}</p>
+                      <p className="text-[10px] text-surface-500">{isEn ? 'View Reports' : '查看详细报表'}</p>
                     </div>
                     <div className="p-2 rounded-lg bg-surface-50 text-center">
-                      <p className="text-xs font-medium text-surface-700">成本中心</p>
-                      <p className="text-[10px] text-surface-500">预算与路由</p>
+                      <p className="text-xs font-medium text-surface-700">{isEn ? 'Cost Center' : '成本中心'}</p>
+                      <p className="text-[10px] text-surface-500">{isEn ? 'Budget & Routing' : '预算与路由'}</p>
                     </div>
                     <div className="p-2 rounded-lg bg-surface-50 text-center">
-                      <p className="text-xs font-medium text-surface-700">告警设置</p>
-                      <p className="text-[10px] text-surface-500">异常及时通知</p>
+                      <p className="text-xs font-medium text-surface-700">{isEn ? 'Alerts' : '告警设置'}</p>
+                      <p className="text-[10px] text-surface-500">{isEn ? 'Get Notified' : '异常及时通知'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -640,20 +648,20 @@ export default function Docs() {
                       href="/reports" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 text-white text-xs font-medium rounded-lg hover:bg-rose-700 transition-colors"
                     >
-                      查看报告
+                      {i18n.onboarding.steps[4].action}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                     <a 
                       href="/routing" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      路由配置
+                      {i18n.onboarding.steps[4].routing}
                     </a>
                     <a 
                       href="/settings" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      告警设置
+                      {i18n.onboarding.steps[4].alerts}
                     </a>
                   </div>
                 </div>
@@ -665,18 +673,18 @@ export default function Docs() {
           <div className="card p-5">
             <h3 className="text-sm font-semibold text-surface-800 mb-4 flex items-center gap-2">
               <Zap className="w-4 h-4 text-brand-600" />
-              核心功能速览
+              {isEn ? 'Core Features Overview' : '核心功能速览'}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { icon: LayoutDashboard, label: '仪表盘', desc: '数据总览', color: 'blue' },
-                { icon: Building2, label: '项目中心', desc: '资源管理', color: 'emerald' },
-                { icon: Key, label: 'API 管理', desc: '密钥与计费', color: 'purple' },
-                { icon: BarChart3, label: '数据分析', desc: '使用报告', color: 'rose' },
-                { icon: Wallet, label: '成本中心', desc: '预算控制', color: 'amber' },
-                { icon: Users, label: '成员管理', desc: '权限分配', color: 'cyan' },
-                { icon: Globe, label: 'API 市场', desc: '模型选择', color: 'violet' },
-                { icon: Settings, label: '系统设置', desc: '偏好配置', color: 'slate' },
+                { icon: LayoutDashboard, label: isEn ? 'Dashboard' : '仪表盘', desc: isEn ? 'Data Overview' : '数据总览', color: 'blue' },
+                { icon: Building2, label: isEn ? 'Projects' : '项目中心', desc: isEn ? 'Resource Management' : '资源管理', color: 'emerald' },
+                { icon: Key, label: isEn ? 'API Management' : 'API 管理', desc: isEn ? 'Keys & Billing' : '密钥与计费', color: 'purple' },
+                { icon: BarChart3, label: isEn ? 'Analytics' : '数据分析', desc: isEn ? 'Usage Reports' : '使用报告', color: 'rose' },
+                { icon: Wallet, label: isEn ? 'Cost Center' : '成本中心', desc: isEn ? 'Budget Control' : '预算控制', color: 'amber' },
+                { icon: Users, label: isEn ? 'Members' : '成员管理', desc: isEn ? 'Permission Mgmt' : '权限分配', color: 'cyan' },
+                { icon: Globe, label: isEn ? 'API Market' : 'API 市场', desc: isEn ? 'Model Selection' : '模型选择', color: 'violet' },
+                { icon: Settings, label: isEn ? 'Settings' : '系统设置', desc: isEn ? 'Preferences' : '偏好配置', color: 'slate' },
               ].map((item, idx) => {
                 const Icon = item.icon;
                 const colorClasses: Record<string, string> = {
@@ -709,15 +717,15 @@ export default function Docs() {
                 <BookOpen className="w-5 h-5 text-brand-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-surface-800">准备好开始了吗？</p>
-                <p className="text-xs text-surface-600">查看「快速开始」获取详细的代码示例</p>
+                <p className="text-sm font-medium text-surface-800">{isEn ? 'Ready to start?' : '准备好开始了吗？'}</p>
+                <p className="text-xs text-surface-600">{isEn ? 'Check "Quick Start" for detailed code examples' : '查看「快速开始」获取详细的代码示例'}</p>
               </div>
             </div>
             <button
               onClick={() => setActiveSection('quickstart')}
               className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition-colors"
             >
-              查看快速开始
+              {isEn ? 'Quick Start' : '查看快速开始'}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
