@@ -62,6 +62,7 @@ interface Version {
   releaseDate?: string;
   goals: string[];
   requirements: string[];
+  docLink?: string;
 }
 
 interface Sprint {
@@ -84,11 +85,13 @@ const VERSIONS: Version[] = [
     startDate: '2026-04-23',
     releaseDate: '2026-04-23',
     goals: [
-      '优化消息通知系统',
-      '清理不支持的功能文案',
-      '提升用户体验',
+      '重新设计消息通知系统',
+      '补充消息文案类型（73种）',
+      '支持中英文国际化',
+      '完善消息通知文档',
     ],
     requirements: ['req-001', 'req-002'],
+    docLink: 'https://github.com/rickysvp/costify/blob/main/docs/notification-messages.md',
   },
   {
     version: 'v2.0.0',
@@ -112,7 +115,7 @@ const SPRINTS: Sprint[] = [
     startDate: '2026-04-23',
     endDate: '2026-04-30',
     status: 'active',
-    goals: ['优化消息通知文案', '移除不支持的功能通知'],
+    goals: ['重新设计消息通知系统', '补充73种消息文案类型', '完善文档'],
     requirements: ['req-001', 'req-002'],
   },
 ];
@@ -120,35 +123,35 @@ const SPRINTS: Sprint[] = [
 const REQUIREMENTS: Requirement[] = [
   {
     id: 'req-001',
-    title: '移除双因素认证相关通知文案',
-    description: '删除消息通知中心中与双因素认证(2FA)相关的所有通知文案，包括"双因素认证已启用"和"双因素认证已禁用"两条消息类型',
-    type: 'improvement',
+    title: '重新设计消息通知系统',
+    description: '重构消息通知中心，支持分类筛选、严重程度筛选，整合整站国际化(i18n)系统，支持中英文切换',
+    type: 'feature',
     status: 'completed',
-    priority: 'p1',
+    priority: 'p0',
     version: 'v2.0.1',
     sprint: 'sprint-1',
     author: '产品经理',
     createdAt: '2026-04-23',
     completedAt: '2026-04-23',
-    tags: ['消息通知', '文案优化', '功能清理'],
-    estimatedDays: 1,
-    actualDays: 1,
+    tags: ['消息通知', '重构', '国际化'],
+    estimatedDays: 2,
+    actualDays: 2,
   },
   {
     id: 'req-002',
-    title: '消息通知系统优化',
-    description: '优化消息通知中心的分类展示，确保只展示当前产品支持的功能相关的通知类型，提升用户体验',
-    type: 'improvement',
+    title: '补充消息文案类型',
+    description: '补充完整的消息通知文案类型，覆盖10大分类共73种通知场景，每种类型包含中英文标题和内容',
+    type: 'feature',
     status: 'completed',
-    priority: 'p1',
+    priority: 'p0',
     version: 'v2.0.1',
     sprint: 'sprint-1',
     author: '产品经理',
     createdAt: '2026-04-23',
     completedAt: '2026-04-23',
-    tags: ['消息通知', '用户体验', '优化'],
-    estimatedDays: 3,
-    actualDays: 3,
+    tags: ['消息通知', '文案', '文档'],
+    estimatedDays: 2,
+    actualDays: 2,
   },
 ];
 
