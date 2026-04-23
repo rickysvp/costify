@@ -22,6 +22,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { API_BASE } from '../config';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Compute a displayable API base URL (absolute path)
 const getDisplayApiBase = () => {
@@ -251,24 +252,98 @@ const anytoknMetadata = [
 
 // ---------- 主组件 ----------
 export default function Docs() {
+  const { t, lang } = useLanguage();
   const [activeSection, setActiveSection] = useState('onboarding');
 
+  const isEn = lang === 'en';
+
+  // 翻译内容
+  const i18n = {
+    title: isEn ? 'Documentation' : '接入指南',
+    subtitle: isEn 
+      ? 'AnyTokn is compatible with OpenAI API format, zero code changes required'
+      : 'AnyTokn 兼容 OpenAI API 格式，零代码改动即可接入',
+    sections: {
+      onboarding: { label: isEn ? 'Getting Started' : '新人导览', icon: Compass },
+      quickstart: { label: isEn ? 'Quick Start' : '快速开始', icon: Zap },
+      auth: { label: isEn ? 'Authentication' : '认证方式', icon: Key },
+      params: { label: isEn ? 'Request Params' : '请求参数', icon: Code2 },
+      response: { label: isEn ? 'Response Format' : '响应格式', icon: BarChart3 },
+      models: { label: isEn ? 'Available Models' : '可用模型', icon: Cpu },
+    },
+    onboarding: {
+      welcomeTitle: isEn ? 'Welcome to AnyTokn Dashboard' : '欢迎使用 AnyTokn Dashboard',
+      welcomeDesc: isEn 
+        ? 'This guide will help you quickly understand the core features of Dashboard, helping you efficiently manage AI Token resources, optimize costs, and monitor usage.'
+        : '本指南将带你快速了解 Dashboard 的核心功能，帮助你高效管理 AI Token 资源、优化成本并监控使用情况。',
+      quickStartTitle: isEn ? '5-Minute Quick Start' : '5 分钟快速上手',
+      steps: [
+        {
+          step: isEn ? 'Step 1' : '第 1 步',
+          title: isEn ? 'Explore Dashboard' : '认识仪表盘',
+          desc: isEn 
+            ? 'The Dashboard homepage displays your core data: monthly consumption, savings, API call count, and other key metrics.'
+            : 'Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。',
+          action: isEn ? 'View Dashboard' : '查看仪表盘',
+          doc: isEn ? 'Quick Start Guide' : '查看快速开始',
+        },
+        {
+          step: isEn ? 'Step 2' : '第 2 步',
+          title: isEn ? 'Create Your First Project' : '创建你的第一个项目',
+          desc: isEn 
+            ? 'Projects are the basic unit of resource management. It is recommended to create separate projects for different business scenarios to facilitate cost tracking and permission management.'
+            : '项目是资源管理的基本单位。建议为不同的业务场景创建独立项目，便于成本追踪和权限管理。',
+          action: isEn ? 'Create Project' : '创建项目',
+          doc: isEn ? 'Project Documentation' : '查看项目文档',
+        },
+        {
+          step: isEn ? 'Step 3' : '第 3 步',
+          title: isEn ? 'Get API Key' : '获取 API Key',
+          desc: isEn 
+            ? 'API Key is the credential for calling AnyTokn services. Each project can create multiple Keys, supporting independent budget and permission settings.'
+            : 'API Key 是调用 AnyTokn 服务的凭证。每个项目可以创建多个 Key，支持独立设置预算和权限。',
+          action: isEn ? 'Manage API Keys' : '管理 API Keys',
+          doc: isEn ? 'Authentication Documentation' : '查看认证文档',
+        },
+        {
+          step: isEn ? 'Step 4' : '第 4 步',
+          title: isEn ? 'Integrate Your Application' : '接入你的应用',
+          desc: isEn 
+            ? 'AnyTokn is fully compatible with OpenAI API format. Simply modify the baseURL and API Key to integrate.'
+            : 'AnyTokn 完全兼容 OpenAI API 格式，只需修改 baseURL 和 API Key 即可接入。',
+          action: isEn ? 'Integration Guide' : '查看接入指南',
+          doc: isEn ? 'API Documentation' : '查看 API 文档',
+        },
+        {
+          step: isEn ? 'Step 5' : '第 5 步',
+          title: isEn ? 'Monitor Usage' : '监控使用情况',
+          desc: isEn 
+            ? 'Regularly check usage reports and cost analysis, and use intelligent routing and caching to further reduce costs.'
+            : '定期查看使用报告和成本分析，利用智能路由和缓存优化进一步降低成本。',
+          action: isEn ? 'View Reports' : '查看报告',
+          routing: isEn ? 'Routing Config' : '路由配置',
+          alerts: isEn ? 'Alert Settings' : '告警设置',
+        },
+      ],
+    },
+  };
+
   const sections = [
-    { id: 'onboarding', label: '新人导览', icon: Compass },
-    { id: 'quickstart', label: '快速开始', icon: Zap },
-    { id: 'auth', label: '认证方式', icon: Key },
-    { id: 'params', label: '请求参数', icon: Code2 },
-    { id: 'response', label: '响应格式', icon: BarChart3 },
-    { id: 'models', label: '可用模型', icon: Cpu },
+    { id: 'onboarding', label: i18n.sections.onboarding.label, icon: Compass },
+    { id: 'quickstart', label: i18n.sections.quickstart.label, icon: Zap },
+    { id: 'auth', label: i18n.sections.auth.label, icon: Key },
+    { id: 'params', label: i18n.sections.params.label, icon: Code2 },
+    { id: 'response', label: i18n.sections.response.label, icon: BarChart3 },
+    { id: 'models', label: i18n.sections.models.label, icon: Cpu },
   ];
 
   return (
     <div className="p-6 space-y-6">
       {/* 标题 */}
       <div>
-        <h1 className="text-xl font-bold text-surface-900">接入指南</h1>
+        <h1 className="text-xl font-bold text-surface-900">{i18n.title}</h1>
         <p className="text-sm text-surface-500 mt-1">
-          AnyTokn 兼容 OpenAI API 格式，零代码改动即可接入
+          {i18n.subtitle}
         </p>
       </div>
 
@@ -303,9 +378,9 @@ export default function Docs() {
                 <Sparkles className="w-6 h-6 text-brand-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-surface-900 mb-2">欢迎使用 AnyTokn Dashboard</h3>
+                <h3 className="text-lg font-semibold text-surface-900 mb-2">{i18n.onboarding.welcomeTitle}</h3>
                 <p className="text-sm text-surface-600 leading-relaxed">
-                  本指南将带你快速了解 Dashboard 的核心功能，帮助你高效管理 AI Token 资源、优化成本并监控使用情况。
+                  {i18n.onboarding.welcomeDesc}
                 </p>
               </div>
             </div>
@@ -315,7 +390,7 @@ export default function Docs() {
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-surface-800 flex items-center gap-2">
               <Compass className="w-4 h-4 text-brand-600" />
-              5 分钟快速上手
+              {i18n.onboarding.quickStartTitle}
             </h3>
 
             {/* 步骤 1: 了解仪表盘 */}
@@ -327,11 +402,11 @@ export default function Docs() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="badge-blue text-[10px]">第 1 步</span>
-                      <h4 className="text-sm font-semibold text-surface-800">认识仪表盘</h4>
+                      <span className="badge-blue text-[10px]">{i18n.onboarding.steps[0].step}</span>
+                      <h4 className="text-sm font-semibold text-surface-800">{i18n.onboarding.steps[0].title}</h4>
                     </div>
                     <p className="text-xs text-surface-600 mb-3">
-                      Dashboard 首页展示了你的核心数据：本月消耗、节省金额、API 调用次数等关键指标。
+                      {i18n.onboarding.steps[0].desc}
                     </p>
                   </div>
                 </div>
@@ -340,10 +415,12 @@ export default function Docs() {
                   <div className="rounded-lg border border-surface-200 overflow-hidden mb-3">
                     <img 
                       src="/onboarding/dashboard-preview.png" 
-                      alt="仪表盘预览"
+                      alt={isEn ? "Dashboard Preview" : "仪表盘预览"}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://placehold.co/600x300/f5f5f5/404040?text=Dashboard+Preview';
+                        (e.target as HTMLImageElement).src = isEn 
+                          ? 'https://placehold.co/600x300/f5f5f5/404040?text=Dashboard+Preview'
+                          : 'https://placehold.co/600x300/f5f5f5/404040?text=仪表盘预览';
                       }}
                     />
                   </div>
@@ -352,14 +429,14 @@ export default function Docs() {
                       href="/dashboard" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     >
-                      查看仪表盘
+                      {i18n.onboarding.steps[0].action}
                       <ArrowRight className="w-3.5 h-3.5" />
                     </a>
                     <a 
                       href="/docs/quickstart" 
                       className="inline-flex items-center gap-1.5 px-4 py-2 bg-surface-100 text-surface-700 text-xs font-medium rounded-lg hover:bg-surface-200 transition-colors"
                     >
-                      查看快速开始
+                      {i18n.onboarding.steps[0].doc}
                     </a>
                   </div>
                 </div>
