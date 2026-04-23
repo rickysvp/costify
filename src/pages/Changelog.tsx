@@ -482,12 +482,35 @@ export default function Changelog() {
                     <div className="mb-4">
                       <h4 className="text-sm font-medium text-surface-700 mb-2">版本目标</h4>
                       <ul className="space-y-1">
-                        {version.goals.map((goal, idx) => (
-                          <li key={idx} className="text-sm text-surface-600 flex items-center gap-2">
-                            <Target className="w-3.5 h-3.5 text-brand-500" />
-                            {goal}
-                          </li>
-                        ))}
+                        {version.goals.map((goal, idx) => {
+                          // 解析 Markdown 链接格式 [文本](链接)
+                          const linkMatch = goal.match(/^(.*)\[(.+?)\]\((.+?)\)$/);
+                          if (linkMatch) {
+                            const [, beforeText, linkText, linkUrl] = linkMatch;
+                            return (
+                              <li key={idx} className="text-sm text-surface-600 flex items-center gap-2">
+                                <Target className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+                                <span>
+                                  {beforeText}
+                                  <a 
+                                    href={linkUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-brand-600 hover:text-brand-700 hover:underline"
+                                  >
+                                    {linkText}
+                                  </a>
+                                </span>
+                              </li>
+                            );
+                          }
+                          return (
+                            <li key={idx} className="text-sm text-surface-600 flex items-center gap-2">
+                              <Target className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+                              {goal}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
 
