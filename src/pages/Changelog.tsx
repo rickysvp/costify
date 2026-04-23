@@ -86,7 +86,7 @@ const VERSIONS: Version[] = [
     releaseDate: '2026-04-23',
     goals: [
       '重新设计消息通知系统',
-      '补充消息文案类型（73种）',
+      '补充消息文案类型（73种）[文档](https://github.com/rickysvp/costify/blob/main/docs/notification-messages.md)',
       '支持中英文国际化',
       '完善消息通知文档',
     ],
