@@ -30,10 +30,6 @@ const Navbar = () => {
           </Link>
           
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-500">
-            <Link to="/" className="hover:text-emerald-600 transition-colors">{t.nav.platform}</Link>
-            <Link to="/" className="hover:text-emerald-600 transition-colors">{t.nav.solutions}</Link>
-            <Link to="/" className="hover:text-emerald-600 transition-colors">{t.nav.engine}</Link>
-            <Link to="/" className="hover:text-emerald-600 transition-colors">{t.nav.pricing}</Link>
             <button 
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
               className="flex items-center gap-1 hover:text-emerald-600 transition-colors"
@@ -55,10 +51,6 @@ const Navbar = () => {
       
       {isOpen && (
         <div className="md:hidden bg-white border-t border-slate-100 px-4 py-6 space-y-4">
-          <Link to="/" className="block text-lg font-medium text-slate-900">{t.nav.platform}</Link>
-          <Link to="/" className="block text-lg font-medium text-slate-900">{t.nav.solutions}</Link>
-          <Link to="/" className="block text-lg font-medium text-slate-900">{t.nav.engine}</Link>
-          <Link to="/" className="block text-lg font-medium text-slate-900">{t.nav.pricing}</Link>
           <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="flex items-center gap-2 text-lg font-medium text-slate-900">
             <Globe className="w-5 h-5" />
             <span>{lang === 'zh' ? 'Switch to English' : '切换到中文'}</span>
