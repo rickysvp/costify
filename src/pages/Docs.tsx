@@ -29,11 +29,9 @@ import {
 import { API_BASE } from '../config';
 import { useLanguage } from '../contexts/LanguageContext';
 
-// Compute a displayable API base URL
+// Use anytokn.com domain for display
 const getDisplayApiBase = () => {
-  if (typeof window === 'undefined') return 'http://localhost:3001/api';
-  if (API_BASE.startsWith('http')) return API_BASE;
-  return window.location.origin + API_BASE;
+  return 'https://api.anytokn.com';
 };
 
 const DISPLAY_API_BASE = getDisplayApiBase();
@@ -145,7 +143,7 @@ console.log(data);`,
 response = requests.post(
     '${DISPLAY_API_BASE}/v1/chat/completions',
     headers={
-        'Authorization': 'Bearer ${apiKeyValue or "your-api-key"}',
+        'Authorization': 'Bearer ${apiKeyValue || "your-api-key"}',
         'Content-Type': 'application/json'
     },
     json={
@@ -208,19 +206,13 @@ print(data)`,
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center">
         <button
           onClick={() => setCurrentStep(1)}
           className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-all"
         >
           {isEn ? 'Start Onboarding' : '开始接入'}
           <ArrowRight className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setApiRefExpanded(true)}
-          className="px-6 py-3 text-slate-600 hover:text-emerald-600 font-medium transition-colors"
-        >
-          {isEn ? 'View API Reference' : '查看 API Reference'}
         </button>
       </div>
     </div>
@@ -252,6 +244,22 @@ print(data)`,
             <Building2 className="w-4 h-4" />
             {isEn ? 'Go Create Project' : '去创建项目'}
           </button>
+          
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <p className="text-sm text-slate-500 mb-4">
+              {isEn ? 'Already created a project? Mark as complete:' : '已经创建好项目了？标记为完成：'}
+            </p>
+            <button
+              onClick={() => {
+                setHasProject(true);
+                setProjectName(isEn ? 'My First Project' : '我的第一个项目');
+              }}
+              className="flex items-center gap-2 px-6 py-3 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-medium rounded-xl transition-all mx-auto"
+            >
+              <Check className="w-4 h-4" />
+              {isEn ? 'I\'ve Created a Project' : '我已完成创建'}
+            </button>
+          </div>
         </div>
       ) : (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
@@ -293,7 +301,7 @@ print(data)`,
           <p className="text-slate-600 mb-6">
             {isEn ? 'Generate your first API Key to start using AnyTokn.' : '生成你的第一个 API Key 开始使用 AnyTokn。'}
           </p>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center">
             <button
               onClick={() => navigate('/api-keys')}
               className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition-all"
@@ -301,11 +309,21 @@ print(data)`,
               <Key className="w-4 h-4" />
               {isEn ? 'Generate API Key' : '去生成 API Key'}
             </button>
+          </div>
+          
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <p className="text-sm text-slate-500 mb-4">
+              {isEn ? 'Already have an API Key? Mark as complete:' : '已经有 API Key 了？标记为完成：'}
+            </p>
             <button
-              onClick={() => setApiRefExpanded(true)}
-              className="px-6 py-3 text-slate-600 hover:text-emerald-600 font-medium transition-colors"
+              onClick={() => {
+                setHasApiKey(true);
+                setApiKeyValue('sk-anytokn-demo-key-xxxxxxxx');
+              }}
+              className="flex items-center gap-2 px-6 py-3 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-medium rounded-xl transition-all mx-auto"
             >
-              {isEn ? 'View Auth Docs' : '查看认证说明'}
+              <Check className="w-4 h-4" />
+              {isEn ? 'I\'ve Got API Key' : '我已完成获取'}
             </button>
           </div>
         </div>
@@ -384,6 +402,19 @@ print(data)`,
             className="px-6 py-3 text-slate-600 hover:text-emerald-600 font-medium transition-colors"
           >
             {isEn ? 'Skip for now' : '稍后再说'}
+          </button>
+        </div>
+        
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center">
+          <p className="text-sm text-slate-500 mb-4">
+            {isEn ? 'Already have balance? Mark as complete:' : '已经有余额了？标记为完成：'}
+          </p>
+          <button
+            onClick={() => setBalance(50)}
+            className="flex items-center gap-2 px-6 py-3 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-medium rounded-xl transition-all mx-auto"
+          >
+            <Check className="w-4 h-4" />
+            {isEn ? 'I\'ve Prepared Balance' : '我已完成准备'}
           </button>
         </div>
       </div>
@@ -555,7 +586,7 @@ print(data)`,
     </div>
   );
 
-  // API Reference Section
+  // Integration Guides Section
   const renderApiReference = () => (
     <div className="mt-12 border-t border-slate-200 pt-8">
       <button
@@ -565,7 +596,7 @@ print(data)`,
         <div className="flex items-center gap-3">
           <BookOpen className="w-5 h-5 text-slate-600" />
           <span className="font-semibold text-slate-900">
-            {isEn ? 'API Reference' : 'API Reference'}
+            {isEn ? 'Integration Guides' : '集成指南'}
           </span>
           <span className="text-sm text-slate-500">
             {isEn ? '(Click to expand)' : '(点击展开)'}
@@ -575,77 +606,133 @@ print(data)`,
       </button>
 
       {apiRefExpanded && (
-        <div className="space-y-8 pb-8">
-          {/* Auth */}
-          <section>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {isEn ? 'Authentication' : '认证方式'}
-            </h3>
-            <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-sm text-slate-600 mb-3">
-                {isEn ? 'All API requests require Bearer token authentication in the header:' : '所有 API 请求需要在 Header 中携带 Bearer Token 认证：'}
-              </p>
-              <CodeBlock code={`Authorization: Bearer your-api-key`} language="http" />
+        <div className="space-y-6 pb-8">
+          {/* OpenClaw */}
+          <section className="bg-slate-50 rounded-xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900">OpenClaw</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn 
+                ? 'Replace the base URL and API key in your OpenClaw configuration:'
+                : '在 OpenClaw 配置中替换 Base URL 和 API Key：'}
+            </p>
+            <div className="bg-slate-900 rounded-lg p-3">
+              <code className="text-xs text-slate-300 font-mono block">
+                {isEn ? '# OpenClaw Config' : '# OpenClaw 配置'}<br/>
+                base_url: {DISPLAY_API_BASE}/v1<br/>
+                api_key: {apiKeyValue || 'your-api-key'}
+              </code>
             </div>
           </section>
 
-          {/* Models */}
-          <section>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {isEn ? 'Available Models' : '可用模型'}
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: 'gpt-4', name: 'GPT-4', desc: isEn ? 'Most capable' : '最强能力' },
-                { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', desc: isEn ? 'Fast & capable' : '快速且强大' },
-                { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', desc: isEn ? 'Cost effective' : '性价比' },
-                { id: 'claude-3-opus', name: 'Claude 3 Opus', desc: isEn ? 'Anthropic best' : 'Anthropic 最强' },
-              ].map((model) => (
-                <div key={model.id} className="bg-slate-50 rounded-lg p-3">
-                  <p className="font-medium text-slate-900 text-sm">{model.name}</p>
-                  <p className="text-xs text-slate-500">{model.desc}</p>
-                </div>
-              ))}
+          {/* Hermes */}
+          <section className="bg-slate-50 rounded-xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <Cpu className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900">Hermes</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn 
+                ? 'Update your Hermes workflow node with these settings:'
+                : '在 Hermes 工作流节点中更新以下设置：'}
+            </p>
+            <div className="bg-slate-900 rounded-lg p-3">
+              <code className="text-xs text-slate-300 font-mono block">
+                {isEn ? '# Hermes LLM Node' : '# Hermes LLM 节点'}<br/>
+                Provider: OpenAI Compatible<br/>
+                Base URL: {DISPLAY_API_BASE}/v1<br/>
+                Model: gpt-3.5-turbo
+              </code>
             </div>
           </section>
 
-          {/* Request Params */}
-          <section>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {isEn ? 'Request Parameters' : '请求参数'}
-            </h3>
-            <div className="bg-slate-50 rounded-xl p-4 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 text-slate-600 font-medium">{isEn ? 'Param' : '参数'}</th>
-                    <th className="text-left py-2 text-slate-600 font-medium">{isEn ? 'Type' : '类型'}</th>
-                    <th className="text-left py-2 text-slate-600 font-medium">{isEn ? 'Required' : '必填'}</th>
-                    <th className="text-left py-2 text-slate-600 font-medium">{isEn ? 'Description' : '说明'}</th>
-                  </tr>
-                </thead>
-                <tbody className="text-slate-700">
-                  <tr className="border-b border-slate-100">
-                    <td className="py-2 font-mono text-xs">model</td>
-                    <td className="py-2">string</td>
-                    <td className="py-2">{isEn ? 'Yes' : '是'}</td>
-                    <td className="py-2">{isEn ? 'Model ID' : '模型 ID'}</td>
-                  </tr>
-                  <tr className="border-b border-slate-100">
-                    <td className="py-2 font-mono text-xs">messages</td>
-                    <td className="py-2">array</td>
-                    <td className="py-2">{isEn ? 'Yes' : '是'}</td>
-                    <td className="py-2">{isEn ? 'Conversation messages' : '对话消息'}</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-mono text-xs">temperature</td>
-                    <td className="py-2">number</td>
-                    <td className="py-2">{isEn ? 'No' : '否'}</td>
-                    <td className="py-2">{isEn ? 'Randomness (0-2)' : '随机性 (0-2)'}</td>
-                  </tr>
-                </tbody>
-              </table>
+          {/* n8n */}
+          <section className="bg-slate-50 rounded-xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                <Globe className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900">n8n</h3>
             </div>
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn 
+                ? 'Use HTTP Request node or OpenAI node with custom base URL:'
+                : '使用 HTTP Request 节点或 OpenAI 节点并设置自定义 Base URL：'}
+            </p>
+            <div className="bg-slate-900 rounded-lg p-3">
+              <code className="text-xs text-slate-300 font-mono block">
+                {isEn ? '# n8n OpenAI Node' : '# n8n OpenAI 节点'}<br/>
+                Base URL: {DISPLAY_API_BASE}/v1<br/>
+                API Key: {apiKeyValue || 'your-api-key'}
+              </code>
+            </div>
+          </section>
+
+          {/* Make/Zapier */}
+          <section className="bg-slate-50 rounded-xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center">
+                <Code2 className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900">Make / Zapier</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn 
+                ? 'Use HTTP module with these headers:'
+                : '使用 HTTP 模块并设置以下请求头：'}
+            </p>
+            <div className="bg-slate-900 rounded-lg p-3">
+              <code className="text-xs text-slate-300 font-mono block">
+                URL: {DISPLAY_API_BASE}/v1/chat/completions<br/>
+                Method: POST<br/>
+                Headers: Authorization: Bearer {apiKeyValue || 'your-api-key'}
+              </code>
+            </div>
+          </section>
+
+          {/* Python/Node.js */}
+          <section className="bg-slate-50 rounded-xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+                <Terminal className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-semibold text-slate-900">
+                {isEn ? 'Custom Code (Python/Node.js)' : '自定义代码 (Python/Node.js)'}
+              </h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn 
+                ? 'Just change the base URL when initializing the OpenAI client:'
+                : '初始化 OpenAI 客户端时只需修改 base_url：'}
+            </p>
+            <div className="bg-slate-900 rounded-lg p-3">
+              <code className="text-xs text-slate-300 font-mono block">
+                {isEn ? '# Python' : '# Python'}<br/>
+                client = OpenAI(<br/>
+                &nbsp;&nbsp;base_url="{DISPLAY_API_BASE}/v1",<br/>
+                &nbsp;&nbsp;api_key="{apiKeyValue || 'your-api-key'}"<br/>
+                )
+              </code>
+            </div>
+          </section>
+
+          {/* Need Help */}
+          <section className="text-center pt-4">
+            <p className="text-sm text-slate-600 mb-3">
+              {isEn ? 'Need help with other tools?' : '需要其他工具的帮助？'}
+            </p>
+            <button
+              onClick={() => navigate('/contact')}
+              className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+            >
+              {isEn ? 'Contact Support →' : '联系客服 →'}
+            </button>
           </section>
         </div>
       )}
@@ -724,13 +811,13 @@ print(data)`,
                 ))}
               </div>
 
-              {/* API Reference Link */}
+              {/* Integration Guides Link */}
               <button
                 onClick={() => setApiRefExpanded(!apiRefExpanded)}
                 className="w-full flex items-center gap-3 px-3 py-2.5 mt-4 pt-4 border-t border-slate-100 text-left text-sm text-slate-600 hover:text-emerald-600 transition-colors"
               >
                 <BookOpen className="w-5 h-5" />
-                <span className="flex-1">API Reference</span>
+                <span className="flex-1">{isEn ? 'Integration Guides' : '集成指南'}</span>
                 {apiRefExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
             </div>
