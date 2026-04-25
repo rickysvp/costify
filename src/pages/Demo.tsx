@@ -483,18 +483,28 @@ export default function Demo() {
       let baseline;
       let optimized;
 
+      // 应用优化步骤（无论真实 API 还是模拟模式，都先计算优化后的 prompt）
+      const promptOpt = OPTIMIZATION_TECHS[0].apply(customPrompt);
+      const systemOpt = OPTIMIZATION_TECHS[1].apply(customSystemPrompt);
+      const optimizedPrompt = promptOpt.text;
+      const optimizedSystem = systemOpt.text;
+
       if (useRealAPI && apiKey.trim()) {
         // 真实 API 调用 - Baseline（原始 prompt）
         baseline = await callRealAPI(apiKey, selectedModel, customSystemPrompt, customPrompt);
         
-        // 应用优化
-        const promptOpt = OPTIMIZATION_TECHS[0].apply(customPrompt);
-        const systemOpt = OPTIMIZATION_TECHS[1].apply(customSystemPrompt);
-        const optimizedPrompt = promptOpt.text;
-        const optimizedSystem = systemOpt.text;
-        
         // 真实 API 调用 - Optimized（优化后 prompt）
-        optimized = await callRealAPI(apiKey, selectedModel, optimizedSystem, optimizedPrompt);
+        const apiOptimized = await callRealAPI(apiKey, selectedModel, optimizedSystem, optimizedPrompt);
+        
+        // 计算优化后的 input tokens：使用 API 返回的 output，但 input 使用优化后的 prompt 长度
+        const optimizedInputTokens = Math.round((optimizedPrompt.length + optimizedSystem.length) * 0.3);
+        optimized = {
+          ...apiOptimized,
+          inputTokens: optimizedInputTokens,
+          totalTokens: optimizedInputTokens + apiOptimized.outputTokens,
+          cost: (optimizedInputTokens / 1000 * selectedModel.inputPrice) + (apiOptimized.outputTokens / 1000 * selectedModel.outputPrice),
+          costStr: `$${((optimizedInputTokens / 1000 * selectedModel.inputPrice) + (apiOptimized.outputTokens / 1000 * selectedModel.outputPrice)).toFixed(5)}`,
+        };
       } else {
         // 模拟调用
         await new Promise(resolve => setTimeout(resolve, 1500));
@@ -527,6 +537,12 @@ export default function Demo() {
         saved: systemOpt.saved,
         details: isEn ? systemOpt.details : systemOpt.detailsZh,
       });
+
+      // 如果之前已经计算过优化后的 prompt（真实 API 模式），直接使用
+      if (useRealAPI && apiKey.trim()) {
+        currentPrompt = optimizedPrompt;
+        currentSystem = optimizedSystem;
+      }
 
       // Step 3: Context Trimming
       const contextOpt = OPTIMIZATION_TECHS[2].apply(currentSystem + '\n' + currentPrompt);
