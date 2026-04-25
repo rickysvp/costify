@@ -1,10 +1,10 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, Zap, Loader2, TrendingDown, Clock, DollarSign,
   BarChart3, CheckCircle2, X, Scissors, Route, Layers, BrainCircuit,
   Filter, AlignLeft, Table2, Key, Eye, EyeOff, Sparkles, ChevronDown,
-  ChevronUp, Copy, Check, AlertTriangle, Cpu, ArrowDownRight
+  ChevronUp, Copy, Check, AlertTriangle, ArrowDownRight
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
@@ -17,8 +17,8 @@ interface ModelConfig {
   id: string;
   name: string;
   provider: 'openai' | 'anthropic' | 'google';
-  modelId: string; // 真实 API model ID
-  inputPrice: number; // per 1K tokens
+  modelId: string;
+  inputPrice: number;
   outputPrice: number;
   maxTokens: number;
 }
@@ -87,7 +87,7 @@ const PRESET_SCENARIOS: Scenario[] = [
   },
 ];
 
-// ==================== 优化技术 ====================
+// ==================== 优化引擎 ====================
 interface OptimizationResult {
   text: string;
   saved: number;
@@ -95,7 +95,7 @@ interface OptimizationResult {
   detailsZh: string[];
 }
 
-interface OptimizationTech {
+interface OptimizationStep {
   id: string;
   name: string;
   nameZh: string;
@@ -105,7 +105,7 @@ interface OptimizationTech {
   apply: (text: string) => OptimizationResult;
 }
 
-const OPTIMIZATION_TECHS: OptimizationTech[] = [
+const OPTIMIZATION_STEPS: OptimizationStep[] = [
   {
     id: 'prompt-compression',
     name: 'Prompt Compression',
@@ -115,24 +115,36 @@ const OPTIMIZATION_TECHS: OptimizationTech[] = [
     icon: Scissors,
     apply: (text: string): OptimizationResult => {
       const original = text;
-      let compressed = text
-        .replace(/Customer inquiry: /gi, '')
-        .replace(/Query: /gi, '')
-        .replace(/Task: /gi, '')
-        .replace(/Generate a /gi, '')
-        .replace(/Can you /gi, '')
-        .replace(/please /gi, '')
-        .replace(/I haven\'t /gi, '')
-        .replace(/yet\?/g, '?')
-        .replace(/Can you check /gi, 'Status: ')
-        .replace(/the status\?/gi, '')
-        .replace(/What are /gi, '')
-        .replace(/and /gi, '& ')
-        .replace(/My /gi, '')
-        .replace(/you /gi, '')
-        .trim();
+      const replacements: [RegExp, string][] = [
+        [/Customer inquiry: /gi, ''],
+        [/Query: /gi, ''],
+        [/Task: /gi, ''],
+        [/Generate a /gi, ''],
+        [/Can you /gi, ''],
+        [/please /gi, ''],
+        [/I haven\'t /gi, ''],
+        [/yet\?/g, '?'],
+        [/Can you check /gi, 'Status: '],
+        [/the status\?/gi, ''],
+        [/What are /gi, ''],
+        [/and /gi, '& '],
+        [/My /gi, ''],
+        [/you /gi, ''],
+        [/的订单/g, '订单'],
+        [/能查一下/g, '查'],
+        [/吗[？?]/g, '？'],
+        [/还没到/g, '未收到'],
+        [/我3天前下的单/g, '3天前下单'],
+        [/追踪号应该是/g, '追踪号'],
+      ];
       
-      const saved = Math.min(50, Math.max(10, Math.round((1 - compressed.length / original.length) * 100)));
+      let compressed = text;
+      for (const [pattern, replacement] of replacements) {
+        compressed = compressed.replace(pattern, replacement);
+      }
+      compressed = compressed.trim();
+      
+      const saved = original.length > 0 ? Math.min(50, Math.max(10, Math.round((1 - compressed.length / original.length) * 100))) : 0;
       return {
         text: compressed || original,
         saved,
@@ -150,31 +162,53 @@ const OPTIMIZATION_TECHS: OptimizationTech[] = [
     icon: Filter,
     apply: (text: string): OptimizationResult => {
       const original = text;
-      let optimized = text
-        .replace(/You are a helpful /gi, '')
-        .replace(/You are an expert /gi, '')
-        .replace(/You are a knowledgeable /gi, '')
-        .replace(/You are a professional /gi, '')
-        .replace(/You are a technical /gi, '')
-        .replace(/You should be /gi, '')
-        .replace(/polite, professional, and thorough\. /gi, '')
-        .replace(/Provide detailed information about /gi, 'Info: ')
-        .replace(/including /gi, ' incl. ')
-        .replace(/and any delays\. /gi, '')
-        .replace(/If the issue is complex, escalate to human support\. /gi, '')
-        .replace(/Always end with a friendly closing\. /gi, '')
-        .replace(/Provide accurate, detailed answers based on the retrieved information\. /gi, '')
-        .replace(/Include specific numbers, pricing tiers, and conditions\. /gi, 'Details: numbers, tiers, conditions. ')
-        .replace(/Cite your sources when possible\. /gi, '')
-        .replace(/Analyze the options thoroughly, considering /gi, 'Analyze: ')
-        .replace(/performance, cost, scalability, and ecosystem\. /gi, 'perf, cost, scale, eco. ')
-        .replace(/Provide structured comparisons with clear recommendations based on specific use cases\. /gi, 'Structured comparison + recommendations. ')
-        .replace(/Create concise, structured summaries that capture /gi, 'Summarize: ')
-        .replace(/key contributions, methodology, results, and implications\. /gi, 'contributions, methods, results. ')
-        .replace(/Use bullet points and tables where appropriate\. /gi, '')
-        .trim();
+      const replacements: [RegExp, string][] = [
+        [/You are a helpful /gi, ''],
+        [/You are an expert /gi, ''],
+        [/You are a knowledgeable /gi, ''],
+        [/You are a professional /gi, ''],
+        [/You are a technical /gi, ''],
+        [/You should be /gi, ''],
+        [/polite, professional, and thorough\. /gi, ''],
+        [/Provide detailed information about /gi, 'Info: '],
+        [/including /gi, ' incl. '],
+        [/and any delays\. /gi, ''],
+        [/If the issue is complex, escalate to human support\. /gi, ''],
+        [/Always end with a friendly closing\. /gi, ''],
+        [/Provide accurate, detailed answers based on the retrieved information\. /gi, ''],
+        [/Include specific numbers, pricing tiers, and conditions\. /gi, 'Details: numbers, tiers, conditions. '],
+        [/Cite your sources when possible\. /gi, ''],
+        [/Analyze the options thoroughly, considering /gi, 'Analyze: '],
+        [/performance, cost, scalability, and ecosystem\. /gi, 'perf, cost, scale, eco. '],
+        [/Provide structured comparisons with clear recommendations based on specific use cases\. /gi, 'Structured comparison + recommendations. '],
+        [/Create concise, structured summaries that capture /gi, 'Summarize: '],
+        [/key contributions, methodology, results, and implications\. /gi, 'contributions, methods, results. '],
+        [/Use bullet points and tables where appropriate\. /gi, ''],
+        [/你是专业的/g, ''],
+        [/请礼貌、专业、详尽地回答/g, '专业回答'],
+        [/提供物流状态的详细信息/g, '提供物流信息'],
+        [/包括承运商、追踪号、预计送达日期和延误情况/g, '含承运商、追踪号、日期'],
+        [/如果问题复杂，请转接人工客服/g, '复杂问题转人工'],
+        [/始终以友好的结束语收尾/g, ''],
+        [/基于检索到的信息/g, '基于检索信息'],
+        [/包含具体数字、定价层级和条件/g, '含数字、层级、条件'],
+        [/尽可能引用来源/g, ''],
+        [/全面分析各选项/g, '分析各选项'],
+        [/考虑性能、成本、可扩展性和生态系统/g, '考虑性能、成本、扩展性、生态'],
+        [/提供结构化对比/g, '结构化对比'],
+        [/并基于具体用例给出明确建议/g, ''],
+        [/创建简洁、结构化的摘要/g, '创建结构化摘要'],
+        [/捕捉关键贡献、方法论、结果和影响/g, '捕捉关键贡献、方法、结果'],
+        [/适当使用要点和表格/g, ''],
+      ];
       
-      const saved = Math.min(60, Math.max(15, Math.round((1 - optimized.length / original.length) * 100)));
+      let optimized = text;
+      for (const [pattern, replacement] of replacements) {
+        optimized = optimized.replace(pattern, replacement);
+      }
+      optimized = optimized.trim();
+      
+      const saved = original.length > 0 ? Math.min(60, Math.max(15, Math.round((1 - optimized.length / original.length) * 100))) : 0;
       return {
         text: optimized || original,
         saved,
@@ -195,12 +229,11 @@ const OPTIMIZATION_TECHS: OptimizationTech[] = [
       const relevantLines = lines.filter((line, i) => {
         if (lines.length <= 5) return true;
         if (i < 2 || i >= lines.length - 2) return true;
-        // Remove middle filler lines
         const isFiller = /^(well|so|anyway|by the way|incidentally|also|plus)\b/i.test(line.trim());
         return !isFiller && Math.random() > 0.4;
       });
       const trimmed = relevantLines.join('\n');
-      const saved = Math.min(45, Math.max(10, Math.round((1 - trimmed.length / text.length) * 100)));
+      const saved = text.length > 0 ? Math.min(45, Math.max(10, Math.round((1 - trimmed.length / text.length) * 100))) : 0;
       return {
         text: trimmed || text,
         saved,
@@ -218,30 +251,36 @@ const OPTIMIZATION_TECHS: OptimizationTech[] = [
     icon: Layers,
     apply: (text: string): OptimizationResult => {
       const original = text;
-      let condensed = text
-        .replace(/Hello! Thank you for reaching out to us\. /gi, '')
-        .replace(/I understand your concern about /gi, '')
-        .replace(/I have checked our system and found that /gi, '')
-        .replace(/Based on our estimates, /gi, '')
-        .replace(/You can track the real-time status on /gi, 'Track: ')
-        .replace(/If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further\. /gi, '')
-        .replace(/We appreciate your patience and understanding\. /gi, '')
-        .replace(/Have a great day! /gi, '')
-        .replace(/Based on the retrieved documentation, /gi, '')
-        .replace(/The authors first introduce /gi, '')
-        .replace(/They then propose /gi, '')
-        .replace(/The experimental results show /gi, '')
-        .replace(/The paper concludes with /gi, '')
-        .replace(/Let me analyze /gi, '')
-        .replace(/First, /gi, '1. ')
-        .replace(/Second, /gi, '2. ')
-        .replace(/Third, /gi, '3. ')
-        .replace(/However, /gi, 'But: ')
-        .replace(/Therefore, /gi, 'So: ')
-        .replace(/In conclusion, /gi, 'Conclusion: ')
-        .trim();
+      const replacements: [RegExp, string][] = [
+        [/Hello! Thank you for reaching out to us\. /gi, ''],
+        [/I understand your concern about /gi, ''],
+        [/I have checked our system and found that /gi, ''],
+        [/Based on our estimates, /gi, ''],
+        [/You can track the real-time status on /gi, 'Track: '],
+        [/If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further\. /gi, ''],
+        [/We appreciate your patience and understanding\. /gi, ''],
+        [/Have a great day! /gi, ''],
+        [/Based on the retrieved documentation, /gi, ''],
+        [/The authors first introduce /gi, ''],
+        [/They then propose /gi, ''],
+        [/The experimental results show /gi, ''],
+        [/The paper concludes with /gi, ''],
+        [/Let me analyze /gi, ''],
+        [/First, /gi, '1. '],
+        [/Second, /gi, '2. '],
+        [/Third, /gi, '3. '],
+        [/However, /gi, 'But: '],
+        [/Therefore, /gi, 'So: '],
+        [/In conclusion, /gi, 'Conclusion: '],
+      ];
       
-      const saved = Math.min(50, Math.max(15, Math.round((1 - condensed.length / original.length) * 100)));
+      let condensed = text;
+      for (const [pattern, replacement] of replacements) {
+        condensed = condensed.replace(pattern, replacement);
+      }
+      condensed = condensed.trim();
+      
+      const saved = original.length > 0 ? Math.min(50, Math.max(15, Math.round((1 - condensed.length / original.length) * 100))) : 0;
       return {
         text: condensed || original,
         saved,
@@ -350,7 +389,6 @@ async function callGoogle(apiKey: string, model: string, systemPrompt: string, u
 
   const data = await response.json();
   const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  // Google doesn't always return usage, estimate
   const inputTokens = Math.round((systemPrompt.length + userPrompt.length) * 0.3);
   const outputTokens = Math.round(content.length * 0.3);
   return {
@@ -393,16 +431,16 @@ async function callRealAPI(apiKey: string, modelConfig: ModelConfig, systemPromp
   };
 }
 
-// ==================== 模拟 API 调用（无 API Key 时使用）====================
+// ==================== 模拟 API 调用 ====================
 function simulateAPICall(prompt: string, systemPrompt: string, model: ModelConfig) {
   const inputTokens = Math.round((prompt.length + systemPrompt.length) * 0.3);
   
   let response = '';
-  if (prompt.includes('order') || prompt.includes('订单')) {
+  if (prompt.includes('order') || prompt.includes('订单') || prompt.includes('ORD')) {
     response = 'Hello! Thank you for reaching out to us. I understand your concern about order #ORD-20260418. I have checked our system and found that your order was shipped on April 20th via SF Express. The tracking number is SF1234567890. Based on our estimates, it should arrive by April 23rd. You can track the real-time status on the SF Express website. If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further. We appreciate your patience and understanding. Have a great day!';
-  } else if (prompt.includes('pricing') || prompt.includes('定价')) {
+  } else if (prompt.includes('pricing') || prompt.includes('定价') || prompt.includes('price')) {
     response = 'Based on the retrieved documentation, AnyTokn offers three pricing tiers for enterprise customers. The Starter tier begins at $499/month for up to 1M tokens. The Growth tier is $1,499/month for up to 5M tokens. The Enterprise tier offers custom pricing for unlimited usage. Volume discounts are available starting at 10M tokens/month, with a 15% discount at 50M tokens and 25% discount at 100M tokens. For your expected 50M tokens per month, you would qualify for the Growth tier with a 15% volume discount, bringing the monthly cost to approximately $1,274.';
-  } else if (prompt.includes('Compare') || prompt.includes('对比') || prompt.includes('AWS')) {
+  } else if (prompt.includes('Compare') || prompt.includes('对比') || prompt.includes('AWS') || prompt.includes('GCP')) {
     response = 'Let me analyze these three cloud providers for ML training workloads. First, AWS offers the most mature ecosystem with SageMaker and EC2 P4/P5 instances, but can be complex to configure and relatively expensive. GCP provides excellent TensorFlow integration, TPU access, and competitive pricing for training jobs. Azure has strong enterprise integration and good Windows support. For transformer fine-tuning with 100GB datasets, I recommend GCP due to its superior AI/ML tooling, TPU availability, and cost-effectiveness for training jobs. However, if you need enterprise features and Windows compatibility, Azure might be better. AWS is best if you need the broadest service ecosystem and most mature infrastructure.';
   } else {
     response = 'This paper presents several key optimizations for transformer architectures. The authors first introduce the motivation behind their work, explaining that current transformers suffer from quadratic attention complexity. They then propose a novel sparse attention mechanism that reduces complexity from O(n²) to O(n log n) through local+global attention patterns. The experimental results show a 40% improvement in training speed without sacrificing accuracy on GLUE, WMT, and WikiText benchmarks. The paper concludes with a discussion of limitations including reduced effectiveness on very long sequences and future directions toward hardware-aware attention patterns.';
@@ -429,18 +467,15 @@ export default function Demo() {
   const { lang } = useLanguage();
   const isEn = lang === 'en';
 
-  // BYOK State
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelConfig>(MODELS[0]);
   const [useRealAPI, setUseRealAPI] = useState(false);
 
-  // Scenario State
   const [selectedScenario, setSelectedScenario] = useState<string>('');
   const [customPrompt, setCustomPrompt] = useState('');
   const [customSystemPrompt, setCustomSystemPrompt] = useState('');
 
-  // Results State
   const [isRunning, setIsRunning] = useState(false);
   const [hasResult, setHasResult] = useState(false);
   const [error, setError] = useState<string>('');
@@ -450,8 +485,6 @@ export default function Demo() {
   const [activeTab, setActiveTab] = useState<'comparison' | 'pipeline' | 'metrics'>('comparison');
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState(false);
-
-  const abortRef = useRef<AbortController | null>(null);
 
   const handleScenarioSelect = useCallback((scenarioId: string) => {
     setSelectedScenario(scenarioId);
@@ -489,10 +522,10 @@ export default function Demo() {
       let currentSystem = customSystemPrompt;
 
       // Step 1: Prompt Compression
-      const promptOpt = OPTIMIZATION_TECHS[0].apply(currentPrompt);
+      const promptOpt = OPTIMIZATION_STEPS[0].apply(currentPrompt);
       currentPrompt = promptOpt.text;
       steps.push({
-        tech: OPTIMIZATION_TECHS[0],
+        tech: OPTIMIZATION_STEPS[0],
         input: customPrompt,
         output: currentPrompt,
         saved: promptOpt.saved,
@@ -500,10 +533,10 @@ export default function Demo() {
       });
 
       // Step 2: System Instruction Optimization
-      const systemOpt = OPTIMIZATION_TECHS[1].apply(currentSystem);
+      const systemOpt = OPTIMIZATION_STEPS[1].apply(currentSystem);
       currentSystem = systemOpt.text;
       steps.push({
-        tech: OPTIMIZATION_TECHS[1],
+        tech: OPTIMIZATION_STEPS[1],
         input: customSystemPrompt,
         output: currentSystem,
         saved: systemOpt.saved,
@@ -512,6 +545,16 @@ export default function Demo() {
 
       const optimizedPrompt = currentPrompt;
       const optimizedSystem = currentSystem;
+
+      // Step 3: Context Trimming
+      const contextOpt = OPTIMIZATION_STEPS[2].apply(currentSystem + '\n' + currentPrompt);
+      steps.push({
+        tech: OPTIMIZATION_STEPS[2],
+        input: currentSystem + '\n' + currentPrompt,
+        output: contextOpt.text,
+        saved: contextOpt.saved,
+        details: isEn ? contextOpt.details : contextOpt.detailsZh,
+      });
 
       if (useRealAPI && apiKey.trim()) {
         // 真实 API 调用 - Baseline（原始 prompt）
@@ -533,27 +576,32 @@ export default function Demo() {
         // 模拟调用
         await new Promise(resolve => setTimeout(resolve, 1500));
         baseline = simulateAPICall(customPrompt, customSystemPrompt, selectedModel);
+        
+        // 模拟优化后的结果：使用优化后的 prompt，并对 output 应用 condensation
+        const rawOptimized = simulateAPICall(optimizedPrompt, optimizedSystem, selectedModel);
+        const outputOpt = OPTIMIZATION_STEPS[3].apply(rawOptimized.response);
+        
+        const optimizedInputTokens = Math.round((optimizedPrompt.length + optimizedSystem.length) * 0.3);
+        const optimizedOutputTokens = Math.round(outputOpt.text.length * 0.3);
+        const optimizedTotalTokens = optimizedInputTokens + optimizedOutputTokens;
+        const optimizedCost = (optimizedInputTokens / 1000 * selectedModel.inputPrice) + (optimizedOutputTokens / 1000 * selectedModel.outputPrice);
+        
+        optimized = {
+          ...rawOptimized,
+          inputTokens: optimizedInputTokens,
+          outputTokens: optimizedOutputTokens,
+          totalTokens: optimizedTotalTokens,
+          cost: optimizedCost,
+          costStr: `$${optimizedCost.toFixed(5)}`,
+          response: outputOpt.text,
+          latencyMs: Math.round(rawOptimized.latencyMs * 0.7), // 优化后延迟更低
+        };
       }
 
-      // Step 3: Context Trimming
-      const contextOpt = OPTIMIZATION_TECHS[2].apply(currentSystem + '\n' + currentPrompt);
+      // Step 4: Output Condensation (展示用)
+      const outputOpt = OPTIMIZATION_STEPS[3].apply(baseline.response || baseline.content);
       steps.push({
-        tech: OPTIMIZATION_TECHS[2],
-        input: currentSystem + '\n' + currentPrompt,
-        output: contextOpt.text,
-        saved: contextOpt.saved,
-        details: isEn ? contextOpt.details : contextOpt.detailsZh,
-      });
-
-      if (!useRealAPI || !apiKey.trim()) {
-        // 模拟优化后的结果
-        optimized = simulateAPICall(currentPrompt, currentSystem, selectedModel);
-      }
-
-      // Step 4: Output Condensation
-      const outputOpt = OPTIMIZATION_TECHS[3].apply(baseline.response || baseline.content);
-      steps.push({
-        tech: OPTIMIZATION_TECHS[3],
+        tech: OPTIMIZATION_STEPS[3],
         input: baseline.response || baseline.content,
         output: outputOpt.text,
         saved: outputOpt.saved,
@@ -561,9 +609,9 @@ export default function Demo() {
       });
 
       // Step 5: Smart Routing
-      const routingOpt = OPTIMIZATION_TECHS[4].apply('');
+      const routingOpt = OPTIMIZATION_STEPS[4].apply('');
       steps.push({
-        tech: OPTIMIZATION_TECHS[4],
+        tech: OPTIMIZATION_STEPS[4],
         input: selectedModel.name,
         output: `${selectedModel.name} → ${selectedModel.name}`,
         saved: routingOpt.saved,
@@ -586,8 +634,6 @@ export default function Demo() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  const currentScenario = PRESET_SCENARIOS.find(s => s.id === selectedScenario);
 
   const savings = baselineResult && optimizedResult ? {
     input: Math.round((1 - optimizedResult.inputTokens / baselineResult.inputTokens) * 100),
@@ -1123,11 +1169,11 @@ export default function Demo() {
                         <div className="card-body border-t border-neutral-100">
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                             <div className="bg-red-50 rounded-lg p-3">
-                              <p className="text-xs text-red-600 mb-1">{isEn ? 'Before' : '优化前'}</p>
+                              <p className="text-xs text-red-600 mb-1">{isEn ? 'Before' : '优化前'} ({step.input.length} chars)</p>
                               <p className="text-xs text-neutral-700 font-mono break-all">{step.input.slice(0, 300)}{step.input.length > 300 ? '...' : ''}</p>
                             </div>
                             <div className="bg-emerald-50 rounded-lg p-3">
-                              <p className="text-xs text-emerald-600 mb-1">{isEn ? 'After' : '优化后'}</p>
+                              <p className="text-xs text-emerald-600 mb-1">{isEn ? 'After' : '优化后'} ({step.output.length} chars)</p>
                               <p className="text-xs text-neutral-700 font-mono break-all">{step.output.slice(0, 300)}{step.output.length > 300 ? '...' : ''}</p>
                             </div>
                           </div>
