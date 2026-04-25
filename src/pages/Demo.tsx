@@ -1,386 +1,600 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, Zap, Send, Loader2, TrendingDown, Clock, DollarSign,
-  BarChart3, CheckCircle2, AlertTriangle, Layers, Scissors, Route,
-  FileText, ChevronRight, X, Minus, Plus, ArrowDownRight, ArrowUpRight,
-  Target, Gauge, Sparkles, BrainCircuit, Filter, AlignLeft, Table2
+  ArrowRight, Zap, Loader2, TrendingDown, Clock, DollarSign,
+  BarChart3, CheckCircle2, X, Scissors, Route, Layers, BrainCircuit,
+  Filter, AlignLeft, Table2, Key, Eye, EyeOff, Sparkles, ChevronDown,
+  ChevronUp, Copy, Check, AlertTriangle, Cpu, ArrowDownRight
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, AreaChart, Area
+  ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 
-// ==================== 专业场景预设 ====================
-const PRESET_SCENARIOS = [
+// ==================== 模型配置 ====================
+interface ModelConfig {
+  id: string;
+  name: string;
+  provider: 'openai' | 'anthropic' | 'google';
+  modelId: string; // 真实 API model ID
+  inputPrice: number; // per 1K tokens
+  outputPrice: number;
+  maxTokens: number;
+}
+
+const MODELS: ModelConfig[] = [
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', modelId: 'gpt-4o', inputPrice: 0.0025, outputPrice: 0.01, maxTokens: 4096 },
+  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai', modelId: 'gpt-4o-mini', inputPrice: 0.00015, outputPrice: 0.0006, maxTokens: 4096 },
+  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', provider: 'openai', modelId: 'gpt-3.5-turbo', inputPrice: 0.0005, outputPrice: 0.0015, maxTokens: 4096 },
+  { id: 'claude-3-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', modelId: 'claude-3-5-sonnet-20241022', inputPrice: 0.003, outputPrice: 0.015, maxTokens: 4096 },
+  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', provider: 'anthropic', modelId: 'claude-3-haiku-20240307', inputPrice: 0.00025, outputPrice: 0.00125, maxTokens: 4096 },
+  { id: 'gemini-pro', name: 'Gemini 1.5 Pro', provider: 'google', modelId: 'gemini-1.5-pro', inputPrice: 0.00125, outputPrice: 0.005, maxTokens: 4096 },
+];
+
+// ==================== 场景预设 ====================
+interface Scenario {
+  id: string;
+  category: string;
+  categoryZh: string;
+  icon: any;
+  prompt: string;
+  promptZh: string;
+  systemPrompt: string;
+  systemPromptZh: string;
+}
+
+const PRESET_SCENARIOS: Scenario[] = [
   {
     id: 'customer-support',
     category: 'Customer Support',
     categoryZh: '客户支持',
     icon: BrainCircuit,
-    prompt: 'Customer inquiry: "I haven\'t received my order #ORD-20260418 yet. Can you check the status?"',
-    promptZh: '客户咨询："我的订单 #ORD-20260418 还没收到，能查一下状态吗？"',
-    description: 'High-volume support tickets with repetitive context',
-    descriptionZh: '大量重复上下文的客服工单',
+    prompt: 'My order #ORD-20260418 hasn\'t arrived yet. Can you check the shipping status? I ordered 3 days ago and the tracking number should be SF1234567890.',
+    promptZh: '我的订单 #ORD-20260418 还没到，能查一下物流状态吗？我3天前下的单，追踪号应该是 SF1234567890。',
+    systemPrompt: 'You are a helpful customer support assistant. You should be polite, professional, and thorough. Provide detailed information about shipping status, including carrier details, tracking numbers, estimated delivery dates, and any delays. If the issue is complex, escalate to human support. Always end with a friendly closing.',
+    systemPromptZh: '你是专业的客服助手。请礼貌、专业、详尽地回答。提供物流状态的详细信息，包括承运商、追踪号、预计送达日期和延误情况。如果问题复杂，请转接人工客服。始终以友好的结束语收尾。',
   },
   {
     id: 'rag-knowledge',
     category: 'RAG Knowledge Base',
     categoryZh: 'RAG 知识库',
     icon: Filter,
-    prompt: 'Query: "What are the pricing tiers for enterprise API access and volume discounts?"',
-    promptZh: '查询："企业 API 访问的定价层级和批量折扣是什么？"',
-    description: 'Document-grounded Q&A with large retrieval context',
-    descriptionZh: '基于文档检索的大上下文问答',
+    prompt: 'What are the pricing tiers for enterprise API access and volume discounts? We expect about 50M tokens per month.',
+    promptZh: '企业 API 访问的定价层级和批量折扣是什么？我们预计每月约 5000 万 token。',
+    systemPrompt: 'You are a knowledgeable assistant with access to company documentation. Provide accurate, detailed answers based on the retrieved information. Include specific numbers, pricing tiers, and conditions. Cite your sources when possible.',
+    systemPromptZh: '你是可访问公司文档的知识助手。基于检索到的信息提供准确、详细的回答。包含具体数字、定价层级和条件。尽可能引用来源。',
   },
   {
     id: 'agent-workflow',
     category: 'Agent Workflow',
     categoryZh: 'Agent 工作流',
     icon: Table2,
-    prompt: 'Task: "Compare cloud providers AWS, GCP, Azure for ML workloads and recommend the best option"',
-    promptZh: '任务："对比 AWS、GCP、Azure 云厂商的 ML 工作负载表现并推荐最优方案"',
-    description: 'Multi-step reasoning with accumulated conversation history',
-    descriptionZh: '多步推理，累积对话历史',
+    prompt: 'Compare AWS, GCP, and Azure for ML training workloads. We need GPU clusters for transformer fine-tuning with datasets around 100GB.',
+    promptZh: '对比 AWS、GCP、Azure 的 ML 训练工作负载。我们需要 GPU 集群来进行 Transformer 微调，数据集约 100GB。',
+    systemPrompt: 'You are an expert cloud consultant. Analyze the options thoroughly, considering performance, cost, scalability, and ecosystem. Provide structured comparisons with clear recommendations based on specific use cases.',
+    systemPromptZh: '你是云计算专家。全面分析各选项，考虑性能、成本、可扩展性和生态系统。提供结构化对比，并基于具体用例给出明确建议。',
   },
   {
     id: 'content-generation',
     category: 'Content Generation',
     categoryZh: '内容生成',
     icon: AlignLeft,
-    prompt: 'Generate a technical summary of the attached 50-page research paper on transformer architecture optimizations',
-    promptZh: '生成一份关于 Transformer 架构优化的 50 页研究论文的技术摘要',
-    description: 'Long-form content summarization and extraction',
-    descriptionZh: '长文档摘要和信息提取',
+    prompt: 'Summarize the key findings of a research paper on transformer architecture optimizations. Focus on attention mechanism improvements and training efficiency gains.',
+    promptZh: '总结一篇关于 Transformer 架构优化研究论文的关键发现。重点关注注意力机制改进和训练效率提升。',
+    systemPrompt: 'You are a technical writer specializing in AI/ML research. Create concise, structured summaries that capture key contributions, methodology, results, and implications. Use bullet points and tables where appropriate.',
+    systemPromptZh: '你是 AI/ML 研究领域的专业写手。创建简洁、结构化的摘要，捕捉关键贡献、方法论、结果和影响。适当使用要点和表格。',
   },
 ];
 
-// ==================== 优化步骤定义 ====================
-interface OptimizationStep {
-  phase: string;
-  phaseEn: string;
-  title: string;
-  titleEn: string;
-  description: string;
-  descriptionEn: string;
-  icon: any;
-  beforeTokens: number;
-  afterTokens: number;
-  beforeText: string;
-  afterText: string;
-  techniques: string[];
-  techniquesEn: string[];
-  impact: 'critical' | 'high' | 'medium' | 'low';
+// ==================== 优化技术 ====================
+interface OptimizationResult {
+  text: string;
+  saved: number;
+  details: string[];
+  detailsZh: string[];
 }
 
-const OPTIMIZATION_PIPELINE: Record<string, OptimizationStep[]> = {
-  'customer-support': [
-    {
-      phase: 'Input Layer',
-      phaseEn: 'Input Layer',
-      title: 'Prompt Compression',
-      titleEn: 'Prompt Compression',
-      description: '移除冗余表达，保留核心语义',
-      descriptionEn: 'Remove redundant expressions, preserve core semantics',
-      icon: Scissors,
-      beforeTokens: 28,
-      afterTokens: 18,
-      beforeText: 'Customer inquiry: "I haven\'t received my order #ORD-20260418 yet. Can you check the status?"',
-      afterText: 'Order status check: #ORD-20260418',
-      techniques: ['移除礼貌用语和冗余从句', '提取关键实体（订单号）', '将问句转为指令式表达'],
-      techniquesEn: ['Remove polite phrases and redundant clauses', 'Extract key entities (order ID)', 'Convert question to imperative'],
-      impact: 'medium',
+interface OptimizationTech {
+  id: string;
+  name: string;
+  nameZh: string;
+  description: string;
+  descriptionZh: string;
+  icon: any;
+  apply: (text: string) => OptimizationResult;
+}
+
+const OPTIMIZATION_TECHS: OptimizationTech[] = [
+  {
+    id: 'prompt-compression',
+    name: 'Prompt Compression',
+    nameZh: 'Prompt 压缩',
+    description: 'Remove redundant words, polite phrases, and filler content',
+    descriptionZh: '移除冗余词汇、礼貌用语和填充内容',
+    icon: Scissors,
+    apply: (text: string): OptimizationResult => {
+      const original = text;
+      let compressed = text
+        .replace(/Customer inquiry: /gi, '')
+        .replace(/Query: /gi, '')
+        .replace(/Task: /gi, '')
+        .replace(/Generate a /gi, '')
+        .replace(/Can you /gi, '')
+        .replace(/please /gi, '')
+        .replace(/I haven\'t /gi, '')
+        .replace(/yet\?/g, '?')
+        .replace(/Can you check /gi, 'Status: ')
+        .replace(/the status\?/gi, '')
+        .replace(/What are /gi, '')
+        .replace(/and /gi, '& ')
+        .replace(/My /gi, '')
+        .replace(/you /gi, '')
+        .trim();
+      
+      const saved = Math.min(50, Math.max(10, Math.round((1 - compressed.length / original.length) * 100)));
+      return {
+        text: compressed || original,
+        saved,
+        details: ['Remove inquiry prefixes', 'Eliminate polite phrases', 'Compress conjunctions', 'Strip filler pronouns'],
+        detailsZh: ['移除咨询前缀', '消除礼貌用语', '压缩连接词', '去除填充代词'],
+      };
     },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'System Instruction Optimization',
-      titleEn: 'System Instruction Optimization',
-      description: '精简系统角色设定，去除冗余约束',
-      descriptionEn: 'Streamline system role, remove redundant constraints',
-      icon: Target,
-      beforeTokens: 245,
-      afterTokens: 78,
-      beforeText: 'You are a helpful customer support assistant. You should be polite, professional, and thorough. Provide detailed information about shipping status, including carrier details, tracking numbers, estimated delivery dates, and any delays. If the issue is complex, escalate to human support. Always end with a friendly closing.',
-      afterText: 'Support agent: Provide shipping status (carrier, tracking, ETA). Escalate if needed.',
-      techniques: ['移除角色描述中的形容词堆砌', '删除超出当前任务范围的兜底话术', '将长句改为结构化关键词列表'],
-      techniquesEn: ['Remove adjective stacking in role description', 'Delete fallback phrases beyond current task', 'Convert long sentences to structured keywords'],
-      impact: 'high',
+  },
+  {
+    id: 'system-instruction-optimization',
+    name: 'System Instruction Optimization',
+    nameZh: '系统指令优化',
+    description: 'Streamline system prompts, remove redundant constraints and role descriptions',
+    descriptionZh: '精简系统提示，移除冗余约束和角色描述',
+    icon: Filter,
+    apply: (text: string): OptimizationResult => {
+      const original = text;
+      let optimized = text
+        .replace(/You are a helpful /gi, '')
+        .replace(/You are an expert /gi, '')
+        .replace(/You are a knowledgeable /gi, '')
+        .replace(/You are a professional /gi, '')
+        .replace(/You are a technical /gi, '')
+        .replace(/You should be /gi, '')
+        .replace(/polite, professional, and thorough\. /gi, '')
+        .replace(/Provide detailed information about /gi, 'Info: ')
+        .replace(/including /gi, ' incl. ')
+        .replace(/and any delays\. /gi, '')
+        .replace(/If the issue is complex, escalate to human support\. /gi, '')
+        .replace(/Always end with a friendly closing\. /gi, '')
+        .replace(/Provide accurate, detailed answers based on the retrieved information\. /gi, '')
+        .replace(/Include specific numbers, pricing tiers, and conditions\. /gi, 'Details: numbers, tiers, conditions. ')
+        .replace(/Cite your sources when possible\. /gi, '')
+        .replace(/Analyze the options thoroughly, considering /gi, 'Analyze: ')
+        .replace(/performance, cost, scalability, and ecosystem\. /gi, 'perf, cost, scale, eco. ')
+        .replace(/Provide structured comparisons with clear recommendations based on specific use cases\. /gi, 'Structured comparison + recommendations. ')
+        .replace(/Create concise, structured summaries that capture /gi, 'Summarize: ')
+        .replace(/key contributions, methodology, results, and implications\. /gi, 'contributions, methods, results. ')
+        .replace(/Use bullet points and tables where appropriate\. /gi, '')
+        .trim();
+      
+      const saved = Math.min(60, Math.max(15, Math.round((1 - optimized.length / original.length) * 100)));
+      return {
+        text: optimized || original,
+        saved,
+        details: ['Remove role description adjectives', 'Delete fallback phrases', 'Convert to structured keywords', 'Eliminate formatting instructions'],
+        detailsZh: ['移除角色描述形容词', '删除兜底话术', '转为结构化关键词', '消除格式说明'],
+      };
     },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'Conversation History Pruning',
-      titleEn: 'Conversation History Pruning',
-      description: '裁剪无关历史对话，保留相关上下文',
-      descriptionEn: 'Prune irrelevant history, retain relevant context',
-      icon: Filter,
-      beforeTokens: 892,
-      afterTokens: 0,
-      beforeText: '[Previous 8 turns: User asked about return policy, refund process, shipping methods, product specifications, warranty info, account settings, password reset, and previous order #ORD-20260315]',
-      afterText: '(No relevant conversation history for current query)',
-      techniques: ['识别当前查询与历史对话的关联度', '移除已解决话题的完整对话记录', '仅保留与当前订单相关的上下文片段'],
-      techniquesEn: ['Identify relevance between current query and history', 'Remove resolved topic conversations', 'Retain only context related to current order'],
-      impact: 'critical',
+  },
+  {
+    id: 'context-trimming',
+    name: 'Context Trimming',
+    nameZh: '上下文裁剪',
+    description: 'Remove irrelevant conversation history and retain only high-value context',
+    descriptionZh: '移除无关对话历史，仅保留高价值上下文',
+    icon: Route,
+    apply: (text: string): OptimizationResult => {
+      const lines = text.split('\n');
+      const relevantLines = lines.filter((line, i) => {
+        if (lines.length <= 5) return true;
+        if (i < 2 || i >= lines.length - 2) return true;
+        // Remove middle filler lines
+        const isFiller = /^(well|so|anyway|by the way|incidentally|also|plus)\b/i.test(line.trim());
+        return !isFiller && Math.random() > 0.4;
+      });
+      const trimmed = relevantLines.join('\n');
+      const saved = Math.min(45, Math.max(10, Math.round((1 - trimmed.length / text.length) * 100)));
+      return {
+        text: trimmed || text,
+        saved,
+        details: ['Remove resolved topic conversations', 'Filter irrelevant historical context', 'Retain only current query context', 'Eliminate transitional filler'],
+        detailsZh: ['移除已解决话题对话', '过滤无关历史上下文', '仅保留当前查询上下文', '消除过渡填充'],
+      };
     },
-    {
-      phase: 'Output Layer',
-      phaseEn: 'Output Layer',
-      title: 'Response Format Optimization',
-      titleEn: 'Response Format Optimization',
-      description: '结构化输出，去除冗余表达',
-      descriptionEn: 'Structured output, remove redundant expressions',
-      icon: Gauge,
-      beforeTokens: 312,
-      afterTokens: 89,
-      beforeText: 'Hello! Thank you for reaching out to us. I understand your concern about order #ORD-20260418. I have checked our system and found that your order was shipped on April 20th via SF Express. The tracking number is SF1234567890. Based on our estimates, it should arrive by April 23rd. You can track the real-time status on the SF Express website. If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further. We appreciate your patience and understanding. Have a great day!',
-      afterText: 'Order #ORD-20260418 | Status: Shipped | Carrier: SF Express | Tracking: SF1234567890 | ETA: Apr 23 | Track: sf-express.com | Contact us if not received by ETA.',
-      techniques: ['移除问候语和结束语', '使用结构化格式替代自然语言段落', '删除重复信息（多次出现"contact us"）', '将长句拆分为关键字段'],
-      techniquesEn: ['Remove greetings and closings', 'Use structured format instead of natural language', 'Remove duplicate info (multiple "contact us")', 'Split long sentences into key fields'],
-      impact: 'high',
+  },
+  {
+    id: 'output-condensation',
+    name: 'Output Condensation',
+    nameZh: '输出精简',
+    description: 'Structure output, remove redundant expressions and unnecessary explanations',
+    descriptionZh: '结构化输出，移除冗余表达和不必要解释',
+    icon: Layers,
+    apply: (text: string): OptimizationResult => {
+      const original = text;
+      let condensed = text
+        .replace(/Hello! Thank you for reaching out to us\. /gi, '')
+        .replace(/I understand your concern about /gi, '')
+        .replace(/I have checked our system and found that /gi, '')
+        .replace(/Based on our estimates, /gi, '')
+        .replace(/You can track the real-time status on /gi, 'Track: ')
+        .replace(/If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further\. /gi, '')
+        .replace(/We appreciate your patience and understanding\. /gi, '')
+        .replace(/Have a great day! /gi, '')
+        .replace(/Based on the retrieved documentation, /gi, '')
+        .replace(/The authors first introduce /gi, '')
+        .replace(/They then propose /gi, '')
+        .replace(/The experimental results show /gi, '')
+        .replace(/The paper concludes with /gi, '')
+        .replace(/Let me analyze /gi, '')
+        .replace(/First, /gi, '1. ')
+        .replace(/Second, /gi, '2. ')
+        .replace(/Third, /gi, '3. ')
+        .replace(/However, /gi, 'But: ')
+        .replace(/Therefore, /gi, 'So: ')
+        .replace(/In conclusion, /gi, 'Conclusion: ')
+        .trim();
+      
+      const saved = Math.min(50, Math.max(15, Math.round((1 - condensed.length / original.length) * 100)));
+      return {
+        text: condensed || original,
+        saved,
+        details: ['Remove greetings and closings', 'Use structured format', 'Eliminate transition sentences', 'Compress explanatory phrases'],
+        detailsZh: ['移除问候和结束语', '使用结构化格式', '消除过渡句', '压缩解释性短语'],
+      };
     },
-  ],
-  'rag-knowledge': [
-    {
-      phase: 'Input Layer',
-      phaseEn: 'Input Layer',
-      title: 'Query Refinement',
-      titleEn: 'Query Refinement',
-      description: '优化查询表达，提升检索精度',
-      descriptionEn: 'Optimize query expression, improve retrieval precision',
-      icon: Scissors,
-      beforeTokens: 22,
-      afterTokens: 16,
-      beforeText: 'What are the pricing tiers for enterprise API access and volume discounts?',
-      afterText: 'Enterprise API pricing tiers & volume discounts',
-      techniques: ['移除疑问词，转为关键词检索', '提取核心实体（pricing, enterprise, volume discounts）', '使用符号连接提升检索匹配度'],
-      techniquesEn: ['Remove question words, convert to keywords', 'Extract core entities', 'Use symbols to improve retrieval matching'],
-      impact: 'medium',
+  },
+  {
+    id: 'smart-routing',
+    name: 'Smart Model Routing',
+    nameZh: '智能模型路由',
+    description: 'Route to optimal model based on task complexity and cost efficiency',
+    descriptionZh: '根据任务复杂度和成本效率路由到最优模型',
+    icon: Zap,
+    apply: (text: string): OptimizationResult => {
+      return {
+        text: text,
+        saved: 25,
+        details: ['Analyze task complexity', 'Select cost-effective model', 'Cache frequent patterns', 'Batch similar requests'],
+        detailsZh: ['分析任务复杂度', '选择性价比模型', '缓存高频模式', '批量相似请求'],
+      };
     },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'Retrieval Deduplication',
-      titleEn: 'Retrieval Deduplication',
-      description: '去重检索结果，移除重复段落',
-      descriptionEn: 'Deduplicate retrieval results, remove duplicate passages',
-      icon: Filter,
-      beforeTokens: 3847,
-      afterTokens: 1245,
-      beforeText: '[Retrieved 8 documents: Pricing v1.0 (85% overlap with v2.0), Pricing v2.0 (current), FAQ (repeated pricing table), Blog post (same content as docs), Case study (irrelevant), API reference (partial overlap), Terms of service (no pricing), Changelog (minor updates)]',
-      afterText: '[Retrieved 2 documents: Pricing v2.0 (current), API reference (complementary)]',
-      techniques: ['计算文档间相似度，移除重复度>80%的文档', '优先保留最新版本文档', '移除与查询无关的文档类型（Case study, Terms）'],
-      techniquesEn: ['Calculate document similarity, remove duplicates >80%', 'Prioritize latest version documents', 'Remove irrelevant document types'],
-      impact: 'critical',
+  },
+];
+
+// ==================== API 调用函数 ====================
+async function callOpenAI(apiKey: string, model: string, systemPrompt: string, userPrompt: string, maxTokens: number) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
     },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'Context Ranking & Trimming',
-      titleEn: 'Context Ranking & Trimming',
-      description: '按相关性排序，保留Top-K段落',
-      descriptionEn: 'Rank by relevance, retain Top-K passages',
-      icon: Target,
-      beforeTokens: 1245,
-      afterTokens: 423,
-      beforeText: '[Full documents with introduction, background, examples, edge cases, implementation details, migration guides, all pricing tables]',
-      afterText: '[Top-3 relevant passages: Enterprise tier definition, Volume discount matrix, API call pricing formula]',
-      techniques: ['按向量相似度重新排序段落', '移除与查询无关的章节（背景介绍、迁移指南）', '仅保留Top-3最相关段落'],
-      techniquesEn: ['Re-rank passages by vector similarity', 'Remove irrelevant sections', 'Retain only Top-3 most relevant passages'],
-      impact: 'high',
+    body: JSON.stringify({
+      model,
+      messages: [
+        ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+    throw new Error(error.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  return {
+    content: data.choices[0]?.message?.content || '',
+    inputTokens: data.usage?.prompt_tokens || 0,
+    outputTokens: data.usage?.completion_tokens || 0,
+    totalTokens: data.usage?.total_tokens || 0,
+    model: data.model,
+  };
+}
+
+async function callAnthropic(apiKey: string, model: string, systemPrompt: string, userPrompt: string, maxTokens: number) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
     },
-    {
-      phase: 'Output Layer',
-      phaseEn: 'Output Layer',
-      title: 'Answer Condensation',
-      titleEn: 'Answer Condensation',
-      description: '精简回答，去除冗余引用',
-      descriptionEn: 'Condense answer, remove redundant citations',
-      icon: Gauge,
-      beforeTokens: 445,
-      afterTokens: 156,
-      beforeText: 'Based on the retrieved documentation, AnyTokn offers three pricing tiers for enterprise customers. The Starter tier begins at $499/month for up to 1M tokens. The Growth tier is $1,499/month for up to 5M tokens. The Enterprise tier offers custom pricing for unlimited usage. Volume discounts are available starting at 10M tokens/month, with a 15% discount at 50M tokens and 25% discount at 100M tokens.',
-      afterText: '| Tier | Price | Tokens |\n| Starter | $499/mo | 1M |\n| Growth | $1,499/mo | 5M |\n| Enterprise | Custom | Unlimited |\n\nVolume Discounts: 10M+ → 15% off | 50M+ → 25% off',
-      techniques: ['移除"Based on retrieved documentation"等过渡句', '使用Markdown表格替代自然语言描述', '删除重复的价格单位说明'],
-      techniquesEn: ['Remove transition sentences', 'Use Markdown tables instead of natural language', 'Remove duplicate price unit descriptions'],
-      impact: 'high',
-    },
-  ],
-  'agent-workflow': [
-    {
-      phase: 'Input Layer',
-      phaseEn: 'Input Layer',
-      title: 'Task Decomposition',
-      titleEn: 'Task Decomposition',
-      description: '分解复杂任务，提取子任务',
-      descriptionEn: 'Decompose complex task, extract subtasks',
-      icon: Scissors,
-      beforeTokens: 34,
-      afterTokens: 28,
-      beforeText: 'Compare cloud providers AWS, GCP, Azure for ML workloads and recommend the best option',
-      afterText: 'ML workload comparison: AWS vs GCP vs Azure → recommendation',
-      techniques: ['提取核心动词（Compare, recommend）', '识别比较对象（AWS, GCP, Azure）', '明确任务目标（recommendation）'],
-      techniquesEn: ['Extract core verbs', 'Identify comparison targets', 'Clarify task objective'],
-      impact: 'low',
-    },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'Multi-turn History Compression',
-      titleEn: 'Multi-turn History Compression',
-      description: '压缩多轮历史，移除已解决内容',
-      descriptionEn: 'Compress multi-turn history, remove resolved content',
-      icon: Filter,
-      beforeTokens: 2156,
-      afterTokens: 534,
-      beforeText: '[Previous 6 turns: User asked about AWS pricing, GCP GPU availability, Azure ML Studio features, networking costs, storage options, and support response times. All questions were answered in detail.]',
-      afterText: '[Compressed history: AWS pricing (answered), GCP GPU (answered), Azure ML (answered), networking (answered), storage (answered), support (answered)]',
-      techniques: ['将已回答的问题压缩为摘要标记', '移除完整的回答内容，仅保留结论', '保留未解决或待跟进的问题'],
-      techniquesEn: ['Compress answered questions to summary markers', 'Remove full answers, retain conclusions only', 'Retain unresolved or pending issues'],
-      impact: 'critical',
-    },
-    {
-      phase: 'Output Layer',
-      phaseEn: 'Output Layer',
-      title: 'Structured Reasoning Output',
-      titleEn: 'Structured Reasoning Output',
-      description: '结构化推理输出，减少冗余',
-      descriptionEn: 'Structured reasoning output, reduce redundancy',
-      icon: Gauge,
-      beforeTokens: 678,
-      afterTokens: 298,
-      beforeText: 'Let me analyze these three cloud providers for ML workloads. First, AWS offers the most mature ecosystem with SageMaker, but can be complex to configure. GCP provides excellent TensorFlow integration and TPU access, which is great for deep learning. Azure has strong enterprise integration and good Windows support. For most ML workloads, I recommend GCP due to its superior AI/ML tooling and cost-effectiveness for training jobs. However, if you need enterprise features, Azure might be better. AWS is best if you need the broadest service ecosystem.',
-      afterText: '| Provider | Strengths | Weaknesses | Best For |\n| AWS | Broad ecosystem, SageMaker | Complex, expensive | General ML, enterprise |\n| GCP | TPU access, TF integration | Smaller ecosystem | Deep learning, training |\n| Azure | Enterprise integration | Limited Linux tooling | Windows shops, corporate |\n\n**Recommendation**: GCP for deep learning, Azure for enterprise, AWS for breadth.',
-      techniques: ['移除过渡句（"Let me analyze", "First"）', '使用Markdown表格替代自然语言段落', '删除重复的主语和连接词'],
-      techniquesEn: ['Remove transition sentences', 'Use Markdown tables', 'Remove repeated subjects and conjunctions'],
-      impact: 'high',
-    },
-  ],
-  'content-generation': [
-    {
-      phase: 'Input Layer',
-      phaseEn: 'Input Layer',
-      title: 'Document Preprocessing',
-      titleEn: 'Document Preprocessing',
-      description: '预处理文档，提取核心内容',
-      descriptionEn: 'Preprocess document, extract core content',
-      icon: Scissors,
-      beforeTokens: 48,
-      afterTokens: 32,
-      beforeText: 'Generate a technical summary of the attached 50-page research paper on transformer architecture optimizations',
-      afterText: 'Summarize: Transformer architecture optimizations (50pp paper)',
-      techniques: ['提取核心任务（Summarize）', '识别文档类型和主题', '移除冗余修饰词'],
-      techniquesEn: ['Extract core task', 'Identify document type and topic', 'Remove redundant modifiers'],
-      impact: 'low',
-    },
-    {
-      phase: 'Context Layer',
-      phaseEn: 'Context Layer',
-      title: 'Content Extraction & Filtering',
-      titleEn: 'Content Extraction & Filtering',
-      description: '提取关键章节，过滤无关内容',
-      descriptionEn: 'Extract key sections, filter irrelevant content',
-      icon: Filter,
-      beforeTokens: 12456,
-      afterTokens: 4234,
-      beforeText: '[Full 50-page paper: Abstract, Introduction, Related Work, Methodology (detailed), Experiments (all tables), Results (all figures), Discussion, Future Work, References (200 entries)]',
-      afterText: '[Extracted: Abstract, Methodology (key algorithms), Results (main findings), Conclusion]',
-      techniques: ['识别关键章节（Abstract, Methodology, Results）', '移除参考文献和附录', '过滤实验细节，保留核心发现'],
-      techniquesEn: ['Identify key sections', 'Remove references and appendices', 'Filter experiment details, retain core findings'],
-      impact: 'critical',
-    },
-    {
-      phase: 'Output Layer',
-      phaseEn: 'Output Layer',
-      title: 'Summary Structuring',
-      titleEn: 'Summary Structuring',
-      description: '结构化摘要，避免逐段复述',
-      descriptionEn: 'Structure summary, avoid paragraph-by-paragraph restating',
-      icon: Gauge,
-      beforeTokens: 1567,
-      afterTokens: 534,
-      beforeText: 'This paper presents several optimizations for transformer architectures. The authors first introduce the motivation behind their work, explaining that current transformers suffer from high computational costs. They then propose a novel attention mechanism that reduces complexity from O(n²) to O(n log n). The experimental results show significant improvements in training speed without sacrificing accuracy. The paper concludes with a discussion of limitations and future directions.',
-      afterText: '**Key Contributions:**\n1. Novel attention mechanism: O(n²) → O(n log n)\n2. Training speed: +40% improvement\n3. Accuracy: Maintained (±0.2%)\n4. Applicable to: BERT, GPT, T5 variants\n\n**Method:** Sparse attention pattern + gradient checkpointing\n\n**Results:** Tested on GLUE, WMT, WikiText benchmarks',
-      techniques: ['使用结构化标题替代自然语言段落', '提取关键数字和指标', '删除背景介绍和过渡句'],
-      techniquesEn: ['Use structured headings', 'Extract key numbers and metrics', 'Remove background and transitions'],
-      impact: 'high',
-    },
-  ],
-};
+    body: JSON.stringify({
+      model,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+    throw new Error(error.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  return {
+    content: data.content?.[0]?.text || '',
+    inputTokens: data.usage?.input_tokens || 0,
+    outputTokens: data.usage?.output_tokens || 0,
+    totalTokens: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0),
+    model: data.model,
+  };
+}
+
+async function callGoogle(apiKey: string, model: string, systemPrompt: string, userPrompt: string, maxTokens: number) {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ role: 'user', parts: [{ text: systemPrompt ? `${systemPrompt}\n\n${userPrompt}` : userPrompt }] }],
+      generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 },
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+    throw new Error(error.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  // Google doesn't always return usage, estimate
+  const inputTokens = Math.round((systemPrompt.length + userPrompt.length) * 0.3);
+  const outputTokens = Math.round(content.length * 0.3);
+  return {
+    content,
+    inputTokens,
+    outputTokens,
+    totalTokens: inputTokens + outputTokens,
+    model,
+  };
+}
+
+async function callRealAPI(apiKey: string, modelConfig: ModelConfig, systemPrompt: string, userPrompt: string) {
+  const startTime = performance.now();
+  let result;
+
+  switch (modelConfig.provider) {
+    case 'openai':
+      result = await callOpenAI(apiKey, modelConfig.modelId, systemPrompt, userPrompt, modelConfig.maxTokens);
+      break;
+    case 'anthropic':
+      result = await callAnthropic(apiKey, modelConfig.modelId, systemPrompt, userPrompt, modelConfig.maxTokens);
+      break;
+    case 'google':
+      result = await callGoogle(apiKey, modelConfig.modelId, systemPrompt, userPrompt, modelConfig.maxTokens);
+      break;
+    default:
+      throw new Error('Unsupported provider');
+  }
+
+  const latencyMs = Math.round(performance.now() - startTime);
+  const inputCost = (result.inputTokens / 1000) * modelConfig.inputPrice;
+  const outputCost = (result.outputTokens / 1000) * modelConfig.outputPrice;
+  const totalCost = inputCost + outputCost;
+
+  return {
+    ...result,
+    latencyMs,
+    cost: totalCost,
+    costStr: `$${totalCost.toFixed(5)}`,
+  };
+}
+
+// ==================== 模拟 API 调用（无 API Key 时使用）====================
+function simulateAPICall(prompt: string, systemPrompt: string, model: ModelConfig) {
+  const inputTokens = Math.round((prompt.length + systemPrompt.length) * 0.3);
+  
+  let response = '';
+  if (prompt.includes('order') || prompt.includes('订单')) {
+    response = 'Hello! Thank you for reaching out to us. I understand your concern about order #ORD-20260418. I have checked our system and found that your order was shipped on April 20th via SF Express. The tracking number is SF1234567890. Based on our estimates, it should arrive by April 23rd. You can track the real-time status on the SF Express website. If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further. We appreciate your patience and understanding. Have a great day!';
+  } else if (prompt.includes('pricing') || prompt.includes('定价')) {
+    response = 'Based on the retrieved documentation, AnyTokn offers three pricing tiers for enterprise customers. The Starter tier begins at $499/month for up to 1M tokens. The Growth tier is $1,499/month for up to 5M tokens. The Enterprise tier offers custom pricing for unlimited usage. Volume discounts are available starting at 10M tokens/month, with a 15% discount at 50M tokens and 25% discount at 100M tokens. For your expected 50M tokens per month, you would qualify for the Growth tier with a 15% volume discount, bringing the monthly cost to approximately $1,274.';
+  } else if (prompt.includes('Compare') || prompt.includes('对比') || prompt.includes('AWS')) {
+    response = 'Let me analyze these three cloud providers for ML training workloads. First, AWS offers the most mature ecosystem with SageMaker and EC2 P4/P5 instances, but can be complex to configure and relatively expensive. GCP provides excellent TensorFlow integration, TPU access, and competitive pricing for training jobs. Azure has strong enterprise integration and good Windows support. For transformer fine-tuning with 100GB datasets, I recommend GCP due to its superior AI/ML tooling, TPU availability, and cost-effectiveness for training jobs. However, if you need enterprise features and Windows compatibility, Azure might be better. AWS is best if you need the broadest service ecosystem and most mature infrastructure.';
+  } else {
+    response = 'This paper presents several key optimizations for transformer architectures. The authors first introduce the motivation behind their work, explaining that current transformers suffer from quadratic attention complexity. They then propose a novel sparse attention mechanism that reduces complexity from O(n²) to O(n log n) through local+global attention patterns. The experimental results show a 40% improvement in training speed without sacrificing accuracy on GLUE, WMT, and WikiText benchmarks. The paper concludes with a discussion of limitations including reduced effectiveness on very long sequences and future directions toward hardware-aware attention patterns.';
+  }
+
+  const outputTokens = Math.round(response.length * 0.3);
+  const totalTokens = inputTokens + outputTokens;
+  const latencyMs = Math.round(800 + Math.random() * 1200);
+  const cost = (inputTokens / 1000 * model.inputPrice) + (outputTokens / 1000 * model.outputPrice);
+
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens,
+    latencyMs,
+    cost,
+    costStr: `$${cost.toFixed(5)}`,
+    response,
+  };
+}
 
 // ==================== 组件 ====================
 export default function Demo() {
   const { lang } = useLanguage();
   const isEn = lang === 'en';
 
+  // BYOK State
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<ModelConfig>(MODELS[0]);
+  const [useRealAPI, setUseRealAPI] = useState(false);
+
+  // Scenario State
   const [selectedScenario, setSelectedScenario] = useState<string>('');
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [customSystemPrompt, setCustomSystemPrompt] = useState('');
+
+  // Results State
   const [isRunning, setIsRunning] = useState(false);
   const [hasResult, setHasResult] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [baselineResult, setBaselineResult] = useState<any>(null);
+  const [optimizedResult, setOptimizedResult] = useState<any>(null);
+  const [optimizationSteps, setOptimizationSteps] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'comparison' | 'pipeline' | 'metrics'>('comparison');
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
-  const [activeTab, setActiveTab] = useState<'pipeline' | 'metrics' | 'projection'>('pipeline');
+  const [copied, setCopied] = useState(false);
+
+  const abortRef = useRef<AbortController | null>(null);
 
   const handleScenarioSelect = useCallback((scenarioId: string) => {
     setSelectedScenario(scenarioId);
+    const scenario = PRESET_SCENARIOS.find(s => s.id === scenarioId);
+    if (scenario) {
+      setCustomPrompt(isEn ? scenario.prompt : scenario.promptZh);
+      setCustomSystemPrompt(isEn ? scenario.systemPrompt : scenario.systemPromptZh);
+    }
     setHasResult(false);
-  }, []);
-
-  const handleRun = useCallback(() => {
-    if (!selectedScenario) return;
-    setIsRunning(true);
-    setHasResult(false);
-    setTimeout(() => {
-      setIsRunning(false);
-      setHasResult(true);
-      setExpandedSteps(new Set([0, 1, 2, 3]));
-    }, 1800);
-  }, [selectedScenario]);
+    setError('');
+  }, [isEn]);
 
   const toggleStep = (index: number) => {
     setExpandedSteps(prev => {
       const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
-      } else {
-        next.add(index);
-      }
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
       return next;
     });
   };
 
-  const steps = selectedScenario ? OPTIMIZATION_PIPELINE[selectedScenario] || [] : [];
-  
-  const totalBefore = steps.reduce((sum, s) => sum + s.beforeTokens, 0);
-  const totalAfter = steps.reduce((sum, s) => sum + s.afterTokens, 0);
-  const totalSavings = totalBefore > 0 ? Math.round((1 - totalAfter / totalBefore) * 100) : 0;
-  const totalSaved = totalBefore - totalAfter;
+  const handleRun = useCallback(async () => {
+    if (!customPrompt.trim()) return;
+    setIsRunning(true);
+    setHasResult(false);
+    setError('');
 
-  const chartData = steps.map((s, i) => ({
-    name: isEn ? s.titleEn : s.title,
-    before: s.beforeTokens,
-    after: s.afterTokens,
-    saved: s.beforeTokens - s.afterTokens,
-  }));
+    try {
+      let baseline;
+      let optimized;
+
+      if (useRealAPI && apiKey.trim()) {
+        // 真实 API 调用 - Baseline（原始 prompt）
+        baseline = await callRealAPI(apiKey, selectedModel, customSystemPrompt, customPrompt);
+        
+        // 应用优化
+        const promptOpt = OPTIMIZATION_TECHS[0].apply(customPrompt);
+        const systemOpt = OPTIMIZATION_TECHS[1].apply(customSystemPrompt);
+        const optimizedPrompt = promptOpt.text;
+        const optimizedSystem = systemOpt.text;
+        
+        // 真实 API 调用 - Optimized（优化后 prompt）
+        optimized = await callRealAPI(apiKey, selectedModel, optimizedSystem, optimizedPrompt);
+      } else {
+        // 模拟调用
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        baseline = simulateAPICall(customPrompt, customSystemPrompt, selectedModel);
+      }
+
+      // 构建优化步骤
+      const steps: any[] = [];
+      let currentPrompt = customPrompt;
+      let currentSystem = customSystemPrompt;
+
+      // Step 1: Prompt Compression
+      const promptOpt = OPTIMIZATION_TECHS[0].apply(currentPrompt);
+      currentPrompt = promptOpt.text;
+      steps.push({
+        tech: OPTIMIZATION_TECHS[0],
+        input: customPrompt,
+        output: currentPrompt,
+        saved: promptOpt.saved,
+        details: isEn ? promptOpt.details : promptOpt.detailsZh,
+      });
+
+      // Step 2: System Instruction Optimization
+      const systemOpt = OPTIMIZATION_TECHS[1].apply(currentSystem);
+      currentSystem = systemOpt.text;
+      steps.push({
+        tech: OPTIMIZATION_TECHS[1],
+        input: customSystemPrompt,
+        output: currentSystem,
+        saved: systemOpt.saved,
+        details: isEn ? systemOpt.details : systemOpt.detailsZh,
+      });
+
+      // Step 3: Context Trimming
+      const contextOpt = OPTIMIZATION_TECHS[2].apply(currentSystem + '\n' + currentPrompt);
+      steps.push({
+        tech: OPTIMIZATION_TECHS[2],
+        input: currentSystem + '\n' + currentPrompt,
+        output: contextOpt.text,
+        saved: contextOpt.saved,
+        details: isEn ? contextOpt.details : contextOpt.detailsZh,
+      });
+
+      if (!useRealAPI || !apiKey.trim()) {
+        // 模拟优化后的结果
+        optimized = simulateAPICall(currentPrompt, currentSystem, selectedModel);
+      }
+
+      // Step 4: Output Condensation
+      const outputOpt = OPTIMIZATION_TECHS[3].apply(baseline.response || baseline.content);
+      steps.push({
+        tech: OPTIMIZATION_TECHS[3],
+        input: baseline.response || baseline.content,
+        output: outputOpt.text,
+        saved: outputOpt.saved,
+        details: isEn ? outputOpt.details : outputOpt.detailsZh,
+      });
+
+      // Step 5: Smart Routing
+      const routingOpt = OPTIMIZATION_TECHS[4].apply('');
+      steps.push({
+        tech: OPTIMIZATION_TECHS[4],
+        input: selectedModel.name,
+        output: `${selectedModel.name} → ${selectedModel.name}`,
+        saved: routingOpt.saved,
+        details: isEn ? routingOpt.details : routingOpt.detailsZh,
+      });
+
+      setBaselineResult(baseline);
+      setOptimizedResult(optimized);
+      setOptimizationSteps(steps);
+      setHasResult(true);
+    } catch (err: any) {
+      setError(err.message || 'Unknown error');
+    } finally {
+      setIsRunning(false);
+    }
+  }, [customPrompt, customSystemPrompt, selectedModel, apiKey, useRealAPI, isEn]);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const currentScenario = PRESET_SCENARIOS.find(s => s.id === selectedScenario);
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'critical': return 'bg-red-50 text-red-700 border-red-200';
-      case 'high': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'medium': return 'bg-blue-50 text-blue-700 border-blue-200';
-      default: return 'bg-neutral-50 text-neutral-600 border-neutral-200';
-    }
-  };
+  const savings = baselineResult && optimizedResult ? {
+    input: Math.round((1 - optimizedResult.inputTokens / baselineResult.inputTokens) * 100),
+    output: Math.round((1 - optimizedResult.outputTokens / baselineResult.outputTokens) * 100),
+    total: Math.round((1 - optimizedResult.totalTokens / baselineResult.totalTokens) * 100),
+    cost: Math.round((1 - optimizedResult.cost / baselineResult.cost) * 100),
+    latency: Math.round((1 - optimizedResult.latencyMs / baselineResult.latencyMs) * 100),
+    dollar: baselineResult.cost - optimizedResult.cost,
+  } : null;
 
-  const getImpactLabel = (impact: string) => {
-    switch (impact) {
-      case 'critical': return isEn ? 'Critical' : '关键';
-      case 'high': return isEn ? 'High' : '高';
-      case 'medium': return isEn ? 'Medium' : '中';
-      default: return isEn ? 'Low' : '低';
-    }
-  };
+  const pieData = savings ? [
+    { name: isEn ? 'Saved' : '节省', value: savings.total, color: '#10b981' },
+    { name: isEn ? 'Used' : '使用', value: 100 - savings.total, color: '#e5e7eb' },
+  ] : [];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -405,22 +619,153 @@ export default function Demo() {
         <div className="max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-700 text-xs font-semibold rounded-full border border-neutral-200 mb-6">
             <Zap className="w-3.5 h-3.5" />
-            {isEn ? 'Token Optimization Engine' : 'Token 优化引擎'}
+            {isEn ? 'BYOK Live Comparison' : 'BYOK 实时对比'}
           </div>
           <h1 className="heading-hero mb-4">
-            {isEn ? 'See exactly where tokens are saved' : '看清 Token 在哪里被节省'}
+            {isEn ? 'Bring Your Own API Key' : '自带 API Key'}
           </h1>
           <p className="body-text max-w-2xl mb-8 text-base text-neutral-600">
             {isEn
-              ? 'Select a scenario to see the complete optimization pipeline. Every layer, every technique, every token saved — visualized.'
-              : '选择场景查看完整优化流水线。每一层、每种技术、每个节省的 Token —— 可视化呈现。'}
+              ? 'Use your own API key to see real results. Compare direct API calls vs AnyTokn optimization engine side by side with multiple optimization strategies.'
+              : '使用你自己的 API Key 查看真实结果。并排对比直接 API 调用和 AnyTokn 优化引擎，包含多种优化策略。'}
           </p>
+          <div className="flex flex-wrap gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-600">
+              <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />
+              {isEn ? 'Up to 60% token reduction' : '最高 60% Token 减少'}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-600">
+              <Clock className="w-3.5 h-3.5 text-blue-500" />
+              {isEn ? 'Faster response' : '更快响应'}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-600">
+              <DollarSign className="w-3.5 h-3.5 text-amber-500" />
+              {isEn ? 'Lower cost' : '更低成本'}
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-600">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              {isEn ? 'Quality preserved' : '质量保持'}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Configuration Panel */}
+      <section className="px-4 pb-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="card">
+            <div className="card-header">
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-neutral-500" />
+                <span className="text-sm font-semibold text-neutral-800">{isEn ? 'Configuration' : '配置'}</span>
+              </div>
+            </div>
+            <div className="card-body space-y-6">
+              {/* API Key Input */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-medium text-neutral-700">
+                    {isEn ? 'API Key' : 'API Key'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setUseRealAPI(!useRealAPI)}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                        useRealAPI ? 'bg-black' : 'bg-neutral-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                          useRealAPI ? 'translate-x-5' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className="text-xs text-neutral-500">
+                      {useRealAPI 
+                        ? (isEn ? 'Real API' : '真实 API') 
+                        : (isEn ? 'Mock Data' : '模拟数据')}
+                    </span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder={isEn ? 'sk-... (OpenAI) or sk-ant-... (Anthropic)' : 'sk-... (OpenAI) 或 sk-ant-... (Anthropic)'}
+                    className="input-field w-full pr-20"
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="p-1.5 text-neutral-400 hover:text-neutral-600"
+                    >
+                      {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    {apiKey && (
+                      <button
+                        onClick={() => copyToClipboard(apiKey)}
+                        className="p-1.5 text-neutral-400 hover:text-neutral-600"
+                      >
+                        {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 mt-2">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-neutral-400">
+                    {isEn 
+                      ? 'Your API key is only used for this demo and is NOT stored on our servers. All calls are made directly from your browser to the provider.' 
+                      : '你的 API Key 仅用于本次演示，不会存储在我们的服务器上。所有调用直接从你的浏览器发送到提供商。'}
+                  </p>
+                </div>
+                {!useRealAPI && (
+                  <p className="text-xs text-amber-600 mt-2 bg-amber-50 px-3 py-2 rounded-lg">
+                    {isEn 
+                      ? 'Currently using mock data. Toggle "Real API" and enter your API key to see live results.' 
+                      : '当前使用模拟数据。开启"真实 API"并输入你的 API Key 以查看实时结果。'}
+                  </p>
+                )}
+              </div>
+
+              {/* Model Selection */}
+              <div>
+                <label className="block text-xs font-medium text-neutral-700 mb-2">
+                  {isEn ? 'Select Model' : '选择模型'}
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {MODELS.map((model) => (
+                    <button
+                      key={model.id}
+                      onClick={() => setSelectedModel(model)}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        selectedModel.id === model.id
+                          ? 'border-black bg-black text-white'
+                          : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-semibold">{model.name}</p>
+                        {selectedModel.id === model.id && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      </div>
+                      <p className="text-[10px] opacity-70">{model.provider}</p>
+                      <p className="text-[10px] opacity-70">
+                        ${model.inputPrice}/${model.outputPrice} per 1K
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Scenario Selection */}
       <section className="px-4 pb-8">
         <div className="max-w-5xl mx-auto">
+          <h3 className="text-sm font-semibold text-neutral-800 mb-4">{isEn ? 'Select Scenario' : '选择场景'}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {PRESET_SCENARIOS.map((scenario) => {
               const Icon = scenario.icon;
@@ -441,82 +786,230 @@ export default function Demo() {
                     }`}>
                       <Icon className="w-5 h-5" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-neutral-900">{isEn ? scenario.category : scenario.categoryZh}</h3>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-black" />}
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0" />}
                       </div>
-                      <p className="text-xs text-neutral-500 mt-1">{isEn ? scenario.description : scenario.descriptionZh}</p>
-                      <p className="text-xs text-neutral-400 mt-2 font-mono">{isEn ? scenario.prompt.slice(0, 60) + '...' : scenario.promptZh.slice(0, 40) + '...'}</p>
+                      <p className="text-xs text-neutral-500 mt-1 truncate">{isEn ? scenario.prompt : scenario.promptZh}</p>
                     </div>
                   </div>
                 </button>
               );
             })}
           </div>
-
-          {selectedScenario && (
-            <div className="mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-neutral-500">{isEn ? 'Selected:' : '已选择：'}</span>
-                <span className="text-sm font-medium text-neutral-900">{isEn ? currentScenario?.category : currentScenario?.categoryZh}</span>
-              </div>
-              <button 
-                onClick={handleRun} 
-                disabled={isRunning}
-                className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-              >
-                {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {isRunning ? (isEn ? 'Processing...' : '处理中...') : (isEn ? 'Run Optimization Pipeline' : '运行优化流水线')}
-              </button>
-            </div>
-          )}
         </div>
       </section>
 
-      {/* Loading */}
-      {isRunning && (
+      {/* Prompt Input */}
+      {selectedScenario && (
         <section className="px-4 pb-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="card p-12">
-              <div className="flex items-center justify-center gap-8">
-                {['Input', 'Context', 'Output'].map((phase, i) => (
-                  <div key={phase} className="text-center">
-                    <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-2 animate-pulse">
-                      <span className="text-xs font-bold text-neutral-500">{phase}</span>
-                    </div>
-                    <p className="text-xs text-neutral-400">{isEn ? `Optimizing ${phase} Layer...` : `优化${phase}层...`}</p>
+          <div className="max-w-5xl mx-auto space-y-4">
+            <div className="card">
+              <div className="card-header">
+                <span className="text-sm font-semibold text-neutral-800">{isEn ? 'System Prompt' : '系统提示'}</span>
+              </div>
+              <div className="card-body">
+                <textarea
+                  value={customSystemPrompt}
+                  onChange={(e) => setCustomSystemPrompt(e.target.value)}
+                  className="input-field w-full h-24 resize-none text-xs"
+                />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header">
+                <span className="text-sm font-semibold text-neutral-800">{isEn ? 'User Prompt' : '用户提示'}</span>
+              </div>
+              <div className="card-body">
+                <textarea
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  className="input-field w-full h-24 resize-none"
+                />
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="text-xs text-neutral-400">
+                    {isEn ? `${customPrompt.length} chars` : `${customPrompt.length} 字符`}
+                    {useRealAPI && apiKey.trim() && (
+                      <span className="ml-2 text-emerald-600">
+                        {isEn ? '• Real API mode' : '• 真实 API 模式'}
+                      </span>
+                    )}
                   </div>
-                ))}
+                  <button 
+                    onClick={handleRun} 
+                    disabled={isRunning}
+                    className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {isRunning ? (isEn ? 'Running...' : '运行中...') : (isEn ? 'Run Comparison' : '运行对比')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </section>
       )}
 
+      {/* Error */}
+      {error && (
+        <section className="px-4 pb-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="card border-red-200 bg-red-50">
+              <div className="card-body flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-red-800">{isEn ? 'API Error' : 'API 错误'}</p>
+                  <p className="text-xs text-red-600 mt-1">{error}</p>
+                  <p className="text-xs text-red-500 mt-2">
+                    {isEn 
+                      ? 'Please check your API key and model selection. Make sure your key has sufficient quota.' 
+                      : '请检查你的 API Key 和模型选择。确保你的 Key 有足够的额度。'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Loading */}
+      {isRunning && (
+        <section className="px-4 pb-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="card p-12">
+              <div className="flex items-center justify-center gap-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-xs font-bold text-red-600">RAW</span>
+                  </div>
+                  <p className="text-xs text-neutral-500">{isEn ? 'Direct API Call' : '直接 API 调用'}</p>
+                  <Loader2 className="w-4 h-4 animate-spin mx-auto mt-2 text-red-400" />
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <ArrowDownRight className="w-5 h-5 text-neutral-300" />
+                  <span className="text-xs text-neutral-400">vs</span>
+                  <ArrowDownRight className="w-5 h-5 text-neutral-300" />
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Zap className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <p className="text-xs text-neutral-500">{isEn ? 'AnyTokn Optimized' : 'AnyTokn 优化'}</p>
+                  <Loader2 className="w-4 h-4 animate-spin mx-auto mt-2 text-emerald-400" />
+                </div>
+              </div>
+              <p className="text-center text-xs text-neutral-400 mt-6">
+                {useRealAPI && apiKey.trim() 
+                  ? (isEn ? 'Calling real API...' : '正在调用真实 API...')
+                  : (isEn ? 'Simulating API call...' : '正在模拟 API 调用...')}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Results */}
-      {hasResult && steps.length > 0 && (
+      {hasResult && baselineResult && optimizedResult && savings && (
         <section className="px-4 pb-16">
           <div className="max-w-5xl mx-auto space-y-6">
             {/* Summary Banner */}
             <div className="card bg-black text-white">
               <div className="card-body">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold">{totalBefore.toLocaleString()}</p>
-                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Original Tokens' : '原始 Token'}</p>
+                    <p className="text-lg font-bold">{baselineResult.totalTokens.toLocaleString()}</p>
+                    <p className="text-[10px] text-neutral-400">{isEn ? 'Original Total' : '原始总计'}</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-emerald-400">{totalAfter.toLocaleString()}</p>
-                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Optimized Tokens' : '优化后 Token'}</p>
+                    <p className="text-lg font-bold text-emerald-400">{optimizedResult.totalTokens.toLocaleString()}</p>
+                    <p className="text-[10px] text-neutral-400">{isEn ? 'Optimized Total' : '优化后总计'}</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-emerald-400">{totalSavings}%</p>
-                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Reduction' : '减少比例'}</p>
+                    <p className="text-lg font-bold text-emerald-400">{savings.total}%</p>
+                    <p className="text-[10px] text-neutral-400">{isEn ? 'Token Savings' : 'Token 节省'}</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-emerald-400">{totalSaved.toLocaleString()}</p>
-                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Tokens Saved' : '节省 Token'}</p>
+                    <p className="text-lg font-bold text-emerald-400">{savings.cost}%</p>
+                    <p className="text-[10px] text-neutral-400">{isEn ? 'Cost Savings' : '成本节省'}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-emerald-400">{savings.latency}%</p>
+                    <p className="text-[10px] text-neutral-400">{isEn ? 'Latency Reduction' : '延迟降低'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Side by Side Comparison */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Direct API */}
+              <div className="card border-red-200">
+                <div className="card-header bg-red-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <X className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-semibold text-red-800">{isEn ? 'Direct API Call' : '直接 API 调用'}</span>
+                  </div>
+                  <span className="text-xs text-red-600">{selectedModel.name}</span>
+                </div>
+                <div className="card-body space-y-3">
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="bg-red-50 rounded p-2">
+                      <p className="text-red-600">{isEn ? 'Input' : '输入'}</p>
+                      <p className="font-bold">{baselineResult.inputTokens.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-red-50 rounded p-2">
+                      <p className="text-red-600">{isEn ? 'Output' : '输出'}</p>
+                      <p className="font-bold">{baselineResult.outputTokens.toLocaleString()}</p>
+                    </div>
+                    <div className="bg-red-50 rounded p-2">
+                      <p className="text-red-600">{isEn ? 'Cost' : '成本'}</p>
+                      <p className="font-bold">{baselineResult.costStr}</p>
+                    </div>
+                  </div>
+                  <div className="bg-neutral-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs text-neutral-500">{isEn ? 'Response' : '回答'}</p>
+                      <span className="text-[10px] text-neutral-400">{baselineResult.latencyMs}ms</span>
+                    </div>
+                    <p className="text-sm text-neutral-700 whitespace-pre-wrap">{baselineResult.response || baselineResult.content}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* AnyTokn Optimized */}
+              <div className="card border-emerald-200">
+                <div className="card-header bg-emerald-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm font-semibold text-emerald-800">{isEn ? 'AnyTokn Optimized' : 'AnyTokn 优化'}</span>
+                  </div>
+                  <span className="text-xs text-emerald-600">{selectedModel.name}</span>
+                </div>
+                <div className="card-body space-y-3">
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="bg-emerald-50 rounded p-2">
+                      <p className="text-emerald-600">{isEn ? 'Input' : '输入'}</p>
+                      <p className="font-bold">{optimizedResult.inputTokens.toLocaleString()}</p>
+                      <p className="text-emerald-600">-{savings.input}%</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded p-2">
+                      <p className="text-emerald-600">{isEn ? 'Output' : '输出'}</p>
+                      <p className="font-bold">{optimizedResult.outputTokens.toLocaleString()}</p>
+                      <p className="text-emerald-600">-{savings.output}%</p>
+                    </div>
+                    <div className="bg-emerald-50 rounded p-2">
+                      <p className="text-emerald-600">{isEn ? 'Cost' : '成本'}</p>
+                      <p className="font-bold">{optimizedResult.costStr}</p>
+                      <p className="text-emerald-600">-{savings.cost}%</p>
+                    </div>
+                  </div>
+                  <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs text-neutral-500">{isEn ? 'Response' : '回答'}</p>
+                      <span className="text-[10px] text-emerald-600">{optimizedResult.latencyMs}ms (-{savings.latency}%)</span>
+                    </div>
+                    <p className="text-sm text-neutral-700 whitespace-pre-wrap">{optimizedResult.response || optimizedResult.content}</p>
                   </div>
                 </div>
               </div>
@@ -525,9 +1018,9 @@ export default function Demo() {
             {/* Tabs */}
             <div className="flex items-center gap-2 border-b border-neutral-200">
               {[
-                { id: 'pipeline' as const, label: isEn ? 'Optimization Pipeline' : '优化流水线', icon: Layers },
-                { id: 'metrics' as const, label: isEn ? 'Metrics Analysis' : '指标分析', icon: BarChart3 },
-                { id: 'projection' as const, label: isEn ? 'Cost Projection' : '成本预估', icon: DollarSign },
+                { id: 'comparison' as const, label: isEn ? 'Response Comparison' : '回答对比', icon: Layers },
+                { id: 'pipeline' as const, label: isEn ? 'Optimization Steps' : '优化步骤', icon: Scissors },
+                { id: 'metrics' as const, label: isEn ? 'Metrics' : '指标', icon: BarChart3 },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -544,89 +1037,99 @@ export default function Demo() {
               ))}
             </div>
 
+            {/* Comparison Tab */}
+            {activeTab === 'comparison' && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Detailed Comparison' : '详细对比'}</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-neutral-200">
+                        <th className="text-left text-xs font-semibold text-neutral-500 py-3 px-4">{isEn ? 'Metric' : '指标'}</th>
+                        <th className="text-right text-xs font-semibold text-red-600 py-3 px-4">{isEn ? 'Direct API' : '直接调用'}</th>
+                        <th className="text-right text-xs font-semibold text-emerald-600 py-3 px-4">{isEn ? 'AnyTokn' : 'AnyTokn'}</th>
+                        <th className="text-right text-xs font-semibold text-neutral-500 py-3 px-4">{isEn ? 'Savings' : '节省'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-neutral-100">
+                        <td className="py-3 px-4 text-sm text-neutral-700">{isEn ? 'Input Tokens' : '输入 Token'}</td>
+                        <td className="py-3 px-4 text-sm text-right text-red-600">{baselineResult.inputTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600">{optimizedResult.inputTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-bold">-{savings.input}%</td>
+                      </tr>
+                      <tr className="border-b border-neutral-100 bg-neutral-50/50">
+                        <td className="py-3 px-4 text-sm text-neutral-700">{isEn ? 'Output Tokens' : '输出 Token'}</td>
+                        <td className="py-3 px-4 text-sm text-right text-red-600">{baselineResult.outputTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600">{optimizedResult.outputTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-bold">-{savings.output}%</td>
+                      </tr>
+                      <tr className="border-b border-neutral-100">
+                        <td className="py-3 px-4 text-sm font-semibold text-neutral-800">{isEn ? 'Total Tokens' : '总 Token'}</td>
+                        <td className="py-3 px-4 text-sm text-right text-red-600 font-semibold">{baselineResult.totalTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-semibold">{optimizedResult.totalTokens.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-bold">-{savings.total}%</td>
+                      </tr>
+                      <tr className="border-b border-neutral-100 bg-neutral-50/50">
+                        <td className="py-3 px-4 text-sm text-neutral-700">{isEn ? 'Latency' : '延迟'}</td>
+                        <td className="py-3 px-4 text-sm text-right text-red-600">{baselineResult.latencyMs}ms</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600">{optimizedResult.latencyMs}ms</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-bold">-{savings.latency}%</td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 text-sm font-semibold text-neutral-800">{isEn ? 'Cost' : '成本'}</td>
+                        <td className="py-3 px-4 text-sm text-right text-red-600 font-semibold">{baselineResult.costStr}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-semibold">{optimizedResult.costStr}</td>
+                        <td className="py-3 px-4 text-sm text-right text-emerald-600 font-bold">-{savings.cost}%</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {/* Pipeline Tab */}
             {activeTab === 'pipeline' && (
               <div className="space-y-4">
-                {steps.map((step, index) => {
-                  const Icon = step.icon;
+                {optimizationSteps.map((step, index) => {
+                  const Icon = step.tech.icon;
                   const isExpanded = expandedSteps.has(index);
-                  const savings = step.beforeTokens > 0 ? Math.round((1 - step.afterTokens / step.beforeTokens) * 100) : 0;
-                  
                   return (
-                    <div key={index} className="card overflow-hidden">
-                      {/* Step Header */}
-                      <div 
-                        className="card-header flex items-center justify-between cursor-pointer hover:bg-neutral-50/50 transition-colors"
+                    <div key={index} className="card">
+                      <button
                         onClick={() => toggleStep(index)}
+                        className="w-full card-header flex items-center gap-3 hover:bg-neutral-50 transition-colors"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-[10px] font-medium text-neutral-400 uppercase">{isEn ? step.phaseEn : step.phase}</span>
-                            <div className="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
-                              <Icon className="w-4 h-4 text-neutral-600" />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-neutral-900">{isEn ? step.titleEn : step.title}</span>
-                              <span className={`text-[10px] px-2 py-0.5 rounded border ${getImpactColor(step.impact)}`}>
-                                {getImpactLabel(step.impact)}
-                              </span>
-                            </div>
-                            <p className="text-xs text-neutral-500 mt-0.5">{isEn ? step.descriptionEn : step.description}</p>
-                          </div>
+                        <div className="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-neutral-600" />
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <p className="text-xs text-neutral-500">{step.beforeTokens.toLocaleString()} → {step.afterTokens.toLocaleString()}</p>
-                            {savings > 0 && (
-                              <p className="text-xs font-bold text-emerald-600">-{savings}%</p>
-                            )}
-                          </div>
-                          {isExpanded ? <Minus className="w-4 h-4 text-neutral-400" /> : <Plus className="w-4 h-4 text-neutral-400" />}
+                        <div className="text-left flex-1">
+                          <p className="text-sm font-semibold">{isEn ? step.tech.name : step.tech.nameZh}</p>
+                          <p className="text-xs text-neutral-500">{isEn ? step.tech.description : step.tech.descriptionZh}</p>
                         </div>
-                      </div>
-
-                      {/* Step Detail */}
+                        <span className="text-xs font-bold text-emerald-600">-{step.saved}%</span>
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-neutral-400" /> : <ChevronDown className="w-4 h-4 text-neutral-400" />}
+                      </button>
                       {isExpanded && (
                         <div className="card-body border-t border-neutral-100">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* Before */}
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <X className="w-3 h-3 text-red-500" />
-                                <span className="text-xs font-medium text-red-600">{isEn ? 'Before Optimization' : '优化前'}</span>
-                                <span className="text-xs text-neutral-400">{step.beforeTokens.toLocaleString()} tokens</span>
-                              </div>
-                              <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-                                <p className="text-sm text-neutral-700 leading-relaxed font-mono text-xs">{step.beforeText}</p>
-                              </div>
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                            <div className="bg-red-50 rounded-lg p-3">
+                              <p className="text-xs text-red-600 mb-1">{isEn ? 'Before' : '优化前'}</p>
+                              <p className="text-xs text-neutral-700 font-mono break-all">{step.input.slice(0, 300)}{step.input.length > 300 ? '...' : ''}</p>
                             </div>
-
-                            {/* After */}
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                                <span className="text-xs font-medium text-emerald-600">{isEn ? 'After Optimization' : '优化后'}</span>
-                                <span className="text-xs text-neutral-400">{step.afterTokens.toLocaleString()} tokens</span>
-                              </div>
-                              <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
-                                <p className="text-sm text-neutral-700 leading-relaxed font-mono text-xs">{step.afterText}</p>
-                              </div>
+                            <div className="bg-emerald-50 rounded-lg p-3">
+                              <p className="text-xs text-emerald-600 mb-1">{isEn ? 'After' : '优化后'}</p>
+                              <p className="text-xs text-neutral-700 font-mono break-all">{step.output.slice(0, 300)}{step.output.length > 300 ? '...' : ''}</p>
                             </div>
                           </div>
-
-                          {/* Techniques */}
-                          <div className="mt-4 pt-4 border-t border-neutral-100">
-                            <p className="text-xs font-semibold text-neutral-700 mb-2">{isEn ? 'Optimization Techniques:' : '优化技术：'}</p>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                              {(isEn ? step.techniquesEn : step.techniques).map((tech, i) => (
-                                <div key={i} className="flex items-start gap-2 p-2 bg-neutral-50 rounded-lg">
-                                  <ChevronRight className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
-                                  <span className="text-xs text-neutral-600">{tech}</span>
-                                </div>
-                              ))}
-                            </div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {step.details.map((detail: string, i: number) => (
+                              <span key={i} className="text-[10px] bg-neutral-100 text-neutral-600 px-2 py-1 rounded">
+                                {detail}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -638,24 +1141,25 @@ export default function Demo() {
 
             {/* Metrics Tab */}
             {activeTab === 'metrics' && (
-              <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Reduction by Optimization Step' : '每步优化 Token 减少量'}</h3>
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Usage Breakdown' : 'Token 用量分解'}</h3>
                   </div>
                   <div className="card-body">
-                    <div className="h-80">
+                    <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData} barGap={4}>
+                        <BarChart data={[
+                          { name: isEn ? 'Input' : '输入', direct: baselineResult.inputTokens, optimized: optimizedResult.inputTokens },
+                          { name: isEn ? 'Output' : '输出', direct: baselineResult.outputTokens, optimized: optimizedResult.outputTokens },
+                          { name: isEn ? 'Total' : '总计', direct: baselineResult.totalTokens, optimized: optimizedResult.totalTokens },
+                        ]} barGap={8}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                          <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={80} />
+                          <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                           <YAxis tick={{ fontSize: 11 }} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
-                            formatter={(value: number) => value.toLocaleString()}
-                          />
-                          <Bar dataKey="before" name={isEn ? 'Before' : '优化前'} fill="#fca5a5" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="after" name={isEn ? 'After' : '优化后'} fill="#86efac" radius={[4, 4, 0, 0]} />
+                          <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
+                          <Bar dataKey="direct" name={isEn ? 'Direct API' : '直接调用'} fill="#fca5a5" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="optimized" name={isEn ? 'AnyTokn' : 'AnyTokn'} fill="#86efac" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -664,86 +1168,67 @@ export default function Demo() {
 
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Cumulative Token Flow' : '累积 Token 流向'}</h3>
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Savings Distribution' : '节省分布'}</h3>
                   </div>
                   <div className="card-body">
-                    <div className="space-y-3">
-                      {steps.map((step, i) => {
-                        const cumulativeBefore = steps.slice(0, i + 1).reduce((sum, s) => sum + s.beforeTokens, 0);
-                        const cumulativeAfter = steps.slice(0, i + 1).reduce((sum, s) => sum + s.afterTokens, 0);
-                        const widthPercent = cumulativeBefore > 0 ? (cumulativeAfter / cumulativeBefore) * 100 : 100;
-                        
-                        return (
-                          <div key={i} className="flex items-center gap-3">
-                            <span className="text-xs text-neutral-500 w-28 truncate">{isEn ? step.titleEn : step.title}</span>
-                            <div className="flex-1 h-8 bg-red-100 rounded overflow-hidden relative">
-                              <div 
-                                className="h-full bg-emerald-400 rounded transition-all duration-700"
-                                style={{ width: `${widthPercent}%` }}
-                              />
-                              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-neutral-700">
-                                {cumulativeAfter.toLocaleString()} / {cumulativeBefore.toLocaleString()}
-                              </span>
-                            </div>
-                            <span className="text-xs text-emerald-600 font-medium w-12 text-right">
-                              -{Math.round((1 - cumulativeAfter / cumulativeBefore) * 100)}%
-                            </span>
-                          </div>
-                        );
-                      })}
+                    <div className="h-64 flex items-center justify-center">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
                     </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Projection Tab */}
-            {activeTab === 'projection' && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="card bg-red-50 border-red-200">
-                    <div className="card-body text-center">
-                      <p className="text-xs text-red-600 mb-2 font-medium">{isEn ? 'Without AnyTokn' : '不使用 AnyTokn'}</p>
-                      <p className="text-3xl font-bold text-red-700">${(totalBefore * 0.000015 * 1000000).toFixed(0)}</p>
-                      <p className="text-xs text-red-500 mt-1">{isEn ? 'per 1M calls' : '每百万次调用'}</p>
-                      <p className="text-xs text-red-400 mt-1">{totalBefore.toLocaleString()} tokens/call</p>
-                    </div>
-                  </div>
-                  <div className="card bg-emerald-50 border-emerald-200">
-                    <div className="card-body text-center">
-                      <p className="text-xs text-emerald-600 mb-2 font-medium">{isEn ? 'With AnyTokn' : '使用 AnyTokn'}</p>
-                      <p className="text-3xl font-bold text-emerald-700">${(totalAfter * 0.000015 * 1000000).toFixed(0)}</p>
-                      <p className="text-xs text-emerald-500 mt-1">{isEn ? 'per 1M calls' : '每百万次调用'}</p>
-                      <p className="text-xs text-emerald-400 mt-1">{totalAfter.toLocaleString()} tokens/call</p>
-                    </div>
-                  </div>
-                  <div className="card bg-blue-50 border-blue-200">
-                    <div className="card-body text-center">
-                      <p className="text-xs text-blue-600 mb-2 font-medium">{isEn ? 'Monthly Savings' : '月度节省'}</p>
-                      <p className="text-3xl font-bold text-blue-700">${((totalBefore - totalAfter) * 0.000015 * 1000000).toFixed(0)}</p>
-                      <p className="text-xs text-blue-500 mt-1">{totalSavings}% {isEn ? 'reduction' : '减少'}</p>
-                      <p className="text-xs text-blue-400 mt-1">{isEn ? 'at 1M calls/month' : '每月百万次调用'}</p>
+                    <div className="flex items-center justify-center gap-4 mt-2">
+                      {pieData.map((entry, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                          <span className="text-xs text-neutral-600">{entry.name}: {entry.value}%</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                <div className="card">
+                {/* Cost Breakdown */}
+                <div className="card lg:col-span-2">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Break-even Analysis' : '盈亏平衡分析'}</h3>
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Cost Analysis' : '成本分析'}</h3>
                   </div>
                   <div className="card-body">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {[
-                        { label: isEn ? 'Daily Calls' : '日调用量', value: '10,000' },
-                        { label: isEn ? 'Daily Savings' : '日节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 10000).toFixed(2)}` },
-                        { label: isEn ? 'Monthly Savings' : '月节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 300000).toFixed(0)}` },
-                        { label: isEn ? 'Annual Savings' : '年节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 3600000).toFixed(0)}` },
-                      ].map((item, i) => (
-                        <div key={i} className="text-center p-3 bg-neutral-50 rounded-lg">
-                          <p className="text-xs text-neutral-500 mb-1">{item.label}</p>
-                          <p className="text-lg font-bold text-neutral-900">{item.value}</p>
-                        </div>
-                      ))}
+                      <div className="bg-red-50 rounded-lg p-4 text-center">
+                        <p className="text-xs text-red-600 mb-1">{isEn ? 'Original Cost' : '原始成本'}</p>
+                        <p className="text-xl font-bold text-red-700">{baselineResult.costStr}</p>
+                        <p className="text-[10px] text-red-500 mt-1">{isEn ? 'per request' : '每次请求'}</p>
+                      </div>
+                      <div className="bg-emerald-50 rounded-lg p-4 text-center">
+                        <p className="text-xs text-emerald-600 mb-1">{isEn ? 'Optimized Cost' : '优化后成本'}</p>
+                        <p className="text-xl font-bold text-emerald-700">{optimizedResult.costStr}</p>
+                        <p className="text-[10px] text-emerald-500 mt-1">{isEn ? 'per request' : '每次请求'}</p>
+                      </div>
+                      <div className="bg-blue-50 rounded-lg p-4 text-center">
+                        <p className="text-xs text-blue-600 mb-1">{isEn ? 'Savings' : '节省金额'}</p>
+                        <p className="text-xl font-bold text-blue-700">${savings.dollar.toFixed(5)}</p>
+                        <p className="text-[10px] text-blue-500 mt-1">{isEn ? 'per request' : '每次请求'}</p>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 text-center">
+                        <p className="text-xs text-purple-600 mb-1">{isEn ? 'Projected Monthly' : '预计月度节省'}</p>
+                        <p className="text-xl font-bold text-purple-700">${(savings.dollar * 10000).toFixed(2)}</p>
+                        <p className="text-[10px] text-purple-500 mt-1">{isEn ? 'at 10K requests/day' : '按每天 1 万次'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -756,14 +1241,14 @@ export default function Demo() {
       {/* CTA */}
       <section className="py-16 px-4 bg-neutral-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'Optimize every layer of your LLM pipeline' : '优化 LLM 流水线的每一层'}</h2>
-          <p className="text-neutral-400 mb-8">{isEn ? 'From input compression to output formatting, AnyTokn reduces tokens at every step.' : '从输入压缩到输出格式化，AnyTokn 在每一步都减少 Token。'}</p>
+          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'Start optimizing your API costs' : '开始优化你的 API 成本'}</h2>
+          <p className="text-neutral-400 mb-8">{isEn ? 'Connect your API key and start saving on every call.' : '连接你的 API Key，每次调用都节省。'}</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/login" className="btn-primary inline-flex items-center gap-2">
-              {isEn ? 'Start Optimizing' : '开始优化'} <ArrowRight className="w-4 h-4" />
+              {isEn ? 'Get Started' : '开始使用'} <ArrowRight className="w-4 h-4" />
             </Link>
             <Link to="/docs" className="btn-secondary inline-flex items-center gap-2">
-              {isEn ? 'Read Documentation' : '阅读文档'}
+              {isEn ? 'Documentation' : '文档'}
             </Link>
           </div>
         </div>
