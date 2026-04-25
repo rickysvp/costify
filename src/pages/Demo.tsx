@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight, Zap, Send, Loader2, TrendingDown, Clock, DollarSign,
   BarChart3, CheckCircle2, AlertTriangle, Layers, Scissors, Route,
-  FileText, ChevronRight, X, Copy, Check
+  FileText, ChevronRight, X, ArrowDown, Minus, Plus
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
@@ -18,83 +18,245 @@ const PRESET_PROMPTS = [
   { id: 'summary', zh: '总结这篇关于AI成本管理的文章', en: 'Summarize this article about AI cost management' },
 ];
 
-// 模拟不同场景的回答
-const MOCK_RESPONSES: Record<string, { without: string; with: string }> = {
-  support: {
-    without: `您好，感谢您联系我们。关于您提到的订单问题，我已经查询了您的订单记录。您的订单 #ORD-20260418 已于4月20日发货，预计4月23日送达。物流单号为 SF1234567890，您可以通过顺丰官网查询实时物流信息。如果超过预计送达时间仍未收到，请再次联系我们，我们会帮您跟进处理。祝您购物愉快！`,
-    with: `订单 #ORD-20260418 已于4月20日发货，预计4月23日送达。物流单号：SF1234567890，可在顺丰官网查询。超期未收件请再联系我们跟进。`,
-  },
-  rag: {
-    without: `根据检索到的文档内容，AnyTokn 的计费方式采用按量计费模式。具体来说，系统会根据您实际使用的 token 数量进行计费，包括输入 token 和输出 token。输入 token 的价格为每 1K token $0.0015，输出 token 的价格为每 1K token $0.002。此外，系统还提供预算管理功能，您可以为每个项目设置月度预算上限，当使用量接近预算时会自动提醒。详细的价格信息请参考我们的定价页面。`,
-    with: `AnyTokn 按量计费：输入 $0.0015/1K token，输出 $0.002/1K token。支持项目级月度预算上限和自动提醒。`,
-  },
-  agent: {
-    without: `好的，我来帮您分析一下这三个方案的对比。首先是方案A，它的优势在于部署简单，维护成本低，但是扩展性有限。方案B的优势是扩展性好，支持高并发，但是初期投入较高，技术复杂度也更高。方案C则是一个折中方案，兼顾了部署便利性和扩展性，但在极端高并发场景下可能不如方案B。综合考虑，如果您的业务规模在中等水平，我建议选择方案C；如果预期会有快速增长，方案B更合适；如果只是小规模使用，方案A就够了。`,
-    with: `三方案对比：A 部署简单、成本低，但扩展有限；B 扩展好、支持高并发，但投入高、复杂度高；C 折中兼顾。建议：中等规模选 C，快速增长选 B，小规模选 A。`,
-  },
-  summary: {
-    without: `本文主要讨论了人工智能在企业成本管理中的应用。文章首先介绍了传统成本管理面临的挑战，包括数据分散、实时性不足和预测能力有限等问题。随后，文章详细分析了 AI 技术如何通过自动化数据采集、实时监控和智能预测来改善这些问题。特别是在 API 成本管理领域，AI 可以通过 token 优化、智能路由和预算预警等机制，帮助企业将 API 调用成本降低 30-50%。文章还介绍了几个实际案例，展示了不同规模企业如何通过 AI 驱动的成本管理实现显著的成本节约。最后，文章展望了未来 AI 在成本管理领域的发展趋势，包括更精细的优化策略和更智能的自动化决策。`,
-    with: `本文探讨 AI 在企业成本管理中的应用：1）传统成本管理面临数据分散、实时性不足、预测能力有限等挑战；2）AI 通过自动数据采集、实时监控、智能预测改善这些问题；3）在 API 成本管理领域，token 优化、智能路由、预算预警可降低 30-50% 调用成本；4）实际案例验证了不同规模企业的成本节约效果；5）未来趋势是更精细的优化策略和更智能的自动化决策。`,
-  },
+// 详细的优化步骤数据
+interface OptimizationStep {
+  name: string;
+  nameEn: string;
+  description: string;
+  descriptionEn: string;
+  icon: any;
+  beforeTokens: number;
+  afterTokens: number;
+  beforeText: string;
+  afterText: string;
+  savings: number;
+  details: string[];
+  detailsEn: string[];
+}
+
+const OPTIMIZATION_STEPS: Record<string, OptimizationStep[]> = {
+  support: [
+    {
+      name: '原始 Prompt',
+      nameEn: 'Original Prompt',
+      description: '用户输入的原始查询',
+      descriptionEn: 'User\'s original query',
+      icon: FileText,
+      beforeTokens: 24,
+      afterTokens: 24,
+      beforeText: '帮我查一下订单 #ORD-20260418 的物流状态',
+      afterText: '帮我查一下订单 #ORD-20260418 的物流状态',
+      savings: 0,
+      details: ['原始输入，未做处理'],
+      detailsEn: ['Original input, no processing'],
+    },
+    {
+      name: 'Prompt 压缩',
+      nameEn: 'Prompt Compression',
+      description: '移除冗余词汇，保留关键信息',
+      descriptionEn: 'Remove redundant words, keep key info',
+      icon: Scissors,
+      beforeTokens: 24,
+      afterTokens: 18,
+      beforeText: '帮我查一下订单 #ORD-20260418 的物流状态',
+      afterText: '查订单 #ORD-20260418 物流',
+      savings: 25,
+      details: ['移除礼貌用语"帮我"、"一下"', '移除冗余动词"查"重复', '简化"物流状态"为"物流"'],
+      detailsEn: ['Remove polite words', 'Remove redundant verbs', 'Simplify "shipping status" to "shipping"'],
+    },
+    {
+      name: '系统指令优化',
+      nameEn: 'System Instruction Optimization',
+      description: '精简系统角色设定',
+      descriptionEn: 'Streamline system role setup',
+      icon: Layers,
+      beforeTokens: 156,
+      afterTokens: 89,
+      beforeText: '你是一个专业的客服助手，你需要以礼貌、专业的态度回答用户的问题。请提供详细的物流信息，包括发货时间、预计送达时间、物流公司、运单号等。如果用户的问题超出你的能力范围，请引导用户联系人工客服。',
+      afterText: '客服助手。提供物流信息：发货时间、预计送达、物流公司、运单号。',
+      savings: 43,
+      details: ['移除角色描述中的形容词', '删除超出能力范围的兜底话术', '将长句改为关键词列表'],
+      detailsEn: ['Remove adjectives from role desc', 'Remove fallback phrases', 'Convert long sentences to keywords'],
+    },
+    {
+      name: '上下文裁剪',
+      nameEn: 'Context Trimming',
+      description: '移除无关历史对话',
+      descriptionEn: 'Remove irrelevant conversation history',
+      icon: Route,
+      beforeTokens: 342,
+      afterTokens: 0,
+      beforeText: '[历史对话: 用户之前询问了3个其他订单的状态，以及退换货政策]',
+      afterText: '(无相关历史上下文)',
+      savings: 100,
+      details: ['当前查询与历史订单无关', '退换货政策与物流查询无关', '仅保留当前订单相关上下文'],
+      detailsEn: ['Current query unrelated to history', 'Return policy irrelevant to shipping', 'Keep only current order context'],
+    },
+    {
+      name: '输出约束',
+      nameEn: 'Output Constraint',
+      description: '控制输出长度和格式',
+      descriptionEn: 'Control output length and format',
+      icon: CheckCircle2,
+      beforeTokens: 423,
+      afterTokens: 198,
+      beforeText: '您好，感谢您联系我们。关于您提到的订单问题，我已经查询了您的订单记录。您的订单 #ORD-20260418 已于4月20日发货，预计4月23日送达。物流单号为 SF1234567890，您可以通过顺丰官网查询实时物流信息。如果超过预计送达时间仍未收到，请再次联系我们，我们会帮您跟进处理。祝您购物愉快！',
+      afterText: '订单 #ORD-20260418 | 状态: 已发货 | 发货: 4/20 | 预计: 4/23 | 物流: 顺丰 SF1234567890 | 查询: sf-express.com',
+      savings: 53,
+      details: ['移除问候语和结束语', '使用结构化格式替代自然语言', '删除重复信息（"联系我们"出现2次）', '将长句拆分为关键字段'],
+      detailsEn: ['Remove greetings and closings', 'Use structured format', 'Remove duplicate info', 'Split into key fields'],
+    },
+  ],
+  rag: [
+    {
+      name: '原始 Prompt',
+      nameEn: 'Original Prompt',
+      description: '用户输入的原始查询',
+      descriptionEn: 'User\'s original query',
+      icon: FileText,
+      beforeTokens: 18,
+      afterTokens: 18,
+      beforeText: 'AnyTokn 的计费方式是什么？',
+      afterText: 'AnyTokn 的计费方式是什么？',
+      savings: 0,
+      details: ['原始输入，未做处理'],
+      detailsEn: ['Original input, no processing'],
+    },
+    {
+      name: '检索结果去重',
+      nameEn: 'Deduplicate Retrieved Results',
+      description: '移除重复检索段落',
+      descriptionEn: 'Remove duplicate retrieved passages',
+      icon: Scissors,
+      beforeTokens: 2847,
+      afterTokens: 1423,
+      beforeText: '[5篇文档，包含重复的价格说明和计费示例]',
+      afterText: '[2篇文档，去重后保留核心计费信息]',
+      savings: 50,
+      details: ['文档1和文档3内容重复度85%', '移除示例中的重复计费说明', '仅保留最新版本的价格表'],
+      detailsEn: ['Doc 1 & 3 85% duplicate', 'Remove duplicate billing examples', 'Keep only latest price table'],
+    },
+    {
+      name: '上下文排序',
+      nameEn: 'Context Ranking',
+      description: '按相关性排序，保留Top-K',
+      descriptionEn: 'Rank by relevance, keep Top-K',
+      icon: Layers,
+      beforeTokens: 1423,
+      afterTokens: 568,
+      beforeText: '[按时间排序的2篇文档，包含大量无关的产品介绍]',
+      afterText: '[按相关性排序，仅保留计费相关段落]',
+      savings: 60,
+      details: ['产品介绍与计费问题无关', '按向量相似度重新排序', '仅保留与"计费"最相关的Top-3段落'],
+      detailsEn: ['Product intro irrelevant to billing', 'Re-rank by vector similarity', 'Keep only Top-3 relevant passages'],
+    },
+    {
+      name: '输出精简',
+      nameEn: 'Output Condensation',
+      description: '去除冗余引用，直接给出答案',
+      descriptionEn: 'Remove redundant quotes, direct answer',
+      icon: CheckCircle2,
+      beforeTokens: 567,
+      afterTokens: 189,
+      beforeText: '根据检索到的文档内容，AnyTokn 的计费方式采用按量计费模式。具体来说，系统会根据您实际使用的 token 数量进行计费，包括输入 token 和输出 token。输入 token 的价格为每 1K token $0.0015，输出 token 的价格为每 1K token $0.002。',
+      afterText: 'AnyTokn 按量计费：输入 $0.0015/1K token，输出 $0.002/1K token。',
+      savings: 67,
+      details: ['移除"根据检索到的文档内容"等过渡句', '删除重复的价格单位说明', '使用表格化表达替代自然语言'],
+      detailsEn: ['Remove transition sentences', 'Remove duplicate price units', 'Use tabular expression'],
+    },
+  ],
+  agent: [
+    {
+      name: '原始 Prompt',
+      nameEn: 'Original Prompt',
+      description: '用户输入的原始查询',
+      descriptionEn: 'User\'s original query',
+      icon: FileText,
+      beforeTokens: 28,
+      afterTokens: 28,
+      beforeText: '对比方案A、B、C的优缺点并给出建议',
+      afterText: '对比方案A、B、C的优缺点并给出建议',
+      savings: 0,
+      details: ['原始输入，未做处理'],
+      detailsEn: ['Original input, no processing'],
+    },
+    {
+      name: '多轮历史裁剪',
+      nameEn: 'Multi-turn History Pruning',
+      description: '移除已解决的历史对话',
+      descriptionEn: 'Remove resolved conversation history',
+      icon: Scissors,
+      beforeTokens: 1245,
+      afterTokens: 312,
+      beforeText: '[历史5轮对话：用户之前询问了方案A的详细架构、方案B的成本估算、方案C的技术栈，均已回答]',
+      afterText: '[保留当前轮次：仅需对比三个方案]',
+      savings: 75,
+      details: ['历史5轮对话与当前对比任务无关', '已回答的问题无需重复携带', '仅保留当前轮次的对比指令'],
+      detailsEn: ['Previous 5 turns irrelevant', 'Answered questions need not repeat', 'Keep only current comparison'],
+    },
+    {
+      name: '结构化输出',
+      nameEn: 'Structured Output',
+      description: '强制结构化格式，减少冗余',
+      descriptionEn: 'Enforce structured format, reduce redundancy',
+      icon: CheckCircle2,
+      beforeTokens: 612,
+      afterTokens: 298,
+      beforeText: '好的，我来帮您分析一下这三个方案的对比。首先是方案A，它的优势在于部署简单，维护成本低，但是扩展性有限。方案B的优势是扩展性好，支持高并发，但是初期投入较高...',
+      afterText: '| 方案 | 优势 | 劣势 | 适用场景 |\n| A | 部署简单、成本低 | 扩展有限 | 小规模 |\n| B | 扩展好、高并发 | 投入高、复杂 | 快速增长 |\n| C | 折中兼顾 | 极端场景弱 | 中等规模 |',
+      savings: 51,
+      details: ['移除过渡句"好的，我来帮您分析"', '使用Markdown表格替代自然语言', '删除重复的主语"方案X的优势/劣势"'],
+      detailsEn: ['Remove filler sentences', 'Use Markdown table', 'Remove repeated subjects'],
+    },
+  ],
+  summary: [
+    {
+      name: '原始 Prompt',
+      nameEn: 'Original Prompt',
+      description: '用户输入的原始查询',
+      descriptionEn: 'User\'s original query',
+      icon: FileText,
+      beforeTokens: 22,
+      afterTokens: 22,
+      beforeText: '总结这篇关于AI成本管理的文章',
+      afterText: '总结这篇关于AI成本管理的文章',
+      savings: 0,
+      details: ['原始输入，未做处理'],
+      detailsEn: ['Original input, no processing'],
+    },
+    {
+      name: '文档预处理',
+      nameEn: 'Document Preprocessing',
+      description: '去除无关段落，保留核心论点',
+      descriptionEn: 'Remove irrelevant passages, keep core arguments',
+      icon: Scissors,
+      beforeTokens: 5234,
+      afterTokens: 2891,
+      beforeText: '[完整文档：包含引言、背景介绍、3个案例研究、未来展望、参考文献]',
+      afterText: '[精简文档：去除引言和参考文献，保留核心论点和1个关键案例]',
+      savings: 45,
+      details: ['引言部分与总结目的无关', '3个案例中选择最具代表性的1个', '参考文献不影响摘要质量'],
+      detailsEn: ['Intro irrelevant to summary', 'Select 1 representative case', 'References don\'t affect summary'],
+    },
+    {
+      name: '摘要输出优化',
+      nameEn: 'Summary Output Optimization',
+      description: '结构化摘要，避免逐段复述',
+      descriptionEn: 'Structured summary, avoid paragraph-by-paragraph restating',
+      icon: CheckCircle2,
+      beforeTokens: 1247,
+      afterTokens: 684,
+      beforeText: '本文主要讨论了人工智能在企业成本管理中的应用。文章首先介绍了传统成本管理面临的挑战，包括数据分散、实时性不足和预测能力有限等问题。随后...',
+      afterText: '本文探讨 AI 在企业成本管理中的应用：1）传统成本管理面临数据分散、实时性不足、预测能力有限等挑战；2）AI 通过自动数据采集、实时监控、智能预测改善这些问题；3）在 API 成本管理领域，token 优化、智能路由、预算预警可降低 30-50% 调用成本；4）实际案例验证了不同规模企业的成本节约效果；5）未来趋势是更精细的优化策略和更智能的自动化决策。',
+      savings: 45,
+      details: ['使用编号列表替代自然语言段落', '删除过渡词"首先"、"随后"、"最后"', '每个论点保留核心动词和名词'],
+      detailsEn: ['Use numbered list', 'Remove transition words', 'Keep core verbs and nouns'],
+    },
+  ],
 };
 
 function countTokens(text: string): number {
   return Math.round(text.length * 0.6 + Math.random() * 50);
-}
-
-function simulateOptimize(input: string, presetId?: string) {
-  const inputTokens = countTokens(input);
-  const outputTokens = Math.round(200 + Math.random() * 300);
-  const totalTokens = inputTokens + outputTokens;
-  const latencyMs = Math.round(1800 + Math.random() * 2000);
-  const cost = totalTokens * 0.000015;
-
-  const inputSavings = 25 + Math.round(Math.random() * 20);
-  const outputSavings = 25 + Math.round(Math.random() * 20);
-  const latencySavings = 15 + Math.round(Math.random() * 15);
-
-  const optInputTokens = Math.round(inputTokens * (1 - inputSavings / 100));
-  const optOutputTokens = Math.round(outputTokens * (1 - outputSavings / 100));
-  const optTotalTokens = optInputTokens + optOutputTokens;
-  const optLatencyMs = Math.round(latencyMs * (1 - latencySavings / 100));
-  const optCost = optTotalTokens * 0.000015;
-
-  const totalSavings = Math.round((1 - optTotalTokens / totalTokens) * 100);
-  const costSavings = Math.round((1 - optCost / cost) * 100);
-  const latencySaved = Math.round((1 - optLatencyMs / latencyMs) * 100);
-
-  // 获取模拟回答
-  let withoutResponse = MOCK_RESPONSES[presetId || '']?.without || `这是未使用 AnyTokn 优化的标准回答。包含了较多的冗余信息和重复内容，使得输出 token 数量较多，成本相应增加。对于简单的问题，这种回答方式虽然详细，但不够高效。`;
-  let withResponse = MOCK_RESPONSES[presetId || '']?.with || `AnyTokn 优化后的精简回答。去除冗余，保留核心信息。`;
-
-  return {
-    baseline: {
-      inputTokens,
-      outputTokens: countTokens(withoutResponse),
-      totalTokens: inputTokens + countTokens(withoutResponse),
-      latencyMs,
-      cost,
-      costStr: `$${cost.toFixed(4)}`,
-      response: withoutResponse,
-    },
-    optimized: {
-      inputTokens: optInputTokens,
-      outputTokens: countTokens(withResponse),
-      totalTokens: optInputTokens + countTokens(withResponse),
-      latencyMs: optLatencyMs,
-      cost: optCost,
-      costStr: `$${optCost.toFixed(4)}`,
-      response: withResponse,
-    },
-    savings: {
-      inputPct: inputSavings,
-      outputPct: outputSavings,
-      totalPct: totalSavings,
-      costPct: costSavings,
-      latencyPct: latencySaved,
-      dollarSaved: cost - optCost,
-    },
-  };
 }
 
 export default function Demo() {
@@ -104,23 +266,22 @@ export default function Demo() {
   const [userInput, setUserInput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [hasResult, setHasResult] = useState(false);
-  const [result, setResult] = useState<ReturnType<typeof simulateOptimize> | null>(null);
-  const [activeTab, setActiveTab] = useState<'comparison' | 'detailed' | 'quality'>('comparison');
-  const [copied, setCopied] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<string>('');
+  const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'comparison' | 'projection'>('pipeline');
 
   const handleRun = useCallback(() => {
     if (!userInput.trim()) return;
     setIsRunning(true);
     setHasResult(false);
     
-    // 检测使用的是哪个预设
     const preset = PRESET_PROMPTS.find(p => p.zh === userInput || p.en === userInput);
+    setSelectedPreset(preset?.id || '');
     
     setTimeout(() => {
-      const res = simulateOptimize(userInput, preset?.id);
-      setResult(res);
       setIsRunning(false);
       setHasResult(true);
+      setExpandedSteps(new Set([0, 1, 2, 3, 4]));
     }, 1500);
   }, [userInput]);
 
@@ -129,40 +290,31 @@ export default function Demo() {
     setHasResult(false);
   };
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const toggleStep = (index: number) => {
+    setExpandedSteps(prev => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
   };
 
-  const chartData = result
-    ? [
-        { name: isEn ? 'Input' : '输入', without: result.baseline.inputTokens, withAnyTokn: result.optimized.inputTokens },
-        { name: isEn ? 'Output' : '输出', without: result.baseline.outputTokens, withAnyTokn: result.optimized.outputTokens },
-        { name: isEn ? 'Total' : '总计', without: result.baseline.totalTokens, withAnyTokn: result.optimized.totalTokens },
-      ]
-    : [];
+  const steps = selectedPreset ? OPTIMIZATION_STEPS[selectedPreset] || [] : [];
+  
+  const totalBefore = steps.reduce((sum, s) => sum + s.beforeTokens, 0);
+  const totalAfter = steps.reduce((sum, s) => sum + s.afterTokens, 0);
+  const totalSavings = totalBefore > 0 ? Math.round((1 - totalAfter / totalBefore) * 100) : 0;
 
-  const costChartData = result
-    ? [
-        { name: isEn ? 'Cost ($)' : '成本 ($)', without: result.baseline.cost * 1000, withAnyTokn: result.optimized.cost * 1000 },
-        { name: isEn ? 'Latency (ms)' : '延迟 (ms)', without: result.baseline.latencyMs, withAnyTokn: result.optimized.latencyMs },
-      ]
-    : [];
-
-  // 30天趋势数据
-  const trendData = result
-    ? Array.from({ length: 30 }, (_, i) => {
-        const day = i + 1;
-        const calls = 1000 + Math.round(Math.random() * 500);
-        return {
-          day: `${day}d`,
-          without: (result.baseline.cost * calls * 30).toFixed(2),
-          withAnyTokn: (result.optimized.cost * calls * 30).toFixed(2),
-          saved: ((result.baseline.cost - result.optimized.cost) * calls * 30).toFixed(2),
-        };
-      })
-    : [];
+  const chartData = steps.map((s, i) => ({
+    step: i + 1,
+    name: isEn ? s.nameEn : s.name,
+    before: s.beforeTokens,
+    after: s.afterTokens,
+    saved: s.beforeTokens - s.afterTokens,
+  }));
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -187,15 +339,15 @@ export default function Demo() {
         <div className="max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-700 text-xs font-semibold rounded-full border border-neutral-200 mb-6">
             <Zap className="w-3.5 h-3.5" />
-            {isEn ? 'Live Comparison Demo' : '实时对比演示'}
+            {isEn ? 'Step-by-Step Optimization Pipeline' : '逐层优化流水线'}
           </div>
           <h1 className="heading-hero mb-4">
-            {isEn ? 'With vs Without AnyTokn' : '使用 vs 不使用 AnyTokn'}
+            {isEn ? 'See every optimization step' : '看清每一步优化'}
           </h1>
           <p className="body-text max-w-2xl mb-8 text-base">
             {isEn
-              ? 'Enter any prompt and see the real difference. Same input, same model, but dramatically different costs and performance.'
-              : '输入任意 prompt，查看真实差异。相同输入，相同模型，但成本和性能截然不同。'}
+              ? 'Not just before/after. See exactly how each optimization layer reduces tokens, with real text comparisons.'
+              : '不只是前后对比。看清每一层优化如何减少 token，附带真实文本对比。'}
           </p>
         </div>
       </section>
@@ -209,7 +361,7 @@ export default function Demo() {
                 <FileText className="w-4 h-4 text-neutral-500" />
                 <span className="text-sm font-semibold text-neutral-800">{isEn ? 'Your Prompt' : '你的 Prompt'}</span>
               </div>
-              <span className="text-xs text-neutral-400">{isEn ? 'Choose a preset or type your own' : '选择预设或输入自定义内容'}</span>
+              <span className="text-xs text-neutral-400">{isEn ? 'Choose a preset to see step-by-step optimization' : '选择预设查看逐层优化'}</span>
             </div>
             <div className="card-body">
               <textarea
@@ -232,7 +384,7 @@ export default function Demo() {
                 </div>
                 <button onClick={handleRun} disabled={!userInput.trim() || isRunning} className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                   {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  {isRunning ? (isEn ? 'Analyzing...' : '分析中...') : (isEn ? 'Run Comparison' : '运行对比')}
+                  {isRunning ? (isEn ? 'Analyzing...' : '分析中...') : (isEn ? 'Show Optimization Steps' : '显示优化步骤')}
                 </button>
               </div>
             </div>
@@ -246,24 +398,13 @@ export default function Demo() {
           <div className="max-w-5xl mx-auto">
             <div className="card p-12 text-center">
               <Loader2 className="w-8 h-8 text-black animate-spin mx-auto mb-4" />
-              <p className="text-sm text-neutral-600">{isEn ? 'Running parallel analysis...' : '运行并行分析...'}</p>
-              <div className="flex items-center justify-center gap-8 mt-6">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="text-xs font-bold text-neutral-400">RAW</span>
-                  </div>
-                  <p className="text-xs text-neutral-400">{isEn ? 'Direct API' : '直接调用'}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ChevronRight className="w-4 h-4 text-neutral-300" />
-                  <ChevronRight className="w-4 h-4 text-neutral-300" />
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <Zap className="w-5 h-5 text-neutral-400" />
-                  </div>
-                  <p className="text-xs text-neutral-400">{isEn ? 'AnyTokn' : 'AnyTokn'}</p>
-                </div>
+              <p className="text-sm text-neutral-600">{isEn ? 'Running optimization pipeline...' : '运行优化流水线...'}</p>
+              <div className="flex items-center justify-center gap-4 mt-4 text-xs text-neutral-400">
+                <span>Prompt Compression</span>
+                <ChevronRight className="w-3 h-3" />
+                <span>Context Trimming</span>
+                <ChevronRight className="w-3 h-3" />
+                <span>Output Optimization</span>
               </div>
             </div>
           </div>
@@ -271,85 +412,28 @@ export default function Demo() {
       )}
 
       {/* Results */}
-      {hasResult && result && (
+      {hasResult && steps.length > 0 && (
         <section className="px-4 pb-16">
           <div className="max-w-5xl mx-auto space-y-6">
-            {/* Side by Side Response Comparison */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Without AnyTokn */}
-              <div className="card border-red-200">
-                <div className="card-header bg-red-50 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <X className="w-4 h-4 text-red-600" />
-                    <span className="text-sm font-semibold text-red-800">{isEn ? 'Without AnyTokn' : '不使用 AnyTokn'}</span>
-                  </div>
-                  <span className="text-xs text-red-600 font-medium">{isEn ? 'Direct API Call' : '直接 API 调用'}</span>
-                </div>
-                <div className="card-body">
-                  <div className="bg-neutral-50 rounded-lg p-4 mb-4 min-h-[120px]">
-                    <p className="text-sm text-neutral-700 leading-relaxed">{result.baseline.response}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white rounded-lg p-3 border border-neutral-200">
-                      <p className="text-neutral-500 mb-1">{isEn ? 'Output Tokens' : '输出 Token'}</p>
-                      <p className="text-lg font-bold text-neutral-900">{result.baseline.outputTokens.toLocaleString()}</p>
-                    </div>
-                    <div className="bg-white rounded-lg p-3 border border-neutral-200">
-                      <p className="text-neutral-500 mb-1">{isEn ? 'Cost' : '成本'}</p>
-                      <p className="text-lg font-bold text-neutral-900">{result.baseline.costStr}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* With AnyTokn */}
-              <div className="card border-emerald-200">
-                <div className="card-header bg-emerald-50 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span className="text-sm font-semibold text-emerald-800">{isEn ? 'With AnyTokn' : '使用 AnyTokn'}</span>
-                  </div>
-                  <span className="text-xs text-emerald-600 font-medium">{isEn ? 'Optimized' : '已优化'}</span>
-                </div>
-                <div className="card-body">
-                  <div className="bg-emerald-50/50 rounded-lg p-4 mb-4 min-h-[120px]">
-                    <p className="text-sm text-neutral-700 leading-relaxed">{result.optimized.response}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <p className="text-neutral-500 mb-1">{isEn ? 'Output Tokens' : '输出 Token'}</p>
-                      <p className="text-lg font-bold text-emerald-700">{result.optimized.outputTokens.toLocaleString()}</p>
-                      <p className="text-emerald-600 font-medium">-{result.savings.outputPct}%</p>
-                    </div>
-                    <div className="bg-white rounded-lg p-3 border border-emerald-200">
-                      <p className="text-neutral-500 mb-1">{isEn ? 'Cost' : '成本'}</p>
-                      <p className="text-lg font-bold text-emerald-700">{result.optimized.costStr}</p>
-                      <p className="text-emerald-600 font-medium">-{result.savings.costPct}%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Savings Banner */}
-            <div className="card bg-gradient-to-r from-emerald-50 to-blue-50 border-emerald-200">
+            {/* Summary Banner */}
+            <div className="card bg-gradient-to-r from-neutral-900 to-neutral-800 text-white">
               <div className="card-body">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div>
-                    <p className="text-3xl font-bold text-emerald-700">{result.savings.totalPct}%</p>
-                    <p className="text-xs text-neutral-600 mt-1">{isEn ? 'Token Savings' : 'Token 节省'}</p>
+                    <p className="text-3xl font-bold">{totalBefore.toLocaleString()}</p>
+                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Original Tokens' : '原始 Token'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-blue-700">{result.savings.costPct}%</p>
-                    <p className="text-xs text-neutral-600 mt-1">{isEn ? 'Cost Savings' : '成本节省'}</p>
+                    <p className="text-3xl font-bold text-emerald-400">{totalAfter.toLocaleString()}</p>
+                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Optimized Tokens' : '优化后 Token'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-violet-700">{result.savings.latencyPct}%</p>
-                    <p className="text-xs text-neutral-600 mt-1">{isEn ? 'Latency Reduction' : '延迟降低'}</p>
+                    <p className="text-3xl font-bold text-emerald-400">{totalSavings}%</p>
+                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Total Savings' : '总节省'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-emerald-700">${result.savings.dollarSaved.toFixed(4)}</p>
-                    <p className="text-xs text-neutral-600 mt-1">{isEn ? 'Saved per call' : '每次节省'}</p>
+                    <p className="text-3xl font-bold text-emerald-400">{(totalBefore - totalAfter).toLocaleString()}</p>
+                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Tokens Saved' : '节省 Token'}</p>
                   </div>
                 </div>
               </div>
@@ -358,9 +442,9 @@ export default function Demo() {
             {/* Tab Navigation */}
             <div className="flex items-center gap-2 border-b border-neutral-200">
               {[
+                { id: 'pipeline' as const, label: isEn ? 'Optimization Pipeline' : '优化流水线', icon: Layers },
                 { id: 'comparison' as const, label: isEn ? 'Visual Comparison' : '可视化对比', icon: BarChart3 },
-                { id: 'detailed' as const, label: isEn ? 'Detailed Metrics' : '详细指标', icon: Layers },
-                { id: 'quality' as const, label: isEn ? 'Quality Analysis' : '质量分析', icon: CheckCircle2 },
+                { id: 'projection' as const, label: isEn ? 'Cost Projection' : '成本预估', icon: DollarSign },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -377,189 +461,179 @@ export default function Demo() {
               ))}
             </div>
 
+            {/* Pipeline Tab */}
+            {activeTab === 'pipeline' && (
+              <div className="space-y-4">
+                {steps.map((step, index) => {
+                  const Icon = step.icon;
+                  const isExpanded = expandedSteps.has(index);
+                  const isLast = index === steps.length - 1;
+                  
+                  return (
+                    <div key={index} className="card">
+                      {/* Step Header */}
+                      <div 
+                        className="card-header flex items-center justify-between cursor-pointer hover:bg-neutral-50/50 transition-colors"
+                        onClick={() => toggleStep(index)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+                            <Icon className="w-4 h-4 text-neutral-600" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-neutral-800">{isEn ? step.nameEn : step.name}</span>
+                              <span className="text-xs text-neutral-400">{isEn ? step.descriptionEn : step.description}</span>
+                            </div>
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="text-xs text-neutral-500">{step.beforeTokens.toLocaleString()} → {step.afterTokens.toLocaleString()} tokens</span>
+                              {step.savings > 0 && (
+                                <span className="text-xs font-semibold text-emerald-600">-{step.savings}%</span>
+                              )}
+                              {step.savings === 0 && (
+                                <span className="text-xs text-neutral-400">{isEn ? 'No change' : '无变化'}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {step.savings > 0 && (
+                            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
+                              -{step.savings}%
+                            </span>
+                          )}
+                          {isExpanded ? <Minus className="w-4 h-4 text-neutral-400" /> : <Plus className="w-4 h-4 text-neutral-400" />}
+                        </div>
+                      </div>
+
+                      {/* Step Detail */}
+                      {isExpanded && (
+                        <div className="card-body border-t border-neutral-100">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {/* Before */}
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <X className="w-3 h-3 text-red-500" />
+                                <span className="text-xs font-medium text-red-600">{isEn ? 'Before' : '优化前'}</span>
+                                <span className="text-xs text-neutral-400">({step.beforeTokens} tokens)</span>
+                              </div>
+                              <div className="bg-red-50 rounded-lg p-3 border border-red-100">
+                                <p className="text-sm text-neutral-700 leading-relaxed">{step.beforeText}</p>
+                              </div>
+                            </div>
+
+                            {/* After */}
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                <span className="text-xs font-medium text-emerald-600">{isEn ? 'After' : '优化后'}</span>
+                                <span className="text-xs text-neutral-400">({step.afterTokens} tokens)</span>
+                              </div>
+                              <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+                                <p className="text-sm text-neutral-700 leading-relaxed">{step.afterText}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Optimization Details */}
+                          {step.details.length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-neutral-100">
+                              <p className="text-xs font-medium text-neutral-600 mb-2">{isEn ? 'What changed:' : '具体变化：'}</p>
+                              <div className="space-y-1">
+                                {(isEn ? step.detailsEn : step.details).map((detail, i) => (
+                                  <div key={i} className="flex items-start gap-2">
+                                    <ChevronRight className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-xs text-neutral-600">{detail}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             {/* Comparison Tab */}
             {activeTab === 'comparison' && (
               <>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="card">
-                    <div className="card-header">
-                      <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Usage: With vs Without' : 'Token 用量：使用 vs 不使用'}</h3>
-                    </div>
-                    <div className="card-body">
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} barGap={8}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 11 }} />
-                            <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
-                            <Bar dataKey="without" name={isEn ? 'Without AnyTokn' : '不使用 AnyTokn'} fill="#ef4444" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="withAnyTokn" name={isEn ? 'With AnyTokn' : '使用 AnyTokn'} fill="#10b981" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
+                <div className="card">
+                  <div className="card-header">
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Reduction per Step' : '每步 Token 减少量'}</h3>
                   </div>
-
-                  <div className="card">
-                    <div className="card-header">
-                      <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Cost & Latency Impact' : '成本与延迟影响'}</h3>
-                    </div>
-                    <div className="card-body">
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={costChartData} barGap={8}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 11 }} />
-                            <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
-                            <Bar dataKey="without" name={isEn ? 'Without AnyTokn' : '不使用 AnyTokn'} fill="#ef4444" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="withAnyTokn" name={isEn ? 'With AnyTokn' : '使用 AnyTokn'} fill="#10b981" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
+                  <div className="card-body">
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData} barGap={4}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={80} />
+                          <YAxis tick={{ fontSize: 11 }} />
+                          <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
+                          <Bar dataKey="before" name={isEn ? 'Before' : '优化前'} fill="#fca5a5" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="after" name={isEn ? 'After' : '优化后'} fill="#86efac" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
                   </div>
                 </div>
 
-                {/* 30-Day Projection */}
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? '30-Day Cost Projection (1K calls/day)' : '30 天成本预估（每天 1K 次调用）'}</h3>
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Cumulative Token Flow' : '累积 Token 流向'}</h3>
                   </div>
                   <div className="card-body">
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={trendData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                          <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-                          <YAxis tick={{ fontSize: 11 }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
-                          <Line type="monotone" dataKey="without" name={isEn ? 'Without AnyTokn' : '不使用 AnyTokn'} stroke="#ef4444" strokeWidth={2} dot={false} />
-                          <Line type="monotone" dataKey="withAnyTokn" name={isEn ? 'With AnyTokn' : '使用 AnyTokn'} stroke="#10b981" strokeWidth={2} dot={false} />
-                        </LineChart>
-                      </ResponsiveContainer>
+                    <div className="space-y-2">
+                      {steps.map((step, i) => {
+                        const cumulativeBefore = steps.slice(0, i + 1).reduce((sum, s) => sum + s.beforeTokens, 0);
+                        const cumulativeAfter = steps.slice(0, i + 1).reduce((sum, s) => sum + s.afterTokens, 0);
+                        const widthPercent = cumulativeBefore > 0 ? (cumulativeAfter / cumulativeBefore) * 100 : 100;
+                        
+                        return (
+                          <div key={i} className="flex items-center gap-3">
+                            <span className="text-xs text-neutral-500 w-24 truncate">{isEn ? step.nameEn : step.name}</span>
+                            <div className="flex-1 h-6 bg-red-100 rounded overflow-hidden relative">
+                              <div 
+                                className="h-full bg-emerald-400 rounded transition-all duration-700"
+                                style={{ width: `${widthPercent}%` }}
+                              />
+                              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-neutral-700">
+                                {cumulativeAfter.toLocaleString()} / {cumulativeBefore.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
               </>
             )}
 
-            {/* Detailed Metrics Tab */}
-            {activeTab === 'detailed' && (
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Complete Breakdown' : '完整分解'}</h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        <th className="table-header">{isEn ? 'Metric' : '指标'}</th>
-                        <th className="table-header text-right text-red-600">{isEn ? 'Without AnyTokn' : '不使用 AnyTokn'}</th>
-                        <th className="table-header text-right text-emerald-600">{isEn ? 'With AnyTokn' : '使用 AnyTokn'}</th>
-                        <th className="table-header text-right">{isEn ? 'Difference' : '差异'}</th>
-                        <th className="table-header">{isEn ? 'Impact' : '影响'}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="table-cell font-medium">{isEn ? 'Input Tokens' : '输入 Token'}</td>
-                        <td className="table-cell text-right text-red-600">{result.baseline.inputTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-medium">{result.optimized.inputTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-semibold">-{result.savings.inputPct}%</td>
-                        <td className="table-cell"><ImpactBadge level="high" /></td>
-                      </tr>
-                      <tr className="bg-neutral-50/50">
-                        <td className="table-cell font-medium">{isEn ? 'Output Tokens' : '输出 Token'}</td>
-                        <td className="table-cell text-right text-red-600">{result.baseline.outputTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-medium">{result.optimized.outputTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-semibold">-{result.savings.outputPct}%</td>
-                        <td className="table-cell"><ImpactBadge level="high" /></td>
-                      </tr>
-                      <tr>
-                        <td className="table-cell font-medium">{isEn ? 'Total Tokens' : '总 Token'}</td>
-                        <td className="table-cell text-right text-red-600 font-bold">{result.baseline.totalTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-bold">{result.optimized.totalTokens.toLocaleString()}</td>
-                        <td className="table-cell text-right text-emerald-600 font-bold">-{result.savings.totalPct}%</td>
-                        <td className="table-cell"><ImpactBadge level="high" /></td>
-                      </tr>
-                      <tr className="bg-neutral-50/50">
-                        <td className="table-cell font-medium">{isEn ? 'Latency' : '延迟'}</td>
-                        <td className="table-cell text-right text-red-600">{result.baseline.latencyMs}ms</td>
-                        <td className="table-cell text-right text-emerald-600 font-medium">{result.optimized.latencyMs}ms</td>
-                        <td className="table-cell text-right text-emerald-600 font-semibold">-{result.savings.latencyPct}%</td>
-                        <td className="table-cell"><ImpactBadge level="medium" /></td>
-                      </tr>
-                      <tr>
-                        <td className="table-cell font-medium">{isEn ? 'Cost per Call' : '单次成本'}</td>
-                        <td className="table-cell text-right text-red-600 font-bold">{result.baseline.costStr}</td>
-                        <td className="table-cell text-right text-emerald-600 font-bold">{result.optimized.costStr}</td>
-                        <td className="table-cell text-right text-emerald-600 font-bold">-{result.savings.costPct}%</td>
-                        <td className="table-cell"><ImpactBadge level="high" /></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Monthly Projection */}
-                <div className="card-body border-t border-neutral-100">
-                  <h4 className="text-sm font-semibold text-neutral-800 mb-4">{isEn ? 'Monthly Projection (10K calls)' : '月度预估（1万次调用）'}</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                      <p className="text-xs text-red-600 mb-1">{isEn ? 'Without AnyTokn' : '不使用 AnyTokn'}</p>
-                      <p className="text-2xl font-bold text-red-700">${(result.baseline.cost * 10000).toFixed(2)}</p>
-                    </div>
-                    <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                      <p className="text-xs text-emerald-600 mb-1">{isEn ? 'With AnyTokn' : '使用 AnyTokn'}</p>
-                      <p className="text-2xl font-bold text-emerald-700">${(result.optimized.cost * 10000).toFixed(2)}</p>
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                      <p className="text-xs text-blue-600 mb-1">{isEn ? 'You Save' : '你节省'}</p>
-                      <p className="text-2xl font-bold text-blue-700">${(result.savings.dollarSaved * 10000).toFixed(2)}</p>
-                      <p className="text-xs text-blue-600 mt-1">{isEn ? 'per month' : '每月'}</p>
-                    </div>
+            {/* Projection Tab */}
+            {activeTab === 'projection' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="card bg-red-50 border-red-200">
+                  <div className="card-body text-center">
+                    <p className="text-xs text-red-600 mb-2">{isEn ? 'Without AnyTokn (1M calls)' : '不使用 AnyTokn（100万次调用）'}</p>
+                    <p className="text-3xl font-bold text-red-700">${(totalBefore * 0.000015 * 1000000).toFixed(0)}</p>
+                    <p className="text-xs text-red-500 mt-1">{totalBefore.toLocaleString()} tokens/call</p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Quality Analysis Tab */}
-            {activeTab === 'quality' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="card">
-                  <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Quality Preservation Score' : '质量保持评分'}</h3>
-                  </div>
-                  <div className="card-body space-y-4">
-                    <QualityItem label={isEn ? 'Semantic Completeness' : '语义完整性'} score={95} desc={isEn ? 'Core meaning fully preserved' : '核心语义完整保留'} />
-                    <QualityItem label={isEn ? 'Factual Accuracy' : '事实准确性'} score={98} desc={isEn ? 'All facts remain correct' : '所有事实保持正确'} />
-                    <QualityItem label={isEn ? 'Response Structure' : '响应结构'} score={90} desc={isEn ? 'Logical flow maintained' : '逻辑流程保持'} />
-                    <QualityItem label={isEn ? 'Tone & Style' : '语气风格'} score={88} desc={isEn ? 'Professional, less verbose' : '专业，减少冗余'} />
+                <div className="card bg-emerald-50 border-emerald-200">
+                  <div className="card-body text-center">
+                    <p className="text-xs text-emerald-600 mb-2">{isEn ? 'With AnyTokn (1M calls)' : '使用 AnyTokn（100万次调用）'}</p>
+                    <p className="text-3xl font-bold text-emerald-700">${(totalAfter * 0.000015 * 1000000).toFixed(0)}</p>
+                    <p className="text-xs text-emerald-500 mt-1">{totalAfter.toLocaleString()} tokens/call</p>
                   </div>
                 </div>
-
-                <div className="card">
-                  <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Optimization Techniques Used' : '使用的优化技术'}</h3>
-                  </div>
-                  <div className="card-body space-y-3">
-                    <TechniqueItem icon={Scissors} title={isEn ? 'Prompt Compression' : 'Prompt 压缩'} desc={isEn ? 'Removes redundant instructions' : '移除冗余指令'} impact={`-${result.savings.inputPct}%`} />
-                    <TechniqueItem icon={Layers} title={isEn ? 'Context Trimming' : '上下文裁剪'} desc={isEn ? 'Keeps high-relevance context' : '保留高相关性上下文'} impact="-28%" />
-                    <TechniqueItem icon={Route} title={isEn ? 'Smart Routing' : '智能路由'} desc={isEn ? 'Routes to optimal model' : '路由到最优模型'} impact={`-${result.savings.latencyPct}%`} />
-                  </div>
-                </div>
-
-                <div className="card lg:col-span-2">
-                  <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Trade-off Analysis' : '权衡分析'}</h3>
-                  </div>
-                  <div className="card-body">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <TradeOffCard type="positive" title={isEn ? 'Significant Savings' : '显著节省'} desc={isEn ? `${result.savings.totalPct}% token reduction = lower costs` : `${result.savings.totalPct}% token 减少 = 更低成本`} />
-                      <TradeOffCard type="positive" title={isEn ? 'Faster Response' : '更快响应'} desc={isEn ? `${result.savings.latencyPct}% lower latency` : `${result.savings.latencyPct}% 延迟降低`} />
-                      <TradeOffCard type="neutral" title={isEn ? 'Minor Trade-off' : '轻微权衡'} desc={isEn ? 'Slightly more concise, meaning preserved' : '略微更简洁，语义保留'} />
-                    </div>
+                <div className="card bg-blue-50 border-blue-200">
+                  <div className="card-body text-center">
+                    <p className="text-xs text-blue-600 mb-2">{isEn ? 'Your Savings (1M calls)' : '你的节省（100万次调用）'}</p>
+                    <p className="text-3xl font-bold text-blue-700">${((totalBefore - totalAfter) * 0.000015 * 1000000).toFixed(0)}</p>
+                    <p className="text-xs text-blue-500 mt-1">{totalSavings}% {isEn ? 'reduction' : '减少'}</p>
                   </div>
                 </div>
               </div>
@@ -571,8 +645,8 @@ export default function Demo() {
       {/* CTA */}
       <section className="py-16 px-4 bg-neutral-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'Start saving on every API call' : '每次调用都开始节省'}</h2>
-          <p className="text-neutral-400 mb-8">{isEn ? 'Join teams that save 30-50% on LLM costs without sacrificing quality.' : '加入那些在不牺牲质量的情况下节省 30-50% LLM 成本的团队。'}</p>
+          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'See the difference in every layer' : '看清每一层的差异'}</h2>
+          <p className="text-neutral-400 mb-8">{isEn ? 'AnyTokn optimizes at every step, not just the final output.' : 'AnyTokn 在每一步都进行优化，不只是最终输出。'}</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/login" className="btn-primary inline-flex items-center gap-2">
               {isEn ? 'Create Free Account' : '创建免费账户'} <ArrowRight className="w-4 h-4" />
@@ -589,72 +663,6 @@ export default function Demo() {
           <p className="text-xs text-neutral-600">© 2026 AnyTokn. All rights reserved.</p>
         </div>
       </footer>
-    </div>
-  );
-}
-
-// Sub-components
-function ImpactBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const styles = {
-    high: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    medium: 'bg-amber-50 text-amber-700 border-amber-200',
-    low: 'bg-neutral-50 text-neutral-600 border-neutral-200',
-  };
-  const labels = { high: 'High', medium: 'Medium', low: 'Low' };
-  return (
-    <span className={`inline-flex px-2 py-0.5 text-[10px] font-medium rounded border ${styles[level]}`}>
-      {labels[level]}
-    </span>
-  );
-}
-
-function QualityItem({ label, score, desc }: { label: string; score: number; desc: string }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-neutral-700">{label}</span>
-        <span className="text-sm font-bold text-neutral-900">{score}/100</span>
-      </div>
-      <div className="h-2 bg-neutral-100 rounded-full overflow-hidden mb-1">
-        <div className="h-full bg-black rounded-full transition-all" style={{ width: `${score}%` }} />
-      </div>
-      <p className="text-xs text-neutral-500">{desc}</p>
-    </div>
-  );
-}
-
-function TechniqueItem({ icon: Icon, title, desc, impact }: { icon: any; title: string; desc: string; impact: string }) {
-  return (
-    <div className="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg">
-      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 border border-neutral-200">
-        <Icon className="w-4 h-4 text-neutral-600" />
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-medium text-neutral-800">{title}</h4>
-          <span className="text-xs font-semibold text-emerald-600">{impact}</span>
-        </div>
-        <p className="text-xs text-neutral-500 mt-0.5">{desc}</p>
-      </div>
-    </div>
-  );
-}
-
-function TradeOffCard({ type, title, desc }: { type: 'positive' | 'neutral' | 'negative'; title: string; desc: string }) {
-  const icons = { positive: CheckCircle2, neutral: AlertTriangle, negative: AlertTriangle };
-  const colors = {
-    positive: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-    neutral: 'text-amber-600 bg-amber-50 border-amber-200',
-    negative: 'text-red-600 bg-red-50 border-red-200',
-  };
-  const Icon = icons[type];
-  return (
-    <div className={`p-4 rounded-lg border ${colors[type]}`}>
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className="w-4 h-4" />
-        <h4 className="text-sm font-semibold">{title}</h4>
-      </div>
-      <p className="text-xs opacity-80">{desc}</p>
     </div>
   );
 }
