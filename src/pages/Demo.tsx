@@ -3,25 +3,65 @@ import { Link } from 'react-router-dom';
 import {
   ArrowRight, Zap, Send, Loader2, TrendingDown, Clock, DollarSign,
   BarChart3, CheckCircle2, AlertTriangle, Layers, Scissors, Route,
-  FileText, ChevronRight, X, ArrowDown, Minus, Plus
+  FileText, ChevronRight, X, Minus, Plus, ArrowDownRight, ArrowUpRight,
+  Target, Gauge, Sparkles, BrainCircuit, Filter, AlignLeft, Table2
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, LineChart, Line
+  ResponsiveContainer, AreaChart, Area
 } from 'recharts';
 
-const PRESET_PROMPTS = [
-  { id: 'support', zh: '帮我查一下订单 #ORD-20260418 的物流状态', en: 'Check the shipping status of order #ORD-20260418' },
-  { id: 'rag', zh: 'AnyTokn 的计费方式是什么？', en: "What is AnyTokn's billing model?" },
-  { id: 'agent', zh: '对比方案A、B、C的优缺点并给出建议', en: 'Compare options A, B, C and give recommendations' },
-  { id: 'summary', zh: '总结这篇关于AI成本管理的文章', en: 'Summarize this article about AI cost management' },
+// ==================== 专业场景预设 ====================
+const PRESET_SCENARIOS = [
+  {
+    id: 'customer-support',
+    category: 'Customer Support',
+    categoryZh: '客户支持',
+    icon: BrainCircuit,
+    prompt: 'Customer inquiry: "I haven\'t received my order #ORD-20260418 yet. Can you check the status?"',
+    promptZh: '客户咨询："我的订单 #ORD-20260418 还没收到，能查一下状态吗？"',
+    description: 'High-volume support tickets with repetitive context',
+    descriptionZh: '大量重复上下文的客服工单',
+  },
+  {
+    id: 'rag-knowledge',
+    category: 'RAG Knowledge Base',
+    categoryZh: 'RAG 知识库',
+    icon: Filter,
+    prompt: 'Query: "What are the pricing tiers for enterprise API access and volume discounts?"',
+    promptZh: '查询："企业 API 访问的定价层级和批量折扣是什么？"',
+    description: 'Document-grounded Q&A with large retrieval context',
+    descriptionZh: '基于文档检索的大上下文问答',
+  },
+  {
+    id: 'agent-workflow',
+    category: 'Agent Workflow',
+    categoryZh: 'Agent 工作流',
+    icon: Table2,
+    prompt: 'Task: "Compare cloud providers AWS, GCP, Azure for ML workloads and recommend the best option"',
+    promptZh: '任务："对比 AWS、GCP、Azure 云厂商的 ML 工作负载表现并推荐最优方案"',
+    description: 'Multi-step reasoning with accumulated conversation history',
+    descriptionZh: '多步推理，累积对话历史',
+  },
+  {
+    id: 'content-generation',
+    category: 'Content Generation',
+    categoryZh: '内容生成',
+    icon: AlignLeft,
+    prompt: 'Generate a technical summary of the attached 50-page research paper on transformer architecture optimizations',
+    promptZh: '生成一份关于 Transformer 架构优化的 50 页研究论文的技术摘要',
+    description: 'Long-form content summarization and extraction',
+    descriptionZh: '长文档摘要和信息提取',
+  },
 ];
 
-// 详细的优化步骤数据
+// ==================== 优化步骤定义 ====================
 interface OptimizationStep {
-  name: string;
-  nameEn: string;
+  phase: string;
+  phaseEn: string;
+  title: string;
+  titleEn: string;
   description: string;
   descriptionEn: string;
   icon: any;
@@ -29,266 +69,272 @@ interface OptimizationStep {
   afterTokens: number;
   beforeText: string;
   afterText: string;
-  savings: number;
-  details: string[];
-  detailsEn: string[];
+  techniques: string[];
+  techniquesEn: string[];
+  impact: 'critical' | 'high' | 'medium' | 'low';
 }
 
-const OPTIMIZATION_STEPS: Record<string, OptimizationStep[]> = {
-  support: [
+const OPTIMIZATION_PIPELINE: Record<string, OptimizationStep[]> = {
+  'customer-support': [
     {
-      name: '原始 Prompt',
-      nameEn: 'Original Prompt',
-      description: '用户输入的原始查询',
-      descriptionEn: 'User\'s original query',
-      icon: FileText,
-      beforeTokens: 24,
-      afterTokens: 24,
-      beforeText: '帮我查一下订单 #ORD-20260418 的物流状态',
-      afterText: '帮我查一下订单 #ORD-20260418 的物流状态',
-      savings: 0,
-      details: ['原始输入，未做处理'],
-      detailsEn: ['Original input, no processing'],
-    },
-    {
-      name: 'Prompt 压缩',
-      nameEn: 'Prompt Compression',
-      description: '移除冗余词汇，保留关键信息',
-      descriptionEn: 'Remove redundant words, keep key info',
+      phase: 'Input Layer',
+      phaseEn: 'Input Layer',
+      title: 'Prompt Compression',
+      titleEn: 'Prompt Compression',
+      description: '移除冗余表达，保留核心语义',
+      descriptionEn: 'Remove redundant expressions, preserve core semantics',
       icon: Scissors,
-      beforeTokens: 24,
-      afterTokens: 18,
-      beforeText: '帮我查一下订单 #ORD-20260418 的物流状态',
-      afterText: '查订单 #ORD-20260418 物流',
-      savings: 25,
-      details: ['移除礼貌用语"帮我"、"一下"', '移除冗余动词"查"重复', '简化"物流状态"为"物流"'],
-      detailsEn: ['Remove polite words', 'Remove redundant verbs', 'Simplify "shipping status" to "shipping"'],
-    },
-    {
-      name: '系统指令优化',
-      nameEn: 'System Instruction Optimization',
-      description: '精简系统角色设定',
-      descriptionEn: 'Streamline system role setup',
-      icon: Layers,
-      beforeTokens: 156,
-      afterTokens: 89,
-      beforeText: '你是一个专业的客服助手，你需要以礼貌、专业的态度回答用户的问题。请提供详细的物流信息，包括发货时间、预计送达时间、物流公司、运单号等。如果用户的问题超出你的能力范围，请引导用户联系人工客服。',
-      afterText: '客服助手。提供物流信息：发货时间、预计送达、物流公司、运单号。',
-      savings: 43,
-      details: ['移除角色描述中的形容词', '删除超出能力范围的兜底话术', '将长句改为关键词列表'],
-      detailsEn: ['Remove adjectives from role desc', 'Remove fallback phrases', 'Convert long sentences to keywords'],
-    },
-    {
-      name: '上下文裁剪',
-      nameEn: 'Context Trimming',
-      description: '移除无关历史对话',
-      descriptionEn: 'Remove irrelevant conversation history',
-      icon: Route,
-      beforeTokens: 342,
-      afterTokens: 0,
-      beforeText: '[历史对话: 用户之前询问了3个其他订单的状态，以及退换货政策]',
-      afterText: '(无相关历史上下文)',
-      savings: 100,
-      details: ['当前查询与历史订单无关', '退换货政策与物流查询无关', '仅保留当前订单相关上下文'],
-      detailsEn: ['Current query unrelated to history', 'Return policy irrelevant to shipping', 'Keep only current order context'],
-    },
-    {
-      name: '输出约束',
-      nameEn: 'Output Constraint',
-      description: '控制输出长度和格式',
-      descriptionEn: 'Control output length and format',
-      icon: CheckCircle2,
-      beforeTokens: 423,
-      afterTokens: 198,
-      beforeText: '您好，感谢您联系我们。关于您提到的订单问题，我已经查询了您的订单记录。您的订单 #ORD-20260418 已于4月20日发货，预计4月23日送达。物流单号为 SF1234567890，您可以通过顺丰官网查询实时物流信息。如果超过预计送达时间仍未收到，请再次联系我们，我们会帮您跟进处理。祝您购物愉快！',
-      afterText: '订单 #ORD-20260418 | 状态: 已发货 | 发货: 4/20 | 预计: 4/23 | 物流: 顺丰 SF1234567890 | 查询: sf-express.com',
-      savings: 53,
-      details: ['移除问候语和结束语', '使用结构化格式替代自然语言', '删除重复信息（"联系我们"出现2次）', '将长句拆分为关键字段'],
-      detailsEn: ['Remove greetings and closings', 'Use structured format', 'Remove duplicate info', 'Split into key fields'],
-    },
-  ],
-  rag: [
-    {
-      name: '原始 Prompt',
-      nameEn: 'Original Prompt',
-      description: '用户输入的原始查询',
-      descriptionEn: 'User\'s original query',
-      icon: FileText,
-      beforeTokens: 18,
-      afterTokens: 18,
-      beforeText: 'AnyTokn 的计费方式是什么？',
-      afterText: 'AnyTokn 的计费方式是什么？',
-      savings: 0,
-      details: ['原始输入，未做处理'],
-      detailsEn: ['Original input, no processing'],
-    },
-    {
-      name: '检索结果去重',
-      nameEn: 'Deduplicate Retrieved Results',
-      description: '移除重复检索段落',
-      descriptionEn: 'Remove duplicate retrieved passages',
-      icon: Scissors,
-      beforeTokens: 2847,
-      afterTokens: 1423,
-      beforeText: '[5篇文档，包含重复的价格说明和计费示例]',
-      afterText: '[2篇文档，去重后保留核心计费信息]',
-      savings: 50,
-      details: ['文档1和文档3内容重复度85%', '移除示例中的重复计费说明', '仅保留最新版本的价格表'],
-      detailsEn: ['Doc 1 & 3 85% duplicate', 'Remove duplicate billing examples', 'Keep only latest price table'],
-    },
-    {
-      name: '上下文排序',
-      nameEn: 'Context Ranking',
-      description: '按相关性排序，保留Top-K',
-      descriptionEn: 'Rank by relevance, keep Top-K',
-      icon: Layers,
-      beforeTokens: 1423,
-      afterTokens: 568,
-      beforeText: '[按时间排序的2篇文档，包含大量无关的产品介绍]',
-      afterText: '[按相关性排序，仅保留计费相关段落]',
-      savings: 60,
-      details: ['产品介绍与计费问题无关', '按向量相似度重新排序', '仅保留与"计费"最相关的Top-3段落'],
-      detailsEn: ['Product intro irrelevant to billing', 'Re-rank by vector similarity', 'Keep only Top-3 relevant passages'],
-    },
-    {
-      name: '输出精简',
-      nameEn: 'Output Condensation',
-      description: '去除冗余引用，直接给出答案',
-      descriptionEn: 'Remove redundant quotes, direct answer',
-      icon: CheckCircle2,
-      beforeTokens: 567,
-      afterTokens: 189,
-      beforeText: '根据检索到的文档内容，AnyTokn 的计费方式采用按量计费模式。具体来说，系统会根据您实际使用的 token 数量进行计费，包括输入 token 和输出 token。输入 token 的价格为每 1K token $0.0015，输出 token 的价格为每 1K token $0.002。',
-      afterText: 'AnyTokn 按量计费：输入 $0.0015/1K token，输出 $0.002/1K token。',
-      savings: 67,
-      details: ['移除"根据检索到的文档内容"等过渡句', '删除重复的价格单位说明', '使用表格化表达替代自然语言'],
-      detailsEn: ['Remove transition sentences', 'Remove duplicate price units', 'Use tabular expression'],
-    },
-  ],
-  agent: [
-    {
-      name: '原始 Prompt',
-      nameEn: 'Original Prompt',
-      description: '用户输入的原始查询',
-      descriptionEn: 'User\'s original query',
-      icon: FileText,
       beforeTokens: 28,
-      afterTokens: 28,
-      beforeText: '对比方案A、B、C的优缺点并给出建议',
-      afterText: '对比方案A、B、C的优缺点并给出建议',
-      savings: 0,
-      details: ['原始输入，未做处理'],
-      detailsEn: ['Original input, no processing'],
+      afterTokens: 18,
+      beforeText: 'Customer inquiry: "I haven\'t received my order #ORD-20260418 yet. Can you check the status?"',
+      afterText: 'Order status check: #ORD-20260418',
+      techniques: ['移除礼貌用语和冗余从句', '提取关键实体（订单号）', '将问句转为指令式表达'],
+      techniquesEn: ['Remove polite phrases and redundant clauses', 'Extract key entities (order ID)', 'Convert question to imperative'],
+      impact: 'medium',
     },
     {
-      name: '多轮历史裁剪',
-      nameEn: 'Multi-turn History Pruning',
-      description: '移除已解决的历史对话',
-      descriptionEn: 'Remove resolved conversation history',
-      icon: Scissors,
-      beforeTokens: 1245,
-      afterTokens: 312,
-      beforeText: '[历史5轮对话：用户之前询问了方案A的详细架构、方案B的成本估算、方案C的技术栈，均已回答]',
-      afterText: '[保留当前轮次：仅需对比三个方案]',
-      savings: 75,
-      details: ['历史5轮对话与当前对比任务无关', '已回答的问题无需重复携带', '仅保留当前轮次的对比指令'],
-      detailsEn: ['Previous 5 turns irrelevant', 'Answered questions need not repeat', 'Keep only current comparison'],
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'System Instruction Optimization',
+      titleEn: 'System Instruction Optimization',
+      description: '精简系统角色设定，去除冗余约束',
+      descriptionEn: 'Streamline system role, remove redundant constraints',
+      icon: Target,
+      beforeTokens: 245,
+      afterTokens: 78,
+      beforeText: 'You are a helpful customer support assistant. You should be polite, professional, and thorough. Provide detailed information about shipping status, including carrier details, tracking numbers, estimated delivery dates, and any delays. If the issue is complex, escalate to human support. Always end with a friendly closing.',
+      afterText: 'Support agent: Provide shipping status (carrier, tracking, ETA). Escalate if needed.',
+      techniques: ['移除角色描述中的形容词堆砌', '删除超出当前任务范围的兜底话术', '将长句改为结构化关键词列表'],
+      techniquesEn: ['Remove adjective stacking in role description', 'Delete fallback phrases beyond current task', 'Convert long sentences to structured keywords'],
+      impact: 'high',
     },
     {
-      name: '结构化输出',
-      nameEn: 'Structured Output',
-      description: '强制结构化格式，减少冗余',
-      descriptionEn: 'Enforce structured format, reduce redundancy',
-      icon: CheckCircle2,
-      beforeTokens: 612,
-      afterTokens: 298,
-      beforeText: '好的，我来帮您分析一下这三个方案的对比。首先是方案A，它的优势在于部署简单，维护成本低，但是扩展性有限。方案B的优势是扩展性好，支持高并发，但是初期投入较高...',
-      afterText: '| 方案 | 优势 | 劣势 | 适用场景 |\n| A | 部署简单、成本低 | 扩展有限 | 小规模 |\n| B | 扩展好、高并发 | 投入高、复杂 | 快速增长 |\n| C | 折中兼顾 | 极端场景弱 | 中等规模 |',
-      savings: 51,
-      details: ['移除过渡句"好的，我来帮您分析"', '使用Markdown表格替代自然语言', '删除重复的主语"方案X的优势/劣势"'],
-      detailsEn: ['Remove filler sentences', 'Use Markdown table', 'Remove repeated subjects'],
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'Conversation History Pruning',
+      titleEn: 'Conversation History Pruning',
+      description: '裁剪无关历史对话，保留相关上下文',
+      descriptionEn: 'Prune irrelevant history, retain relevant context',
+      icon: Filter,
+      beforeTokens: 892,
+      afterTokens: 0,
+      beforeText: '[Previous 8 turns: User asked about return policy, refund process, shipping methods, product specifications, warranty info, account settings, password reset, and previous order #ORD-20260315]',
+      afterText: '(No relevant conversation history for current query)',
+      techniques: ['识别当前查询与历史对话的关联度', '移除已解决话题的完整对话记录', '仅保留与当前订单相关的上下文片段'],
+      techniquesEn: ['Identify relevance between current query and history', 'Remove resolved topic conversations', 'Retain only context related to current order'],
+      impact: 'critical',
+    },
+    {
+      phase: 'Output Layer',
+      phaseEn: 'Output Layer',
+      title: 'Response Format Optimization',
+      titleEn: 'Response Format Optimization',
+      description: '结构化输出，去除冗余表达',
+      descriptionEn: 'Structured output, remove redundant expressions',
+      icon: Gauge,
+      beforeTokens: 312,
+      afterTokens: 89,
+      beforeText: 'Hello! Thank you for reaching out to us. I understand your concern about order #ORD-20260418. I have checked our system and found that your order was shipped on April 20th via SF Express. The tracking number is SF1234567890. Based on our estimates, it should arrive by April 23rd. You can track the real-time status on the SF Express website. If you do not receive it by the estimated date, please contact us again and we will be happy to assist you further. We appreciate your patience and understanding. Have a great day!',
+      afterText: 'Order #ORD-20260418 | Status: Shipped | Carrier: SF Express | Tracking: SF1234567890 | ETA: Apr 23 | Track: sf-express.com | Contact us if not received by ETA.',
+      techniques: ['移除问候语和结束语', '使用结构化格式替代自然语言段落', '删除重复信息（多次出现"contact us"）', '将长句拆分为关键字段'],
+      techniquesEn: ['Remove greetings and closings', 'Use structured format instead of natural language', 'Remove duplicate info (multiple "contact us")', 'Split long sentences into key fields'],
+      impact: 'high',
     },
   ],
-  summary: [
+  'rag-knowledge': [
     {
-      name: '原始 Prompt',
-      nameEn: 'Original Prompt',
-      description: '用户输入的原始查询',
-      descriptionEn: 'User\'s original query',
-      icon: FileText,
-      beforeTokens: 22,
-      afterTokens: 22,
-      beforeText: '总结这篇关于AI成本管理的文章',
-      afterText: '总结这篇关于AI成本管理的文章',
-      savings: 0,
-      details: ['原始输入，未做处理'],
-      detailsEn: ['Original input, no processing'],
-    },
-    {
-      name: '文档预处理',
-      nameEn: 'Document Preprocessing',
-      description: '去除无关段落，保留核心论点',
-      descriptionEn: 'Remove irrelevant passages, keep core arguments',
+      phase: 'Input Layer',
+      phaseEn: 'Input Layer',
+      title: 'Query Refinement',
+      titleEn: 'Query Refinement',
+      description: '优化查询表达，提升检索精度',
+      descriptionEn: 'Optimize query expression, improve retrieval precision',
       icon: Scissors,
-      beforeTokens: 5234,
-      afterTokens: 2891,
-      beforeText: '[完整文档：包含引言、背景介绍、3个案例研究、未来展望、参考文献]',
-      afterText: '[精简文档：去除引言和参考文献，保留核心论点和1个关键案例]',
-      savings: 45,
-      details: ['引言部分与总结目的无关', '3个案例中选择最具代表性的1个', '参考文献不影响摘要质量'],
-      detailsEn: ['Intro irrelevant to summary', 'Select 1 representative case', 'References don\'t affect summary'],
+      beforeTokens: 22,
+      afterTokens: 16,
+      beforeText: 'What are the pricing tiers for enterprise API access and volume discounts?',
+      afterText: 'Enterprise API pricing tiers & volume discounts',
+      techniques: ['移除疑问词，转为关键词检索', '提取核心实体（pricing, enterprise, volume discounts）', '使用符号连接提升检索匹配度'],
+      techniquesEn: ['Remove question words, convert to keywords', 'Extract core entities', 'Use symbols to improve retrieval matching'],
+      impact: 'medium',
     },
     {
-      name: '摘要输出优化',
-      nameEn: 'Summary Output Optimization',
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'Retrieval Deduplication',
+      titleEn: 'Retrieval Deduplication',
+      description: '去重检索结果，移除重复段落',
+      descriptionEn: 'Deduplicate retrieval results, remove duplicate passages',
+      icon: Filter,
+      beforeTokens: 3847,
+      afterTokens: 1245,
+      beforeText: '[Retrieved 8 documents: Pricing v1.0 (85% overlap with v2.0), Pricing v2.0 (current), FAQ (repeated pricing table), Blog post (same content as docs), Case study (irrelevant), API reference (partial overlap), Terms of service (no pricing), Changelog (minor updates)]',
+      afterText: '[Retrieved 2 documents: Pricing v2.0 (current), API reference (complementary)]',
+      techniques: ['计算文档间相似度，移除重复度>80%的文档', '优先保留最新版本文档', '移除与查询无关的文档类型（Case study, Terms）'],
+      techniquesEn: ['Calculate document similarity, remove duplicates >80%', 'Prioritize latest version documents', 'Remove irrelevant document types'],
+      impact: 'critical',
+    },
+    {
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'Context Ranking & Trimming',
+      titleEn: 'Context Ranking & Trimming',
+      description: '按相关性排序，保留Top-K段落',
+      descriptionEn: 'Rank by relevance, retain Top-K passages',
+      icon: Target,
+      beforeTokens: 1245,
+      afterTokens: 423,
+      beforeText: '[Full documents with introduction, background, examples, edge cases, implementation details, migration guides, all pricing tables]',
+      afterText: '[Top-3 relevant passages: Enterprise tier definition, Volume discount matrix, API call pricing formula]',
+      techniques: ['按向量相似度重新排序段落', '移除与查询无关的章节（背景介绍、迁移指南）', '仅保留Top-3最相关段落'],
+      techniquesEn: ['Re-rank passages by vector similarity', 'Remove irrelevant sections', 'Retain only Top-3 most relevant passages'],
+      impact: 'high',
+    },
+    {
+      phase: 'Output Layer',
+      phaseEn: 'Output Layer',
+      title: 'Answer Condensation',
+      titleEn: 'Answer Condensation',
+      description: '精简回答，去除冗余引用',
+      descriptionEn: 'Condense answer, remove redundant citations',
+      icon: Gauge,
+      beforeTokens: 445,
+      afterTokens: 156,
+      beforeText: 'Based on the retrieved documentation, AnyTokn offers three pricing tiers for enterprise customers. The Starter tier begins at $499/month for up to 1M tokens. The Growth tier is $1,499/month for up to 5M tokens. The Enterprise tier offers custom pricing for unlimited usage. Volume discounts are available starting at 10M tokens/month, with a 15% discount at 50M tokens and 25% discount at 100M tokens.',
+      afterText: '| Tier | Price | Tokens |\n| Starter | $499/mo | 1M |\n| Growth | $1,499/mo | 5M |\n| Enterprise | Custom | Unlimited |\n\nVolume Discounts: 10M+ → 15% off | 50M+ → 25% off',
+      techniques: ['移除"Based on retrieved documentation"等过渡句', '使用Markdown表格替代自然语言描述', '删除重复的价格单位说明'],
+      techniquesEn: ['Remove transition sentences', 'Use Markdown tables instead of natural language', 'Remove duplicate price unit descriptions'],
+      impact: 'high',
+    },
+  ],
+  'agent-workflow': [
+    {
+      phase: 'Input Layer',
+      phaseEn: 'Input Layer',
+      title: 'Task Decomposition',
+      titleEn: 'Task Decomposition',
+      description: '分解复杂任务，提取子任务',
+      descriptionEn: 'Decompose complex task, extract subtasks',
+      icon: Scissors,
+      beforeTokens: 34,
+      afterTokens: 28,
+      beforeText: 'Compare cloud providers AWS, GCP, Azure for ML workloads and recommend the best option',
+      afterText: 'ML workload comparison: AWS vs GCP vs Azure → recommendation',
+      techniques: ['提取核心动词（Compare, recommend）', '识别比较对象（AWS, GCP, Azure）', '明确任务目标（recommendation）'],
+      techniquesEn: ['Extract core verbs', 'Identify comparison targets', 'Clarify task objective'],
+      impact: 'low',
+    },
+    {
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'Multi-turn History Compression',
+      titleEn: 'Multi-turn History Compression',
+      description: '压缩多轮历史，移除已解决内容',
+      descriptionEn: 'Compress multi-turn history, remove resolved content',
+      icon: Filter,
+      beforeTokens: 2156,
+      afterTokens: 534,
+      beforeText: '[Previous 6 turns: User asked about AWS pricing, GCP GPU availability, Azure ML Studio features, networking costs, storage options, and support response times. All questions were answered in detail.]',
+      afterText: '[Compressed history: AWS pricing (answered), GCP GPU (answered), Azure ML (answered), networking (answered), storage (answered), support (answered)]',
+      techniques: ['将已回答的问题压缩为摘要标记', '移除完整的回答内容，仅保留结论', '保留未解决或待跟进的问题'],
+      techniquesEn: ['Compress answered questions to summary markers', 'Remove full answers, retain conclusions only', 'Retain unresolved or pending issues'],
+      impact: 'critical',
+    },
+    {
+      phase: 'Output Layer',
+      phaseEn: 'Output Layer',
+      title: 'Structured Reasoning Output',
+      titleEn: 'Structured Reasoning Output',
+      description: '结构化推理输出，减少冗余',
+      descriptionEn: 'Structured reasoning output, reduce redundancy',
+      icon: Gauge,
+      beforeTokens: 678,
+      afterTokens: 298,
+      beforeText: 'Let me analyze these three cloud providers for ML workloads. First, AWS offers the most mature ecosystem with SageMaker, but can be complex to configure. GCP provides excellent TensorFlow integration and TPU access, which is great for deep learning. Azure has strong enterprise integration and good Windows support. For most ML workloads, I recommend GCP due to its superior AI/ML tooling and cost-effectiveness for training jobs. However, if you need enterprise features, Azure might be better. AWS is best if you need the broadest service ecosystem.',
+      afterText: '| Provider | Strengths | Weaknesses | Best For |\n| AWS | Broad ecosystem, SageMaker | Complex, expensive | General ML, enterprise |\n| GCP | TPU access, TF integration | Smaller ecosystem | Deep learning, training |\n| Azure | Enterprise integration | Limited Linux tooling | Windows shops, corporate |\n\n**Recommendation**: GCP for deep learning, Azure for enterprise, AWS for breadth.',
+      techniques: ['移除过渡句（"Let me analyze", "First"）', '使用Markdown表格替代自然语言段落', '删除重复的主语和连接词'],
+      techniquesEn: ['Remove transition sentences', 'Use Markdown tables', 'Remove repeated subjects and conjunctions'],
+      impact: 'high',
+    },
+  ],
+  'content-generation': [
+    {
+      phase: 'Input Layer',
+      phaseEn: 'Input Layer',
+      title: 'Document Preprocessing',
+      titleEn: 'Document Preprocessing',
+      description: '预处理文档，提取核心内容',
+      descriptionEn: 'Preprocess document, extract core content',
+      icon: Scissors,
+      beforeTokens: 48,
+      afterTokens: 32,
+      beforeText: 'Generate a technical summary of the attached 50-page research paper on transformer architecture optimizations',
+      afterText: 'Summarize: Transformer architecture optimizations (50pp paper)',
+      techniques: ['提取核心任务（Summarize）', '识别文档类型和主题', '移除冗余修饰词'],
+      techniquesEn: ['Extract core task', 'Identify document type and topic', 'Remove redundant modifiers'],
+      impact: 'low',
+    },
+    {
+      phase: 'Context Layer',
+      phaseEn: 'Context Layer',
+      title: 'Content Extraction & Filtering',
+      titleEn: 'Content Extraction & Filtering',
+      description: '提取关键章节，过滤无关内容',
+      descriptionEn: 'Extract key sections, filter irrelevant content',
+      icon: Filter,
+      beforeTokens: 12456,
+      afterTokens: 4234,
+      beforeText: '[Full 50-page paper: Abstract, Introduction, Related Work, Methodology (detailed), Experiments (all tables), Results (all figures), Discussion, Future Work, References (200 entries)]',
+      afterText: '[Extracted: Abstract, Methodology (key algorithms), Results (main findings), Conclusion]',
+      techniques: ['识别关键章节（Abstract, Methodology, Results）', '移除参考文献和附录', '过滤实验细节，保留核心发现'],
+      techniquesEn: ['Identify key sections', 'Remove references and appendices', 'Filter experiment details, retain core findings'],
+      impact: 'critical',
+    },
+    {
+      phase: 'Output Layer',
+      phaseEn: 'Output Layer',
+      title: 'Summary Structuring',
+      titleEn: 'Summary Structuring',
       description: '结构化摘要，避免逐段复述',
-      descriptionEn: 'Structured summary, avoid paragraph-by-paragraph restating',
-      icon: CheckCircle2,
-      beforeTokens: 1247,
-      afterTokens: 684,
-      beforeText: '本文主要讨论了人工智能在企业成本管理中的应用。文章首先介绍了传统成本管理面临的挑战，包括数据分散、实时性不足和预测能力有限等问题。随后...',
-      afterText: '本文探讨 AI 在企业成本管理中的应用：1）传统成本管理面临数据分散、实时性不足、预测能力有限等挑战；2）AI 通过自动数据采集、实时监控、智能预测改善这些问题；3）在 API 成本管理领域，token 优化、智能路由、预算预警可降低 30-50% 调用成本；4）实际案例验证了不同规模企业的成本节约效果；5）未来趋势是更精细的优化策略和更智能的自动化决策。',
-      savings: 45,
-      details: ['使用编号列表替代自然语言段落', '删除过渡词"首先"、"随后"、"最后"', '每个论点保留核心动词和名词'],
-      detailsEn: ['Use numbered list', 'Remove transition words', 'Keep core verbs and nouns'],
+      descriptionEn: 'Structure summary, avoid paragraph-by-paragraph restating',
+      icon: Gauge,
+      beforeTokens: 1567,
+      afterTokens: 534,
+      beforeText: 'This paper presents several optimizations for transformer architectures. The authors first introduce the motivation behind their work, explaining that current transformers suffer from high computational costs. They then propose a novel attention mechanism that reduces complexity from O(n²) to O(n log n). The experimental results show significant improvements in training speed without sacrificing accuracy. The paper concludes with a discussion of limitations and future directions.',
+      afterText: '**Key Contributions:**\n1. Novel attention mechanism: O(n²) → O(n log n)\n2. Training speed: +40% improvement\n3. Accuracy: Maintained (±0.2%)\n4. Applicable to: BERT, GPT, T5 variants\n\n**Method:** Sparse attention pattern + gradient checkpointing\n\n**Results:** Tested on GLUE, WMT, WikiText benchmarks',
+      techniques: ['使用结构化标题替代自然语言段落', '提取关键数字和指标', '删除背景介绍和过渡句'],
+      techniquesEn: ['Use structured headings', 'Extract key numbers and metrics', 'Remove background and transitions'],
+      impact: 'high',
     },
   ],
 };
 
-function countTokens(text: string): number {
-  return Math.round(text.length * 0.6 + Math.random() * 50);
-}
-
+// ==================== 组件 ====================
 export default function Demo() {
   const { lang } = useLanguage();
   const isEn = lang === 'en';
 
-  const [userInput, setUserInput] = useState('');
+  const [selectedScenario, setSelectedScenario] = useState<string>('');
   const [isRunning, setIsRunning] = useState(false);
   const [hasResult, setHasResult] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<string>('');
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
-  const [activeTab, setActiveTab] = useState<'pipeline' | 'comparison' | 'projection'>('pipeline');
+  const [activeTab, setActiveTab] = useState<'pipeline' | 'metrics' | 'projection'>('pipeline');
+
+  const handleScenarioSelect = useCallback((scenarioId: string) => {
+    setSelectedScenario(scenarioId);
+    setHasResult(false);
+  }, []);
 
   const handleRun = useCallback(() => {
-    if (!userInput.trim()) return;
+    if (!selectedScenario) return;
     setIsRunning(true);
     setHasResult(false);
-    
-    const preset = PRESET_PROMPTS.find(p => p.zh === userInput || p.en === userInput);
-    setSelectedPreset(preset?.id || '');
-    
     setTimeout(() => {
       setIsRunning(false);
       setHasResult(true);
-      setExpandedSteps(new Set([0, 1, 2, 3, 4]));
-    }, 1500);
-  }, [userInput]);
-
-  const handlePreset = (preset: (typeof PRESET_PROMPTS)[0]) => {
-    setUserInput(isEn ? preset.en : preset.zh);
-    setHasResult(false);
-  };
+      setExpandedSteps(new Set([0, 1, 2, 3]));
+    }, 1800);
+  }, [selectedScenario]);
 
   const toggleStep = (index: number) => {
     setExpandedSteps(prev => {
@@ -302,19 +348,39 @@ export default function Demo() {
     });
   };
 
-  const steps = selectedPreset ? OPTIMIZATION_STEPS[selectedPreset] || [] : [];
+  const steps = selectedScenario ? OPTIMIZATION_PIPELINE[selectedScenario] || [] : [];
   
   const totalBefore = steps.reduce((sum, s) => sum + s.beforeTokens, 0);
   const totalAfter = steps.reduce((sum, s) => sum + s.afterTokens, 0);
   const totalSavings = totalBefore > 0 ? Math.round((1 - totalAfter / totalBefore) * 100) : 0;
+  const totalSaved = totalBefore - totalAfter;
 
   const chartData = steps.map((s, i) => ({
-    step: i + 1,
-    name: isEn ? s.nameEn : s.name,
+    name: isEn ? s.titleEn : s.title,
     before: s.beforeTokens,
     after: s.afterTokens,
     saved: s.beforeTokens - s.afterTokens,
   }));
+
+  const currentScenario = PRESET_SCENARIOS.find(s => s.id === selectedScenario);
+
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'critical': return 'bg-red-50 text-red-700 border-red-200';
+      case 'high': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'medium': return 'bg-blue-50 text-blue-700 border-blue-200';
+      default: return 'bg-neutral-50 text-neutral-600 border-neutral-200';
+    }
+  };
+
+  const getImpactLabel = (impact: string) => {
+    switch (impact) {
+      case 'critical': return isEn ? 'Critical' : '关键';
+      case 'high': return isEn ? 'High' : '高';
+      case 'medium': return isEn ? 'Medium' : '中';
+      default: return isEn ? 'Low' : '低';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -339,56 +405,72 @@ export default function Demo() {
         <div className="max-w-5xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-700 text-xs font-semibold rounded-full border border-neutral-200 mb-6">
             <Zap className="w-3.5 h-3.5" />
-            {isEn ? 'Step-by-Step Optimization Pipeline' : '逐层优化流水线'}
+            {isEn ? 'Token Optimization Engine' : 'Token 优化引擎'}
           </div>
           <h1 className="heading-hero mb-4">
-            {isEn ? 'See every optimization step' : '看清每一步优化'}
+            {isEn ? 'See exactly where tokens are saved' : '看清 Token 在哪里被节省'}
           </h1>
-          <p className="body-text max-w-2xl mb-8 text-base">
+          <p className="body-text max-w-2xl mb-8 text-base text-neutral-600">
             {isEn
-              ? 'Not just before/after. See exactly how each optimization layer reduces tokens, with real text comparisons.'
-              : '不只是前后对比。看清每一层优化如何减少 token，附带真实文本对比。'}
+              ? 'Select a scenario to see the complete optimization pipeline. Every layer, every technique, every token saved — visualized.'
+              : '选择场景查看完整优化流水线。每一层、每种技术、每个节省的 Token —— 可视化呈现。'}
           </p>
         </div>
       </section>
 
-      {/* Input Area */}
+      {/* Scenario Selection */}
       <section className="px-4 pb-8">
         <div className="max-w-5xl mx-auto">
-          <div className="card">
-            <div className="card-header flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-neutral-500" />
-                <span className="text-sm font-semibold text-neutral-800">{isEn ? 'Your Prompt' : '你的 Prompt'}</span>
-              </div>
-              <span className="text-xs text-neutral-400">{isEn ? 'Choose a preset to see step-by-step optimization' : '选择预设查看逐层优化'}</span>
-            </div>
-            <div className="card-body">
-              <textarea
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder={isEn ? 'Type your prompt here...' : '在这里输入你的 prompt...'}
-                className="input-field w-full h-28 resize-none"
-              />
-              <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
-                <div className="flex flex-wrap gap-2">
-                  {PRESET_PROMPTS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => handlePreset(preset)}
-                      className="px-3 py-1.5 text-xs font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-lg transition-colors"
-                    >
-                      {isEn ? preset.en.slice(0, 35) + '...' : preset.zh.slice(0, 18) + '...'}
-                    </button>
-                  ))}
-                </div>
-                <button onClick={handleRun} disabled={!userInput.trim() || isRunning} className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                  {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  {isRunning ? (isEn ? 'Analyzing...' : '分析中...') : (isEn ? 'Show Optimization Steps' : '显示优化步骤')}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {PRESET_SCENARIOS.map((scenario) => {
+              const Icon = scenario.icon;
+              const isSelected = selectedScenario === scenario.id;
+              return (
+                <button
+                  key={scenario.id}
+                  onClick={() => handleScenarioSelect(scenario.id)}
+                  className={`card p-5 text-left transition-all ${
+                    isSelected 
+                      ? 'ring-2 ring-black border-black' 
+                      : 'hover:border-neutral-300'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isSelected ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600'
+                    }`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-neutral-900">{isEn ? scenario.category : scenario.categoryZh}</h3>
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-black" />}
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-1">{isEn ? scenario.description : scenario.descriptionZh}</p>
+                      <p className="text-xs text-neutral-400 mt-2 font-mono">{isEn ? scenario.prompt.slice(0, 60) + '...' : scenario.promptZh.slice(0, 40) + '...'}</p>
+                    </div>
+                  </div>
                 </button>
-              </div>
-            </div>
+              );
+            })}
           </div>
+
+          {selectedScenario && (
+            <div className="mt-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-neutral-500">{isEn ? 'Selected:' : '已选择：'}</span>
+                <span className="text-sm font-medium text-neutral-900">{isEn ? currentScenario?.category : currentScenario?.categoryZh}</span>
+              </div>
+              <button 
+                onClick={handleRun} 
+                disabled={isRunning}
+                className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
+              >
+                {isRunning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                {isRunning ? (isEn ? 'Processing...' : '处理中...') : (isEn ? 'Run Optimization Pipeline' : '运行优化流水线')}
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -396,15 +478,16 @@ export default function Demo() {
       {isRunning && (
         <section className="px-4 pb-8">
           <div className="max-w-5xl mx-auto">
-            <div className="card p-12 text-center">
-              <Loader2 className="w-8 h-8 text-black animate-spin mx-auto mb-4" />
-              <p className="text-sm text-neutral-600">{isEn ? 'Running optimization pipeline...' : '运行优化流水线...'}</p>
-              <div className="flex items-center justify-center gap-4 mt-4 text-xs text-neutral-400">
-                <span>Prompt Compression</span>
-                <ChevronRight className="w-3 h-3" />
-                <span>Context Trimming</span>
-                <ChevronRight className="w-3 h-3" />
-                <span>Output Optimization</span>
+            <div className="card p-12">
+              <div className="flex items-center justify-center gap-8">
+                {['Input', 'Context', 'Output'].map((phase, i) => (
+                  <div key={phase} className="text-center">
+                    <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-2 animate-pulse">
+                      <span className="text-xs font-bold text-neutral-500">{phase}</span>
+                    </div>
+                    <p className="text-xs text-neutral-400">{isEn ? `Optimizing ${phase} Layer...` : `优化${phase}层...`}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -416,34 +499,34 @@ export default function Demo() {
         <section className="px-4 pb-16">
           <div className="max-w-5xl mx-auto space-y-6">
             {/* Summary Banner */}
-            <div className="card bg-gradient-to-r from-neutral-900 to-neutral-800 text-white">
+            <div className="card bg-black text-white">
               <div className="card-body">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                   <div>
-                    <p className="text-3xl font-bold">{totalBefore.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{totalBefore.toLocaleString()}</p>
                     <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Original Tokens' : '原始 Token'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-emerald-400">{totalAfter.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-emerald-400">{totalAfter.toLocaleString()}</p>
                     <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Optimized Tokens' : '优化后 Token'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-emerald-400">{totalSavings}%</p>
-                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Total Savings' : '总节省'}</p>
+                    <p className="text-2xl font-bold text-emerald-400">{totalSavings}%</p>
+                    <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Reduction' : '减少比例'}</p>
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-emerald-400">{(totalBefore - totalAfter).toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-emerald-400">{totalSaved.toLocaleString()}</p>
                     <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Tokens Saved' : '节省 Token'}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Tab Navigation */}
+            {/* Tabs */}
             <div className="flex items-center gap-2 border-b border-neutral-200">
               {[
                 { id: 'pipeline' as const, label: isEn ? 'Optimization Pipeline' : '优化流水线', icon: Layers },
-                { id: 'comparison' as const, label: isEn ? 'Visual Comparison' : '可视化对比', icon: BarChart3 },
+                { id: 'metrics' as const, label: isEn ? 'Metrics Analysis' : '指标分析', icon: BarChart3 },
                 { id: 'projection' as const, label: isEn ? 'Cost Projection' : '成本预估', icon: DollarSign },
               ].map((tab) => (
                 <button
@@ -467,41 +550,39 @@ export default function Demo() {
                 {steps.map((step, index) => {
                   const Icon = step.icon;
                   const isExpanded = expandedSteps.has(index);
-                  const isLast = index === steps.length - 1;
+                  const savings = step.beforeTokens > 0 ? Math.round((1 - step.afterTokens / step.beforeTokens) * 100) : 0;
                   
                   return (
-                    <div key={index} className="card">
+                    <div key={index} className="card overflow-hidden">
                       {/* Step Header */}
                       <div 
                         className="card-header flex items-center justify-between cursor-pointer hover:bg-neutral-50/50 transition-colors"
                         onClick={() => toggleStep(index)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
-                            <Icon className="w-4 h-4 text-neutral-600" />
+                        <div className="flex items-center gap-4">
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-[10px] font-medium text-neutral-400 uppercase">{isEn ? step.phaseEn : step.phase}</span>
+                            <div className="w-8 h-8 bg-neutral-100 rounded-lg flex items-center justify-center">
+                              <Icon className="w-4 h-4 text-neutral-600" />
+                            </div>
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-neutral-800">{isEn ? step.nameEn : step.name}</span>
-                              <span className="text-xs text-neutral-400">{isEn ? step.descriptionEn : step.description}</span>
+                              <span className="text-sm font-semibold text-neutral-900">{isEn ? step.titleEn : step.title}</span>
+                              <span className={`text-[10px] px-2 py-0.5 rounded border ${getImpactColor(step.impact)}`}>
+                                {getImpactLabel(step.impact)}
+                              </span>
                             </div>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-xs text-neutral-500">{step.beforeTokens.toLocaleString()} → {step.afterTokens.toLocaleString()} tokens</span>
-                              {step.savings > 0 && (
-                                <span className="text-xs font-semibold text-emerald-600">-{step.savings}%</span>
-                              )}
-                              {step.savings === 0 && (
-                                <span className="text-xs text-neutral-400">{isEn ? 'No change' : '无变化'}</span>
-                              )}
-                            </div>
+                            <p className="text-xs text-neutral-500 mt-0.5">{isEn ? step.descriptionEn : step.description}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {step.savings > 0 && (
-                            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
-                              -{step.savings}%
-                            </span>
-                          )}
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <p className="text-xs text-neutral-500">{step.beforeTokens.toLocaleString()} → {step.afterTokens.toLocaleString()}</p>
+                            {savings > 0 && (
+                              <p className="text-xs font-bold text-emerald-600">-{savings}%</p>
+                            )}
+                          </div>
                           {isExpanded ? <Minus className="w-4 h-4 text-neutral-400" /> : <Plus className="w-4 h-4 text-neutral-400" />}
                         </div>
                       </div>
@@ -514,11 +595,11 @@ export default function Demo() {
                             <div>
                               <div className="flex items-center gap-2 mb-2">
                                 <X className="w-3 h-3 text-red-500" />
-                                <span className="text-xs font-medium text-red-600">{isEn ? 'Before' : '优化前'}</span>
-                                <span className="text-xs text-neutral-400">({step.beforeTokens} tokens)</span>
+                                <span className="text-xs font-medium text-red-600">{isEn ? 'Before Optimization' : '优化前'}</span>
+                                <span className="text-xs text-neutral-400">{step.beforeTokens.toLocaleString()} tokens</span>
                               </div>
                               <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-                                <p className="text-sm text-neutral-700 leading-relaxed">{step.beforeText}</p>
+                                <p className="text-sm text-neutral-700 leading-relaxed font-mono text-xs">{step.beforeText}</p>
                               </div>
                             </div>
 
@@ -526,29 +607,27 @@ export default function Demo() {
                             <div>
                               <div className="flex items-center gap-2 mb-2">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                                <span className="text-xs font-medium text-emerald-600">{isEn ? 'After' : '优化后'}</span>
-                                <span className="text-xs text-neutral-400">({step.afterTokens} tokens)</span>
+                                <span className="text-xs font-medium text-emerald-600">{isEn ? 'After Optimization' : '优化后'}</span>
+                                <span className="text-xs text-neutral-400">{step.afterTokens.toLocaleString()} tokens</span>
                               </div>
                               <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
-                                <p className="text-sm text-neutral-700 leading-relaxed">{step.afterText}</p>
+                                <p className="text-sm text-neutral-700 leading-relaxed font-mono text-xs">{step.afterText}</p>
                               </div>
                             </div>
                           </div>
 
-                          {/* Optimization Details */}
-                          {step.details.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-neutral-100">
-                              <p className="text-xs font-medium text-neutral-600 mb-2">{isEn ? 'What changed:' : '具体变化：'}</p>
-                              <div className="space-y-1">
-                                {(isEn ? step.detailsEn : step.details).map((detail, i) => (
-                                  <div key={i} className="flex items-start gap-2">
-                                    <ChevronRight className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
-                                    <span className="text-xs text-neutral-600">{detail}</span>
-                                  </div>
-                                ))}
-                              </div>
+                          {/* Techniques */}
+                          <div className="mt-4 pt-4 border-t border-neutral-100">
+                            <p className="text-xs font-semibold text-neutral-700 mb-2">{isEn ? 'Optimization Techniques:' : '优化技术：'}</p>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                              {(isEn ? step.techniquesEn : step.techniques).map((tech, i) => (
+                                <div key={i} className="flex items-start gap-2 p-2 bg-neutral-50 rounded-lg">
+                                  <ChevronRight className="w-3 h-3 text-emerald-500 mt-0.5 flex-shrink-0" />
+                                  <span className="text-xs text-neutral-600">{tech}</span>
+                                </div>
+                              ))}
                             </div>
-                          )}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -557,21 +636,24 @@ export default function Demo() {
               </div>
             )}
 
-            {/* Comparison Tab */}
-            {activeTab === 'comparison' && (
+            {/* Metrics Tab */}
+            {activeTab === 'metrics' && (
               <>
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Reduction per Step' : '每步 Token 减少量'}</h3>
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Token Reduction by Optimization Step' : '每步优化 Token 减少量'}</h3>
                   </div>
                   <div className="card-body">
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} barGap={4}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                          <XAxis dataKey="name" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={80} />
+                          <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={80} />
                           <YAxis tick={{ fontSize: 11 }} />
-                          <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
+                            formatter={(value: number) => value.toLocaleString()}
+                          />
                           <Bar dataKey="before" name={isEn ? 'Before' : '优化前'} fill="#fca5a5" radius={[4, 4, 0, 0]} />
                           <Bar dataKey="after" name={isEn ? 'After' : '优化后'} fill="#86efac" radius={[4, 4, 0, 0]} />
                         </BarChart>
@@ -585,7 +667,7 @@ export default function Demo() {
                     <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Cumulative Token Flow' : '累积 Token 流向'}</h3>
                   </div>
                   <div className="card-body">
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {steps.map((step, i) => {
                         const cumulativeBefore = steps.slice(0, i + 1).reduce((sum, s) => sum + s.beforeTokens, 0);
                         const cumulativeAfter = steps.slice(0, i + 1).reduce((sum, s) => sum + s.afterTokens, 0);
@@ -593,8 +675,8 @@ export default function Demo() {
                         
                         return (
                           <div key={i} className="flex items-center gap-3">
-                            <span className="text-xs text-neutral-500 w-24 truncate">{isEn ? step.nameEn : step.name}</span>
-                            <div className="flex-1 h-6 bg-red-100 rounded overflow-hidden relative">
+                            <span className="text-xs text-neutral-500 w-28 truncate">{isEn ? step.titleEn : step.title}</span>
+                            <div className="flex-1 h-8 bg-red-100 rounded overflow-hidden relative">
                               <div 
                                 className="h-full bg-emerald-400 rounded transition-all duration-700"
                                 style={{ width: `${widthPercent}%` }}
@@ -603,6 +685,9 @@ export default function Demo() {
                                 {cumulativeAfter.toLocaleString()} / {cumulativeBefore.toLocaleString()}
                               </span>
                             </div>
+                            <span className="text-xs text-emerald-600 font-medium w-12 text-right">
+                              -{Math.round((1 - cumulativeAfter / cumulativeBefore) * 100)}%
+                            </span>
                           </div>
                         );
                       })}
@@ -614,26 +699,52 @@ export default function Demo() {
 
             {/* Projection Tab */}
             {activeTab === 'projection' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="card bg-red-50 border-red-200">
-                  <div className="card-body text-center">
-                    <p className="text-xs text-red-600 mb-2">{isEn ? 'Without AnyTokn (1M calls)' : '不使用 AnyTokn（100万次调用）'}</p>
-                    <p className="text-3xl font-bold text-red-700">${(totalBefore * 0.000015 * 1000000).toFixed(0)}</p>
-                    <p className="text-xs text-red-500 mt-1">{totalBefore.toLocaleString()} tokens/call</p>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="card bg-red-50 border-red-200">
+                    <div className="card-body text-center">
+                      <p className="text-xs text-red-600 mb-2 font-medium">{isEn ? 'Without AnyTokn' : '不使用 AnyTokn'}</p>
+                      <p className="text-3xl font-bold text-red-700">${(totalBefore * 0.000015 * 1000000).toFixed(0)}</p>
+                      <p className="text-xs text-red-500 mt-1">{isEn ? 'per 1M calls' : '每百万次调用'}</p>
+                      <p className="text-xs text-red-400 mt-1">{totalBefore.toLocaleString()} tokens/call</p>
+                    </div>
+                  </div>
+                  <div className="card bg-emerald-50 border-emerald-200">
+                    <div className="card-body text-center">
+                      <p className="text-xs text-emerald-600 mb-2 font-medium">{isEn ? 'With AnyTokn' : '使用 AnyTokn'}</p>
+                      <p className="text-3xl font-bold text-emerald-700">${(totalAfter * 0.000015 * 1000000).toFixed(0)}</p>
+                      <p className="text-xs text-emerald-500 mt-1">{isEn ? 'per 1M calls' : '每百万次调用'}</p>
+                      <p className="text-xs text-emerald-400 mt-1">{totalAfter.toLocaleString()} tokens/call</p>
+                    </div>
+                  </div>
+                  <div className="card bg-blue-50 border-blue-200">
+                    <div className="card-body text-center">
+                      <p className="text-xs text-blue-600 mb-2 font-medium">{isEn ? 'Monthly Savings' : '月度节省'}</p>
+                      <p className="text-3xl font-bold text-blue-700">${((totalBefore - totalAfter) * 0.000015 * 1000000).toFixed(0)}</p>
+                      <p className="text-xs text-blue-500 mt-1">{totalSavings}% {isEn ? 'reduction' : '减少'}</p>
+                      <p className="text-xs text-blue-400 mt-1">{isEn ? 'at 1M calls/month' : '每月百万次调用'}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="card bg-emerald-50 border-emerald-200">
-                  <div className="card-body text-center">
-                    <p className="text-xs text-emerald-600 mb-2">{isEn ? 'With AnyTokn (1M calls)' : '使用 AnyTokn（100万次调用）'}</p>
-                    <p className="text-3xl font-bold text-emerald-700">${(totalAfter * 0.000015 * 1000000).toFixed(0)}</p>
-                    <p className="text-xs text-emerald-500 mt-1">{totalAfter.toLocaleString()} tokens/call</p>
+
+                <div className="card">
+                  <div className="card-header">
+                    <h3 className="text-sm font-semibold text-neutral-800">{isEn ? 'Break-even Analysis' : '盈亏平衡分析'}</h3>
                   </div>
-                </div>
-                <div className="card bg-blue-50 border-blue-200">
-                  <div className="card-body text-center">
-                    <p className="text-xs text-blue-600 mb-2">{isEn ? 'Your Savings (1M calls)' : '你的节省（100万次调用）'}</p>
-                    <p className="text-3xl font-bold text-blue-700">${((totalBefore - totalAfter) * 0.000015 * 1000000).toFixed(0)}</p>
-                    <p className="text-xs text-blue-500 mt-1">{totalSavings}% {isEn ? 'reduction' : '减少'}</p>
+                  <div className="card-body">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[
+                        { label: isEn ? 'Daily Calls' : '日调用量', value: '10,000' },
+                        { label: isEn ? 'Daily Savings' : '日节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 10000).toFixed(2)}` },
+                        { label: isEn ? 'Monthly Savings' : '月节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 300000).toFixed(0)}` },
+                        { label: isEn ? 'Annual Savings' : '年节省', value: `$${((totalBefore - totalAfter) * 0.000015 * 3600000).toFixed(0)}` },
+                      ].map((item, i) => (
+                        <div key={i} className="text-center p-3 bg-neutral-50 rounded-lg">
+                          <p className="text-xs text-neutral-500 mb-1">{item.label}</p>
+                          <p className="text-lg font-bold text-neutral-900">{item.value}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -645,14 +756,14 @@ export default function Demo() {
       {/* CTA */}
       <section className="py-16 px-4 bg-neutral-900">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'See the difference in every layer' : '看清每一层的差异'}</h2>
-          <p className="text-neutral-400 mb-8">{isEn ? 'AnyTokn optimizes at every step, not just the final output.' : 'AnyTokn 在每一步都进行优化，不只是最终输出。'}</p>
+          <h2 className="text-2xl font-bold text-white mb-4">{isEn ? 'Optimize every layer of your LLM pipeline' : '优化 LLM 流水线的每一层'}</h2>
+          <p className="text-neutral-400 mb-8">{isEn ? 'From input compression to output formatting, AnyTokn reduces tokens at every step.' : '从输入压缩到输出格式化，AnyTokn 在每一步都减少 Token。'}</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to="/login" className="btn-primary inline-flex items-center gap-2">
-              {isEn ? 'Create Free Account' : '创建免费账户'} <ArrowRight className="w-4 h-4" />
+              {isEn ? 'Start Optimizing' : '开始优化'} <ArrowRight className="w-4 h-4" />
             </Link>
             <Link to="/docs" className="btn-secondary inline-flex items-center gap-2">
-              {isEn ? 'View Documentation' : '查看文档'}
+              {isEn ? 'Read Documentation' : '阅读文档'}
             </Link>
           </div>
         </div>
