@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText, Store, Wallet, Globe, GitCommit
+  FileText, Store, Wallet, Globe, GitCommit, Play
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -167,6 +167,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </button>
           </div>
           <div className="flex items-center gap-3">
+            <a
+              href="/demo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              <span className="text-sm font-medium">{lang === 'zh' ? '演示' : 'Demo'}</span>
+            </a>
             <button
               className="p-2 rounded-lg hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}

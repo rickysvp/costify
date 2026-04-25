@@ -24,6 +24,7 @@ import Changelog from './pages/Changelog';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Contact from './pages/Contact';
+import Demo from './pages/Demo';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           <Route path="/users/:id" element={<ProtectedRoute><Layout><UserDetail /></Layout></ProtectedRoute>} />
           <Route path="/budget" element={<ProtectedRoute requireAdmin><Layout><BudgetManagement /></Layout></ProtectedRoute>} />
           <Route path="/changelog" element={<ProtectedRoute><Layout><Changelog /></Layout></ProtectedRoute>} />
+          <Route path="/demo" element={<Demo />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
