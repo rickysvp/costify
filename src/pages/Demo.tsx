@@ -3,9 +3,11 @@ import {
   Zap, ArrowRight, Scissors, CheckCircle2, 
   ChevronDown, ShieldCheck, DollarSign,
   BarChart3, Sparkles,
-  MessageSquare, Code2, Database, Settings2, Key
+  MessageSquare, Code2, Database, Settings2, Key,
+  Globe
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // ==================== AnyTokn Optimization Engine v6.0 ====================
 
@@ -172,6 +174,7 @@ What should we focus on next quarter?`,
 // ==================== Components ====================
 
 export default function Demo() {
+  const { lang, setLang, t } = useLanguage();
   const [selectedScenario, setSelectedScenario] = useState(DEMO_SCENARIOS[0]);
   const [systemPrompt, setSystemPrompt] = useState(DEMO_SCENARIOS[0].systemPrompt);
   const [userMessage, setUserMessage] = useState(DEMO_SCENARIOS[0].userMessage);
@@ -215,10 +218,17 @@ export default function Demo() {
             <span className="text-xs text-zinc-600 font-medium">Demo</span>
           </div>
           <div className="flex items-center gap-4">
-            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">Docs</button>
-            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">Pricing</button>
+            <button 
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors font-medium"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {lang === 'zh' ? 'EN' : '中文'}
+            </button>
+            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">{t.nav.docs}</button>
+            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">{t.nav.pricing}</button>
             <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">
-              Get Started
+              {t.nav.signup}
             </button>
           </div>
         </div>
@@ -230,7 +240,7 @@ export default function Demo() {
           <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <BarChart3 className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-zinc-500 font-medium">Tokens Saved</span>
+              <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '节省 Tokens' : 'Tokens Saved'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {originalTokens - optimizedTokens}
@@ -243,20 +253,20 @@ export default function Demo() {
           <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <Scissors className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-zinc-500 font-medium">Reduction</span>
+              <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '缩减率' : 'Reduction'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {totalSavings.toFixed(1)}%
             </div>
             <div className="text-xs text-zinc-500 font-medium mt-1">
-              of input tokens
+              {lang === 'zh' ? '输入 token' : 'of input tokens'}
             </div>
           </div>
           
           <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-zinc-500 font-medium">Cost Saved</span>
+              <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '节省成本' : 'Cost Saved'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {costSavings.toFixed(1)}%
@@ -269,20 +279,20 @@ export default function Demo() {
           <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-zinc-500 font-medium">Cached Tokens</span>
+              <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '缓存 Tokens' : 'Cached Tokens'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {Math.floor(optimizedTokens * 0.3)}
             </div>
             <div className="text-xs text-zinc-500 font-medium mt-1">
-              billed at 10%
+              {lang === 'zh' ? '按 10% 计费' : 'billed at 10%'}
             </div>
           </div>
         </div>
 
         {/* Scenario Selector */}
         <div className="flex items-center gap-3 mb-6">
-          <span className="text-xs text-zinc-500 font-medium">Demo Scenario</span>
+          <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '演示场景' : 'Demo Scenario'}</span>
           <div className="flex gap-2">
             {DEMO_SCENARIOS.map(scenario => (
               <button
@@ -308,7 +318,7 @@ export default function Demo() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-orange-400" />
-                <span className="text-xs text-zinc-500 font-medium">Before · Original</span>
+                <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '优化前 · 原始' : 'Before · Original'}</span>
               </div>
               <span className="text-xs text-zinc-600 font-mono">{originalTokens} tok</span>
             </div>
@@ -322,7 +332,7 @@ export default function Demo() {
                     activeTab === 'system' ? 'text-white bg-zinc-800/30' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
-                  System Prompt
+                  {lang === 'zh' ? '系统提示词' : 'System Prompt'}
                 </button>
                 <button
                   onClick={() => setActiveTab('user')}
@@ -330,7 +340,7 @@ export default function Demo() {
                     activeTab === 'user' ? 'text-white bg-zinc-800/30' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
-                  User Message
+                  {lang === 'zh' ? '用户消息' : 'User Message'}
                 </button>
               </div>
 
@@ -360,7 +370,7 @@ export default function Demo() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span className="text-xs text-emerald-400 font-medium">After · Optimized</span>
+                <span className="text-xs text-emerald-400 font-medium">{lang === 'zh' ? '优化后 · 已优化' : 'After · Optimized'}</span>
               </div>
               <span className="text-xs text-emerald-400 font-mono">{optimizedTokens} tok</span>
             </div>
@@ -374,7 +384,7 @@ export default function Demo() {
                     activeTab === 'system' ? 'text-white bg-emerald-500/5' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
-                  System Prompt
+                  {lang === 'zh' ? '系统提示词' : 'System Prompt'}
                 </button>
                 <button
                   onClick={() => setActiveTab('user')}
@@ -382,7 +392,7 @@ export default function Demo() {
                     activeTab === 'user' ? 'text-white bg-emerald-500/5' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
-                  User Message
+                  {lang === 'zh' ? '用户消息' : 'User Message'}
                 </button>
               </div>
 
@@ -435,8 +445,10 @@ export default function Demo() {
               <Zap className="w-4 h-4 text-emerald-400" />
             </div>
             <div className="text-xs text-zinc-400">
-              <span className="font-medium">Smart Routing engaged.</span>{' '}
-              Task complexity classified as simple — routed to a cheaper model.
+              <span className="font-medium">{lang === 'zh' ? '智能路由已启用。' : 'Smart Routing engaged.'}</span>{' '}
+              {lang === 'zh' 
+                ? '任务复杂度被归类为简单 — 已路由到更便宜的模型。' 
+                : 'Task complexity classified as simple — routed to a cheaper model.'}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -451,18 +463,24 @@ export default function Demo() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Key className="w-4 h-4 text-emerald-400" />
-              <span className="text-sm font-bold text-white">BYOK — Verify with Your Own Key</span>
+              <span className="text-sm font-bold text-white">
+                {lang === 'zh' ? 'BYOK — 使用您自己的 API Key 验证' : 'BYOK — Verify with Your Own Key'}
+              </span>
             </div>
             <button
               onClick={() => setShowApiKey(!showApiKey)}
               className="text-xs text-zinc-500 hover:text-white transition-colors"
             >
-              {showApiKey ? 'Hide' : 'Show'} API Key Input
+              {showApiKey 
+                ? (lang === 'zh' ? '隐藏' : 'Hide') 
+                : (lang === 'zh' ? '显示' : 'Show')} API Key {lang === 'zh' ? '输入' : 'Input'}
             </button>
           </div>
           
           <p className="text-xs text-zinc-500 mb-4">
-            Your API key never leaves the browser. We call your provider directly with both versions and show the real token usage.
+            {lang === 'zh' 
+              ? '您的 API Key 不会离开浏览器。我们直接调用您的提供商，同时展示两个版本的实际 token 使用量。' 
+              : 'Your API key never leaves the browser. We call your provider directly with both versions and show the real token usage.'}
           </p>
 
           <AnimatePresence>
@@ -485,7 +503,7 @@ export default function Demo() {
                     />
                   </div>
                   <div className="w-48">
-                    <label className="text-xs text-zinc-500 font-medium mb-2 block">Model</label>
+                    <label className="text-xs text-zinc-500 font-medium mb-2 block">{lang === 'zh' ? '模型' : 'Model'}</label>
                     <select
                       value={selectedModel}
                       onChange={(e) => setSelectedModel(e.target.value)}
@@ -501,7 +519,7 @@ export default function Demo() {
                 
                 <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
                   <Zap className="w-3.5 h-3.5" />
-                  Run Live Comparison
+                  {lang === 'zh' ? '运行实时对比' : 'Run Live Comparison'}
                 </button>
               </motion.div>
             )}
@@ -512,23 +530,25 @@ export default function Demo() {
         <div className="mt-6 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-6">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm font-bold text-white">Token-Level Breakdown</span>
+            <span className="text-sm font-bold text-white">
+              {lang === 'zh' ? 'Token 级别分解' : 'Token-Level Breakdown'}
+            </span>
           </div>
           
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-3">
-              <div className="text-xs text-zinc-500 font-medium">System Prompt</div>
+              <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '系统提示词' : 'System Prompt'}</div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400">Original</span>
+                <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
                 <span className="text-zinc-500 font-mono">{countTokens(systemPrompt)} tok</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-emerald-400">Optimized</span>
+                <span className="text-emerald-400">{lang === 'zh' ? '已优化' : 'Optimized'}</span>
                 <span className="text-emerald-400 font-mono">{countTokens(systemOptimization.optimized)} tok</span>
               </div>
               <div className="h-px bg-zinc-800" />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Saved</span>
+                <span className="text-zinc-500">{lang === 'zh' ? '节省' : 'Saved'}</span>
                 <span className="text-emerald-400 font-mono">
                   {countTokens(systemPrompt) - countTokens(systemOptimization.optimized)} tok
                 </span>
@@ -536,18 +556,18 @@ export default function Demo() {
             </div>
             
             <div className="space-y-3">
-              <div className="text-xs text-zinc-500 font-medium">User Message</div>
+              <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '用户消息' : 'User Message'}</div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400">Original</span>
+                <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
                 <span className="text-zinc-500 font-mono">{countTokens(userMessage)} tok</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-emerald-400">Optimized</span>
+                <span className="text-emerald-400">{lang === 'zh' ? '已优化' : 'Optimized'}</span>
                 <span className="text-emerald-400 font-mono">{countTokens(userOptimization.optimized)} tok</span>
               </div>
               <div className="h-px bg-zinc-800" />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Saved</span>
+                <span className="text-zinc-500">{lang === 'zh' ? '节省' : 'Saved'}</span>
                 <span className="text-emerald-400 font-mono">
                   {countTokens(userMessage) - countTokens(userOptimization.optimized)} tok
                 </span>
@@ -555,18 +575,18 @@ export default function Demo() {
             </div>
             
             <div className="space-y-3">
-              <div className="text-xs text-zinc-500 font-medium">Total</div>
+              <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '总计' : 'Total'}</div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400">Original</span>
+                <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
                 <span className="text-zinc-500 font-mono">{originalTokens} tok</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-emerald-400">Optimized</span>
+                <span className="text-emerald-400">{lang === 'zh' ? '已优化' : 'Optimized'}</span>
                 <span className="text-emerald-400 font-mono">{optimizedTokens} tok</span>
               </div>
               <div className="h-px bg-zinc-800" />
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-500">Reduction</span>
+                <span className="text-zinc-500">{lang === 'zh' ? '缩减率' : 'Reduction'}</span>
                 <span className="text-emerald-400 font-mono">{totalSavings.toFixed(1)}%</span>
               </div>
             </div>
