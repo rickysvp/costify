@@ -615,57 +615,25 @@ export const translations = {
       tipRecommended: '推荐模型经过优化，在性能和成本之间达到最佳平衡',
       tipContext: '长上下文模型适合处理大型文档和复杂对话',
       models: {
-        'gpt-4o': {
-          description: '最强大的多模态模型，支持文本、图像和音频处理',
-          features: ['多模态', '128K 上下文', '函数调用', 'JSON 模式'],
+        'gpt-5-5': {
+          description: 'OpenAI 旗舰级 AGI 引擎，支持全模态实时流推理与 Omni-Flow 调度',
+          features: ['AGI 推理', '2M 上下文', '实时流控制', 'Omni-Flow'],
         },
-        'gpt-4o-mini': {
-          description: '高性价比的轻量级模型，适合日常任务',
-          features: ['128K 上下文', '函数调用', '快速响应'],
+        'claude-4-7': {
+          description: 'Anthropic 量子级理解引擎，具备极高的语义置信度与量子化逻辑',
+          features: ['量子逻辑', '5M 上下文', '高置信度', '代码原力'],
         },
-        'gpt-4-turbo': {
-          description: '高级模型，适合复杂推理任务',
-          features: ['128K 上下文', '知识截止 2023-12', '函数调用'],
+        'deepseek-v4': {
+          description: 'DeepSeek 新一代超轻量架构，重新定义 Token 成本极限',
+          features: ['超轻量', '1M 上下文', '极速响应', '极致成本'],
         },
-        'gpt-3.5-turbo': {
-          description: '经济实惠，适合简单任务和快速响应',
-          features: ['16K 上下文', '快速响应', '低成本'],
+        'kimi-2-6': {
+          description: 'Moonshot 极致长文本引擎，支持超大规模知识库实时检索',
+          features: ['10M 上下文', '超长记忆', '知识图谱', '中文特化'],
         },
-        'claude-3.5-sonnet': {
-          description: 'Anthropic 最强大的模型，出色的推理能力',
-          features: ['200K 上下文', '出色推理', '代码生成', '视觉理解'],
-        },
-        'claude-3-opus': {
-          description: '深度推理和复杂任务处理',
-          features: ['200K 上下文', '深度推理', '研究分析'],
-        },
-        'claude-3-haiku': {
-          description: '快速响应，适合日常对话',
-          features: ['200K 上下文', '极速响应', '低成本'],
-        },
-        'deepseek-chat': {
-          description: '国产大模型，高性价比',
-          features: ['64K 上下文', '中文优化', '代码能力'],
-        },
-        'deepseek-reasoner': {
-          description: '专注于推理和数学问题求解',
-          features: ['64K 上下文', '数学推理', '逻辑分析'],
-        },
-        'qwen-max': {
-          description: '通义千问最强模型',
-          features: ['32K 上下文', '中文理解', '多语言'],
-        },
-        'qwen-plus': {
-          description: '平衡的性价比选择',
-          features: ['32K 上下文', '中文优化', '快速响应'],
-        },
-        'gemini-1.5-pro': {
-          description: 'Google 最强多模态模型',
-          features: ['1M 上下文', '多模态', '长文档'],
-        },
-        'gemini-1.5-flash': {
-          description: '快速高效的多模态模型',
-          features: ['1M 上下文', '极速响应', '多模态'],
+        'glm-5-1': {
+          description: '智谱 AI 强逻辑推理引擎，专注复杂科研与数学证明',
+          features: ['强逻辑', '4M 上下文', '科研增强', '多模态对话'],
         },
       }
     },
@@ -962,6 +930,119 @@ export const translations = {
       qualityDetail: '默认使用高端模型（如 GPT-4o、Claude 3.5 Sonnet），仅对完全重复的请求启用缓存。适合对输出质量要求极高的场景，如法律文档生成、医疗咨询。',
       routingSavings: '路由节省',
       cacheSavings: '缓存节省',
+    },
+    demo: {
+      title: 'AnyTokn 智能仪表盘',
+      debugger: '调试器',
+      analytics: '分析',
+      logs: '日志',
+      optimize: '立即优化',
+      deploy: '部署',
+      engines: '优化引擎',
+      targetModel: '目标模型',
+      scenarios: '应用场景',
+      workspace: '工作区仪表盘',
+      sourcePrompt: '原始 Prompt (草稿)',
+      analysis: '智能分析与 Diff',
+      hub: '情报中心',
+      efficiency: '效率评分',
+      tokenReduction: 'Token 缩减率',
+      latencyDelta: '延迟增量',
+      costProjection: '成本预测 (10M 每月)',
+      annualSavings: '预计年度节省',
+      pipeline: '诊断流水线',
+      compilation: '编译成功',
+      fidelity: '高语义保真度维护',
+      waiting: '等待智能分析...',
+      standard: '标准 API',
+      optimized: 'AnyTokn 优化',
+      comparison: {
+        title: '深度性能对比演示',
+        vs: 'VS',
+        savings: '令牌缩减率',
+        standardCost: '标准推理成本',
+        optimizedCost: 'AnyTokn 优化成本',
+        tokens: 'Tokens',
+        methodology: '优化方法论',
+      },
+      layers: {
+        structural: {
+          name: '结构化精简 (Structural)',
+          desc: '消除多余空白、换行及非必要格式符号。',
+          detail: '移除空白字符、规范化 Markdown 语法、压缩 JSON 键值对。'
+        },
+        semantic: {
+          name: '语义化压缩 (Semantic)',
+          desc: '保留核心逻辑，重写冗长表述。',
+          detail: '同义词替换、时态归一化、语气词过滤。'
+        },
+        contextual: {
+          name: '上下文窗口优化 (Contextual)',
+          desc: '智能提取关键知识点，裁切历史背景。',
+          detail: '关键实体识别、冗余背景剔除、窗口滑动压缩。'
+        }
+      },
+      metrics: {
+        retention: '知识保留度',
+        latency: '延迟优化',
+        density: 'Token 密度',
+        efficiency: '处理效率',
+        fidelity: '语义置信度'
+      },
+      benchmark: {
+        title: '全场景性能基准矩阵',
+        subtitle: '覆盖 20+ 真实业务场景的综合测试验证',
+        taskType: '任务类型',
+        mode: '优化模式',
+        balanced: '平衡模式',
+        aggressive: '极致模式',
+        conservative: '保守模式',
+        routing: '智能路由策略',
+        output: '输出一致性验证',
+        latency: '全链路延迟 (ms)',
+        scenarios: {
+          agi: 'AGI 多步逻辑推理',
+          swarm: '智能体集群审计',
+          quantum: '量子物理模拟',
+          coding: '全工程重构',
+          summarization: '全球情报流'
+        }
+      },
+      tabs: {
+        optimization: '输入优化',
+        routing: '智能路由',
+        output: '输出验证'
+      },
+      routing: {
+        title: '多模型智能路由对比',
+        subtitle: 'AnyTokn 自动选择最经济的模型组合',
+        standard: '固定模型 (Standard)',
+        optimized: '动态路由 (AnyTokn)',
+        decision: '路由决策',
+        savings: '路由节省'
+      },
+      fidelity: {
+        title: '语义一致性深度验证',
+        subtitle: '对比原始 Prompt 与优化后 Prompt 的模型输出',
+        standardOutput: '原始模型响应',
+        optimizedOutput: '优化后模型响应',
+        similarity: '语义相似度'
+      },
+      byok: {
+        title: '接入自有 API (BYOK)',
+        connect: '连接您的 API',
+        provider: '供应商',
+        apiKey: 'API 密钥',
+        apiKeyPlaceholder: '输入您的 sk-...',
+        baseUrl: '代理地址 (可选)',
+        baseUrlPlaceholder: 'https://api.openai.com/v1',
+        status: '连接状态',
+        connected: '已连接',
+        disconnected: '未连接',
+        runReal: '优化并真实调用',
+        runSim: '模拟优化',
+        notice: '您的密钥仅保存在本地浏览器，不会上传到我们的服务器。',
+      },
     },
   },
   en: {
@@ -1926,6 +2007,119 @@ export const translations = {
       qualityDetail: 'Uses high-end models (like GPT-4o, Claude 3.5 Sonnet) by default, enabling caching only for identical requests. Suitable for high-quality requirements like legal/medical docs.',
       routingSavings: 'Routing Savings',
       cacheSavings: 'Cache Savings',
+    },
+    demo: {
+      title: 'AnyTokn Intelligence',
+      debugger: 'Debugger',
+      analytics: 'Analytics',
+      logs: 'Logs',
+      optimize: 'Optimize',
+      deploy: 'Deploy',
+      engines: 'Optimization Engines',
+      targetModel: 'Target Model',
+      scenarios: 'Scenarios',
+      workspace: 'Workspace Dashboard',
+      sourcePrompt: 'Source Prompt (Draft)',
+      analysis: 'Intelligence Analysis & Diff',
+      hub: 'Intelligence Hub',
+      efficiency: 'Efficiency Score',
+      tokenReduction: 'Token Reduction',
+      latencyDelta: 'Latency Delta',
+      costProjection: 'Cost Projection (10M Monthly)',
+      annualSavings: 'Annual Savings',
+      pipeline: 'Diagnostic Pipeline',
+      compilation: 'Compilation Success',
+      fidelity: 'High semantic fidelity maintained',
+      waiting: 'Waiting for intelligence analysis...',
+      standard: 'Standard API',
+      optimized: 'AnyTokn Optimized',
+      comparison: {
+        title: 'Advanced Performance Analysis',
+        vs: 'VS',
+        savings: 'Token Reduction',
+        standardCost: 'Standard Inference Cost',
+        optimizedCost: 'AnyTokn Optimized Cost',
+        tokens: 'Tokens',
+        methodology: 'Methodology',
+      },
+      layers: {
+        structural: {
+          name: 'Structural Compaction',
+          desc: 'Eliminates redundant whitespace and formatting overhead.',
+          detail: 'Whitespace stripping, Markdown normalization, JSON key minification.'
+        },
+        semantic: {
+          name: 'Semantic Compression',
+          desc: 'Rewrites verbose phrasing while preserving logical intent.',
+          detail: 'Synonym substitution, Tense normalization, Linguistic pruning.'
+        },
+        contextual: {
+          name: 'Contextual Windowing',
+          desc: 'Extracts critical entities and prunes historical background.',
+          detail: 'Entity recognition, Redundancy filtering, Sliding window compression.'
+        }
+      },
+      metrics: {
+        retention: 'Knowledge Retention',
+        latency: 'Latency Gain',
+        density: 'Token Density',
+        efficiency: 'Processing Efficiency',
+        fidelity: 'Semantic Confidence'
+      },
+      benchmark: {
+        title: 'Full-Scenario Benchmark Matrix',
+        subtitle: 'Comprehensive validation across 20+ real-world business scenarios',
+        taskType: 'Task Type',
+        mode: 'Optimization Mode',
+        balanced: 'Balanced',
+        aggressive: 'Aggressive',
+        conservative: 'Conservative',
+        routing: 'Intelligent Routing',
+        output: 'Output Fidelity Verification',
+        latency: 'End-to-End Latency (ms)',
+        scenarios: {
+          agi: 'AGI Multi-Step Logic',
+          swarm: 'Agent Swarm Audit',
+          quantum: 'Quantum Simulation',
+          coding: 'Project-Wide Refactor',
+          summarization: 'Global Intel Stream'
+        }
+      },
+      tabs: {
+        optimization: 'Input Optimization',
+        routing: 'Intelligent Routing',
+        output: 'Output Verification'
+      },
+      routing: {
+        title: 'Multi-Model Routing Comparison',
+        subtitle: 'AnyTokn automatically selects the most cost-effective model',
+        standard: 'Static (Standard)',
+        optimized: 'Dynamic (AnyTokn)',
+        decision: 'Routing Decision',
+        savings: 'Routing Savings'
+      },
+      fidelity: {
+        title: 'Semantic Fidelity Deep-Dive',
+        subtitle: 'Comparing outputs between original and optimized prompts',
+        standardOutput: 'Standard LLM Response',
+        optimizedOutput: 'Optimized LLM Response',
+        similarity: 'Semantic Similarity'
+      },
+      byok: {
+        title: 'Bring Your Own Key (BYOK)',
+        connect: 'Connect Your API',
+        provider: 'Provider',
+        apiKey: 'API Key',
+        apiKeyPlaceholder: 'Enter your sk-...',
+        baseUrl: 'Base URL (Optional)',
+        baseUrlPlaceholder: 'https://api.openai.com/v1',
+        status: 'Status',
+        connected: 'Connected',
+        disconnected: 'Disconnected',
+        runReal: 'Optimize & Execute',
+        runSim: 'Simulate',
+        notice: 'Your key is stored locally in your browser and never sent to our servers.',
+      },
     },
   },
 };
