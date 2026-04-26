@@ -4,12 +4,13 @@ import {
   ChevronDown, ShieldCheck, DollarSign,
   BarChart3, Sparkles,
   MessageSquare, Code2, Database, Settings2, Key,
-  Globe
+  Globe, Copy, Check, Play, Pause
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 
-// ==================== AnyTokn Optimization Engine v6.0 ====================
+// ==================== AnyTokn Optimization Engine v7.0 ====================
+// Production-grade token optimization with real diff visualization
 
 interface OptimizationRule {
   pattern: RegExp;
@@ -27,6 +28,8 @@ const OPTIMIZATION_RULES: OptimizationRule[] = [
   { pattern: /\bin the event that\b/gi, replacement: 'if', desc: 'Redundant phrase' },
   { pattern: /\bon a daily basis\b/gi, replacement: 'daily', desc: 'Redundant phrase' },
   { pattern: /\bon a regular basis\b/gi, replacement: 'regularly', desc: 'Redundant phrase' },
+  { pattern: /\bwith regard to\b/gi, replacement: 'regarding', desc: 'Redundant phrase' },
+  { pattern: /\bin the process of\b/gi, replacement: '', desc: 'Redundant phrase' },
   // Filler words
   { pattern: /\b(please|kindly)\b/gi, replacement: '', desc: 'Filler word' },
   { pattern: /\b(actually|basically|literally|essentially|effectively)\b/gi, replacement: '', desc: 'Filler word' },
@@ -36,8 +39,11 @@ const OPTIMIZATION_RULES: OptimizationRule[] = [
   { pattern: /\b(act as a|pretend to be|imagine you are)\b/gi, replacement: '', desc: 'Role prefix' },
   // Meta commentary
   { pattern: /\b(make sure that|be sure to|note that)\b/gi, replacement: '', desc: 'Meta commentary' },
+  { pattern: /\b(let me know if|feel free to|don't hesitate to)\b/gi, replacement: '', desc: 'Meta commentary' },
   // Extra whitespace
   { pattern: /\s{2,}/g, replacement: ' ', desc: 'Extra whitespace' },
+  // Leading/trailing whitespace per line
+  { pattern: /^\s+|\s+$/gm, replacement: '', desc: 'Trim whitespace' },
 ];
 
 interface DiffSegment {
@@ -45,37 +51,50 @@ interface DiffSegment {
   type: 'kept' | 'removed' | 'added';
 }
 
-function optimizeText(text: string): { optimized: string; diff: DiffSegment[]; savings: number } {
+function optimizeText(text: string): { optimized: string; diff: DiffSegment[]; savings: number; rulesApplied: string[] } {
   let optimized = text;
-  const removedSegments: { start: number; end: number; text: string }[] = [];
-
-  // Track all replacements
+  const rulesApplied: string[] = [];
+  
+  // Track all replacements with positions
+  const removedRanges: { start: number; end: number; text: string; desc: string }[] = [];
+  
   OPTIMIZATION_RULES.forEach(rule => {
     let match;
     const regex = new RegExp(rule.pattern.source, 'gi');
     while ((match = regex.exec(text)) !== null) {
-      removedSegments.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        text: match[0]
-      });
+      // Avoid overlapping matches
+      const isOverlapping = removedRanges.some(r => 
+        (match.index >= r.start && match.index < r.end) || 
+        (match.index + match[0].length > r.start && match.index + match[0].length <= r.end)
+      );
+      
+      if (!isOverlapping) {
+        removedRanges.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          text: match[0],
+          desc: rule.desc
+        });
+        if (!rulesApplied.includes(rule.desc)) {
+          rulesApplied.push(rule.desc);
+        }
+      }
     }
     optimized = optimized.replace(rule.pattern, rule.replacement);
   });
 
   // Clean up
   optimized = optimized.replace(/\s{2,}/g, ' ').trim();
+  optimized = optimized.replace(/^\s+|\s+$/gm, '').trim();
 
-  // Build diff
+  // Build diff from original text
   const diff: DiffSegment[] = [];
   let lastEnd = 0;
 
-  // Sort segments
-  removedSegments.sort((a, b) => a.start - b.start);
-
-  // Merge overlapping segments
-  const merged: typeof removedSegments = [];
-  removedSegments.forEach(seg => {
+  // Sort and merge overlapping segments
+  removedRanges.sort((a, b) => a.start - b.start);
+  const merged: typeof removedRanges = [];
+  removedRanges.forEach(seg => {
     if (merged.length === 0 || seg.start >= merged[merged.length - 1].end) {
       merged.push(seg);
     } else {
@@ -97,10 +116,10 @@ function optimizeText(text: string): { optimized: string; diff: DiffSegment[]; s
 
   const savings = text.length > 0 ? ((text.length - optimized.length) / text.length) * 100 : 0;
 
-  return { optimized, diff, savings };
+  return { optimized, diff, savings, rulesApplied };
 }
 
-// Simple tokenizer (approximation)
+// Simple tokenizer (approximation: ~4 chars per token)
 function countTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
@@ -111,6 +130,7 @@ const DEMO_SCENARIOS = [
   {
     id: 'support',
     name: 'Customer Support',
+    nameZh: '客户支持',
     icon: MessageSquare,
     systemPrompt: `<!-- Internal: revision 2024-Q3 -->
 You are a customer support assistant for Acme Corp. It is very important to be polite at all times. Please note that you must always greet the user warmly. In order to answer questions, you should use the knowledge base provided below. Make sure that you do not invent information. Kindly respond in the same language as the user.
@@ -146,6 +166,7 @@ My order #4451 hasn't arrived yet, it's been 9 days. Can I get a refund?`,
   {
     id: 'code',
     name: 'Code Review',
+    nameZh: '代码审查',
     icon: Code2,
     systemPrompt: `You are a senior software engineer. Please be thorough in your analysis. In order to provide the best review, you should check for the following: code style, potential bugs, performance issues, and security vulnerabilities. Make sure that you are very detailed in your feedback. I would like you to also suggest improvements where applicable.`,
     userMessage: `Please review this function:
@@ -160,6 +181,7 @@ function getUserData(userId) {
   {
     id: 'data',
     name: 'Data Analysis',
+    nameZh: '数据分析',
     icon: Database,
     systemPrompt: `You are a data analyst. Please analyze the following data and provide insights. In order to be helpful, you should identify trends, anomalies, and actionable recommendations. Make sure that your analysis is data-driven and objective.`,
     userMessage: `Analyze Q3 sales data:
@@ -174,7 +196,7 @@ What should we focus on next quarter?`,
 // ==================== Components ====================
 
 export default function Demo() {
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang } = useLanguage();
   const [selectedScenario, setSelectedScenario] = useState(DEMO_SCENARIOS[0]);
   const [systemPrompt, setSystemPrompt] = useState(DEMO_SCENARIOS[0].systemPrompt);
   const [userMessage, setUserMessage] = useState(DEMO_SCENARIOS[0].userMessage);
@@ -182,6 +204,7 @@ export default function Demo() {
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-4o');
+  const [copied, setCopied] = useState(false);
 
   // Optimize system prompt
   const systemOptimization = useMemo(() => optimizeText(systemPrompt), [systemPrompt]);
@@ -197,7 +220,7 @@ export default function Demo() {
   // Cost calculation (GPT-4o: $5/1M input tokens, GPT-4o mini: $0.15/1M)
   const originalCost = (originalTokens / 1000000) * 5;
   const optimizedCost = (optimizedTokens / 1000000) * 0.15; // Route to mini for simple tasks
-  const costSavings = ((originalCost - optimizedCost) / originalCost) * 100;
+  const costSavings = originalCost > 0 ? ((originalCost - optimizedCost) / originalCost) * 100 : 0;
 
   const handleScenarioChange = (scenario: typeof DEMO_SCENARIOS[0]) => {
     setSelectedScenario(scenario);
@@ -205,30 +228,44 @@ export default function Demo() {
     setUserMessage(scenario.userMessage);
   };
 
+  const handleCopy = () => {
+    const text = activeTab === 'system' ? systemOptimization.optimized : userOptimization.optimized;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const currentOptimization = activeTab === 'system' ? systemOptimization : userOptimization;
+  const currentOriginal = activeTab === 'system' ? systemPrompt : userMessage;
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-zinc-300 font-sans">
+    <div className="min-h-screen bg-[#0a0a0f] text-zinc-300 font-sans selection:bg-emerald-500/20">
       {/* Header */}
-      <header className="border-b border-zinc-800/50 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-zinc-800/50 bg-[#0a0a0f]/90 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
               <Zap className="w-4 h-4 text-emerald-400" />
             </div>
             <span className="text-sm font-bold text-white tracking-tight">AnyTokn</span>
-            <span className="text-xs text-zinc-600 font-medium">Demo</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 font-medium">Demo</span>
           </div>
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors font-medium"
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-white transition-colors font-medium px-3 py-1.5 rounded-lg hover:bg-zinc-800/50"
             >
               <Globe className="w-3.5 h-3.5" />
               {lang === 'zh' ? 'EN' : '中文'}
             </button>
-            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">{t.nav.docs}</button>
-            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">{t.nav.pricing}</button>
-            <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">
-              {t.nav.signup}
+            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">
+              {lang === 'zh' ? '文档' : 'Docs'}
+            </button>
+            <button className="text-xs text-zinc-500 hover:text-white transition-colors font-medium">
+              {lang === 'zh' ? '价格' : 'Pricing'}
+            </button>
+            <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-4 py-1.5 rounded-lg text-xs font-bold transition-all hover:shadow-lg hover:shadow-emerald-500/20">
+              {lang === 'zh' ? '开始使用' : 'Get Started'}
             </button>
           </div>
         </div>
@@ -237,54 +274,62 @@ export default function Demo() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Hero Stats */}
         <div className="grid grid-cols-4 gap-4 mb-8">
-          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-emerald-400" />
+          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-5 hover:border-zinc-700/50 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '节省 Tokens' : 'Tokens Saved'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {originalTokens - optimizedTokens}
             </div>
-            <div className="text-xs text-emerald-400 font-medium mt-1">
+            <div className="text-xs text-emerald-400 font-mono mt-1.5">
               {originalTokens} → {optimizedTokens}
             </div>
           </div>
           
-          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Scissors className="w-4 h-4 text-emerald-400" />
+          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-5 hover:border-zinc-700/50 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Scissors className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '缩减率' : 'Reduction'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {totalSavings.toFixed(1)}%
             </div>
-            <div className="text-xs text-zinc-500 font-medium mt-1">
+            <div className="text-xs text-zinc-500 font-mono mt-1.5">
               {lang === 'zh' ? '输入 token' : 'of input tokens'}
             </div>
           </div>
           
-          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="w-4 h-4 text-emerald-400" />
+          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-5 hover:border-zinc-700/50 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '节省成本' : 'Cost Saved'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {costSavings.toFixed(1)}%
             </div>
-            <div className="text-xs text-zinc-500 font-medium mt-1">
+            <div className="text-xs text-zinc-500 font-mono mt-1.5">
               ${originalCost.toFixed(5)} → ${optimizedCost.toFixed(5)}
             </div>
           </div>
           
-          <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-5 hover:border-zinc-700/50 transition-colors">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '缓存 Tokens' : 'Cached Tokens'}</span>
             </div>
             <div className="text-3xl font-black text-white tracking-tight">
               {Math.floor(optimizedTokens * 0.3)}
             </div>
-            <div className="text-xs text-zinc-500 font-medium mt-1">
+            <div className="text-xs text-zinc-500 font-mono mt-1.5">
               {lang === 'zh' ? '按 10% 计费' : 'billed at 10%'}
             </div>
           </div>
@@ -300,12 +345,12 @@ export default function Demo() {
                 onClick={() => handleScenarioChange(scenario)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                   selectedScenario.id === scenario.id
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                    : 'bg-zinc-900/50 text-zinc-500 border border-zinc-800/50 hover:border-zinc-700'
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/5'
+                    : 'bg-zinc-900/50 text-zinc-500 border border-zinc-800/50 hover:border-zinc-700 hover:text-zinc-300'
                 }`}
               >
                 <scenario.icon className="w-3.5 h-3.5" />
-                {scenario.name}
+                {lang === 'zh' ? scenario.nameZh : scenario.name}
               </button>
             ))}
           </div>
@@ -314,13 +359,13 @@ export default function Demo() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-2 gap-6">
           {/* Left: Original */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-orange-400" />
                 <span className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '优化前 · 原始' : 'Before · Original'}</span>
               </div>
-              <span className="text-xs text-zinc-600 font-mono">{originalTokens} tok</span>
+              <span className="text-xs text-zinc-600 font-mono bg-zinc-900/50 px-2 py-1 rounded-md">{countTokens(currentOriginal)} tok</span>
             </div>
 
             <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-2xl overflow-hidden">
@@ -328,51 +373,53 @@ export default function Demo() {
               <div className="flex border-b border-zinc-800/50">
                 <button
                   onClick={() => setActiveTab('system')}
-                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors ${
-                    activeTab === 'system' ? 'text-white bg-zinc-800/30' : 'text-zinc-600 hover:text-zinc-400'
+                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors relative ${
+                    activeTab === 'system' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
                   {lang === 'zh' ? '系统提示词' : 'System Prompt'}
+                  {activeTab === 'system' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500/50" />}
                 </button>
                 <button
                   onClick={() => setActiveTab('user')}
-                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors ${
-                    activeTab === 'user' ? 'text-white bg-zinc-800/30' : 'text-zinc-600 hover:text-zinc-400'
+                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors relative ${
+                    activeTab === 'user' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
                   {lang === 'zh' ? '用户消息' : 'User Message'}
+                  {activeTab === 'user' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500/50" />}
                 </button>
               </div>
 
               {/* Content */}
               <div className="p-4">
-                {activeTab === 'system' ? (
-                  <textarea
-                    value={systemPrompt}
-                    onChange={(e) => setSystemPrompt(e.target.value)}
-                    className="w-full h-96 bg-transparent text-xs text-zinc-400 font-mono leading-relaxed resize-none outline-none"
-                    spellCheck={false}
-                  />
-                ) : (
-                  <textarea
-                    value={userMessage}
-                    onChange={(e) => setUserMessage(e.target.value)}
-                    className="w-full h-96 bg-transparent text-xs text-zinc-400 font-mono leading-relaxed resize-none outline-none"
-                    spellCheck={false}
-                  />
-                )}
+                <textarea
+                  value={currentOriginal}
+                  onChange={(e) => activeTab === 'system' ? setSystemPrompt(e.target.value) : setUserMessage(e.target.value)}
+                  className="w-full h-80 bg-transparent text-xs text-zinc-400 font-mono leading-relaxed resize-none outline-none"
+                  spellCheck={false}
+                />
               </div>
             </div>
           </div>
 
           {/* Right: Optimized */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-400" />
                 <span className="text-xs text-emerald-400 font-medium">{lang === 'zh' ? '优化后 · 已优化' : 'After · Optimized'}</span>
               </div>
-              <span className="text-xs text-emerald-400 font-mono">{optimizedTokens} tok</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-emerald-400 font-mono bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">{countTokens(currentOptimization.optimized)} tok</span>
+                <button
+                  onClick={handleCopy}
+                  className="p-1.5 rounded-lg hover:bg-zinc-800/50 transition-colors text-zinc-500 hover:text-white"
+                  title={lang === 'zh' ? '复制' : 'Copy'}
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             </div>
 
             <div className="bg-zinc-900/30 border border-emerald-500/20 rounded-2xl overflow-hidden">
@@ -380,100 +427,86 @@ export default function Demo() {
               <div className="flex border-b border-zinc-800/50">
                 <button
                   onClick={() => setActiveTab('system')}
-                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors ${
-                    activeTab === 'system' ? 'text-white bg-emerald-500/5' : 'text-zinc-600 hover:text-zinc-400'
+                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors relative ${
+                    activeTab === 'system' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
                   {lang === 'zh' ? '系统提示词' : 'System Prompt'}
+                  {activeTab === 'system' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />}
                 </button>
                 <button
                   onClick={() => setActiveTab('user')}
-                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors ${
-                    activeTab === 'user' ? 'text-white bg-emerald-500/5' : 'text-zinc-600 hover:text-zinc-400'
+                  className={`flex-1 px-4 py-3 text-xs font-medium transition-colors relative ${
+                    activeTab === 'user' ? 'text-white' : 'text-zinc-600 hover:text-zinc-400'
                   }`}
                 >
                   {lang === 'zh' ? '用户消息' : 'User Message'}
+                  {activeTab === 'user' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />}
                 </button>
               </div>
 
               {/* Content with Diff */}
-              <div className="p-4 h-96 overflow-auto">
-                {activeTab === 'system' ? (
-                  <div className="text-xs font-mono leading-relaxed">
-                    {systemOptimization.diff.map((segment, i) => (
-                      <span
-                        key={i}
-                        className={
-                          segment.type === 'removed'
-                            ? 'bg-red-500/20 text-red-400 line-through'
-                            : segment.type === 'added'
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'text-zinc-300'
-                        }
-                      >
-                        {segment.text}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs font-mono leading-relaxed">
-                    {userOptimization.diff.map((segment, i) => (
-                      <span
-                        key={i}
-                        className={
-                          segment.type === 'removed'
-                            ? 'bg-red-500/20 text-red-400 line-through'
-                            : segment.type === 'added'
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'text-zinc-300'
-                        }
-                      >
-                        {segment.text}
-                      </span>
-                    ))}
-                  </div>
-                )}
+              <div className="p-4 h-80 overflow-auto">
+                <div className="text-xs font-mono leading-relaxed whitespace-pre-wrap">
+                  {currentOptimization.diff.map((segment, i) => (
+                    <span
+                      key={i}
+                      className={
+                        segment.type === 'removed'
+                          ? 'bg-red-500/15 text-red-400/80 line-through decoration-red-500/30'
+                          : segment.type === 'added'
+                          ? 'bg-emerald-500/15 text-emerald-400'
+                          : 'text-zinc-300'
+                      }
+                    >
+                      {segment.text}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Smart Routing Banner */}
-        <div className="mt-6 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-4 flex items-center justify-between">
+        <div className="mt-6 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
               <Zap className="w-4 h-4 text-emerald-400" />
             </div>
             <div className="text-xs text-zinc-400">
-              <span className="font-medium">{lang === 'zh' ? '智能路由已启用。' : 'Smart Routing engaged.'}</span>{' '}
+              <span className="font-medium text-zinc-300">{lang === 'zh' ? '智能路由已启用。' : 'Smart Routing engaged.'}</span>{' '}
               {lang === 'zh' 
                 ? '任务复杂度被归类为简单 — 已路由到更便宜的模型。' 
                 : 'Task complexity classified as simple — routed to a cheaper model.'}
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-500 font-mono">GPT-4o</span>
+            <span className="text-xs text-zinc-500 font-mono bg-zinc-900/50 px-2 py-1 rounded-md">GPT-4o</span>
             <ArrowRight className="w-3 h-3 text-zinc-600" />
-            <span className="text-xs text-emerald-400 font-mono font-bold">GPT-4o mini</span>
+            <span className="text-xs text-emerald-400 font-mono font-bold bg-emerald-500/5 px-2 py-1 rounded-md border border-emerald-500/10">GPT-4o mini</span>
           </div>
         </div>
 
         {/* BYOK Section */}
-        <div className="mt-6 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6">
+        <div className="mt-6 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Key className="w-4 h-4 text-emerald-400" />
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                <Key className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="text-sm font-bold text-white">
                 {lang === 'zh' ? 'BYOK — 使用您自己的 API Key 验证' : 'BYOK — Verify with Your Own Key'}
               </span>
             </div>
             <button
               onClick={() => setShowApiKey(!showApiKey)}
-              className="text-xs text-zinc-500 hover:text-white transition-colors"
+              className="text-xs text-zinc-500 hover:text-white transition-colors flex items-center gap-1"
             >
               {showApiKey 
                 ? (lang === 'zh' ? '隐藏' : 'Hide') 
-                : (lang === 'zh' ? '显示' : 'Show')} API Key {lang === 'zh' ? '输入' : 'Input'}
+                : (lang === 'zh' ? '显示' : 'Show')}
+              <ChevronDown className={`w-3 h-3 transition-transform ${showApiKey ? 'rotate-180' : ''}`} />
             </button>
           </div>
           
@@ -489,6 +522,7 @@ export default function Demo() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className="space-y-4 overflow-hidden"
               >
                 <div className="flex gap-4">
@@ -499,7 +533,7 @@ export default function Demo() {
                       value={apiKey}
                       onChange={(e) => setApiKey(e.target.value)}
                       placeholder="sk-..."
-                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 outline-none focus:border-emerald-500/50"
+                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 outline-none focus:border-emerald-500/50 transition-colors"
                     />
                   </div>
                   <div className="w-48">
@@ -507,7 +541,7 @@ export default function Demo() {
                     <select
                       value={selectedModel}
                       onChange={(e) => setSelectedModel(e.target.value)}
-                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-emerald-500/50"
+                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-emerald-500/50 transition-colors appearance-none cursor-pointer"
                     >
                       <option value="gpt-4o">GPT-4o</option>
                       <option value="gpt-4o-mini">GPT-4o mini</option>
@@ -517,8 +551,8 @@ export default function Demo() {
                   </div>
                 </div>
                 
-                <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5" />
+                <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-6 py-2.5 rounded-xl text-xs font-bold transition-all hover:shadow-lg hover:shadow-emerald-500/20 flex items-center gap-2">
+                  <Play className="w-3.5 h-3.5" />
                   {lang === 'zh' ? '运行实时对比' : 'Run Live Comparison'}
                 </button>
               </motion.div>
@@ -527,16 +561,18 @@ export default function Demo() {
         </div>
 
         {/* Token Breakdown */}
-        <div className="mt-6 bg-zinc-900/30 border border-zinc-800/50 rounded-2xl p-6">
+        <div className="mt-6 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-6">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            </div>
             <span className="text-sm font-bold text-white">
               {lang === 'zh' ? 'Token 级别分解' : 'Token-Level Breakdown'}
             </span>
           </div>
           
           <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-3">
+            <div className="space-y-3 bg-zinc-900/30 rounded-xl p-4 border border-zinc-800/30">
               <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '系统提示词' : 'System Prompt'}</div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
@@ -555,7 +591,7 @@ export default function Demo() {
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-3 bg-zinc-900/30 rounded-xl p-4 border border-zinc-800/30">
               <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '用户消息' : 'User Message'}</div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
@@ -574,8 +610,8 @@ export default function Demo() {
               </div>
             </div>
             
-            <div className="space-y-3">
-              <div className="text-xs text-zinc-500 font-medium">{lang === 'zh' ? '总计' : 'Total'}</div>
+            <div className="space-y-3 bg-zinc-900/30 rounded-xl p-4 border border-emerald-500/10">
+              <div className="text-xs text-emerald-400 font-medium">{lang === 'zh' ? '总计' : 'Total'}</div>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-400">{lang === 'zh' ? '原始' : 'Original'}</span>
                 <span className="text-zinc-500 font-mono">{originalTokens} tok</span>
@@ -587,11 +623,32 @@ export default function Demo() {
               <div className="h-px bg-zinc-800" />
               <div className="flex items-center justify-between text-xs">
                 <span className="text-zinc-500">{lang === 'zh' ? '缩减率' : 'Reduction'}</span>
-                <span className="text-emerald-400 font-mono">{totalSavings.toFixed(1)}%</span>
+                <span className="text-emerald-400 font-mono font-bold">{totalSavings.toFixed(1)}%</span>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Optimization Rules Applied */}
+        {currentOptimization.rulesApplied.length > 0 && (
+          <div className="mt-6 bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                <Settings2 className="w-4 h-4 text-emerald-400" />
+              </div>
+              <span className="text-sm font-bold text-white">
+                {lang === 'zh' ? '应用的优化规则' : 'Optimization Rules Applied'}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {currentOptimization.rulesApplied.map((rule, i) => (
+                <span key={i} className="text-xs bg-zinc-900/50 text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800/50">
+                  {rule}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
