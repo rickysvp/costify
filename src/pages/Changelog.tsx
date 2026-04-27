@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Layout, ExternalLink } from 'lucide-react';
+import { FileText, Layout } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // ---------- 类型定义 ----------
@@ -86,7 +86,7 @@ const getStatusBadge = (status: RequirementStatus, isEn: boolean) => {
   return { style: styles[status], label: labels[status] };
 };
 
-const getPriorityBadge = (priority: RequirementPriority, isEn: boolean) => {
+const getPriorityBadge = (priority: RequirementPriority) => {
   const styles = {
     p0: 'bg-red-100 text-red-700',
     p1: 'bg-amber-100 text-amber-700',
@@ -197,7 +197,7 @@ export default function Changelog() {
                       <tbody className="divide-y divide-slate-200">
                         {version.requirements.map(req => {
                           const statusBadge = getStatusBadge(req.status, isEn);
-                          const priorityBadge = getPriorityBadge(req.priority, isEn);
+                          const priorityBadge = getPriorityBadge(req.priority);
 
                           return (
                             <tr key={req.id} className="hover:bg-slate-50">

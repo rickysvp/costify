@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Bell,
-  AlertTriangle,
   Info,
   Shield,
   DollarSign,
@@ -11,22 +10,12 @@ import {
   RefreshCw,
   Search,
   X,
-  TrendingUp,
-  CreditCard,
   Users,
   FileText,
-  Clock,
-  Zap,
   BarChart3,
-  AlertOctagon,
   Wallet,
-  PieChart,
   Server,
   Lock,
-  Globe,
-  Smartphone,
-  Mail,
-  Settings,
   Package,
   Gift,
 } from 'lucide-react';
@@ -873,7 +862,7 @@ export default function Alerts() {
   const [error, setError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<MessageCategory | 'all'>('all');
   const [severityFilter, setSeverityFilter] = useState<MessageSeverity | 'all'>('all');
-  const [channelFilter, setChannelFilter] = useState<NotificationChannel | 'all'>('all');
+  const [channelFilter] = useState<NotificationChannel | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // 生成消息列表
@@ -933,10 +922,11 @@ export default function Alerts() {
     return true;
   });
 
-  const unreadCount = messages.filter(m => !m.read).length;
+  const _unreadCount = messages.filter(m => !m.read).length;
+  void _unreadCount;
 
   // 分类统计
-  const categoryStats = {
+  const _categoryStats = {
     budget: messages.filter(m => m.category === 'budget').length,
     usage: messages.filter(m => m.category === 'usage').length,
     cost: messages.filter(m => m.category === 'cost').length,
@@ -948,6 +938,7 @@ export default function Alerts() {
     product: messages.filter(m => m.category === 'product').length,
     marketing: messages.filter(m => m.category === 'marketing').length,
   };
+  void _categoryStats;
 
   // 获取分类标签
   const getCategoryLabel = (cat: MessageCategory) => {
@@ -1071,7 +1062,7 @@ export default function Alerts() {
             onClick={markAllRead}
           >
             <CheckCheck className="w-3.5 h-3.5" />
-            {t.alerts?.markAllRead || '全部已读'}
+            {t.alerts?.markAsRead || '全部已读'}
           </button>
           <button
             className="btn-secondary text-xs flex items-center gap-1.5"

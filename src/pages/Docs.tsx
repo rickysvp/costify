@@ -1,18 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Check,
   Copy,
-  ChevronRight,
   Key,
   Globe,
   Zap,
   Cpu,
   BarChart3,
-  Shield,
   Code2,
   LayoutDashboard,
-  Users,
   Wallet,
   ArrowRight,
   Building2,
@@ -21,12 +18,9 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  Play,
   CheckCircle2,
   Circle,
-  Clock,
 } from 'lucide-react';
-import { API_BASE } from '../config';
 import { useLanguage } from '../contexts/LanguageContext';
 
 // Use anytokn.com domain for display

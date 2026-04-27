@@ -13,7 +13,6 @@ import {
   Zap,
   ShieldCheck,
   BarChart3,
-  Search,
   Globe,
   Play,
 } from "lucide-react";

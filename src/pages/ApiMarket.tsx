@@ -504,7 +504,7 @@ export default function ApiMarket() {
               </div>
 
               {/* 描述 */}
-              <p className="text-sm text-surface-600 mb-4">{t.apiMarket.models[model.id as keyof typeof t.apiMarket.models]?.description || model.description}</p>
+              <p className="text-sm text-surface-600 mb-4">{model.description}</p>
 
               {/* 价格 */}
               <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-surface-50 rounded-lg">
@@ -526,7 +526,7 @@ export default function ApiMarket() {
 
               {/* 特性标签 */}
               <div className="flex flex-wrap gap-1.5 mb-4">
-                {(t.apiMarket.models[model.id as keyof typeof t.apiMarket.models]?.features || model.features).map((feature: string) => (
+                {model.features.map((feature: string) => (
                   <span
                     key={feature}
                     className="px-2 py-0.5 rounded-full bg-surface-100 text-surface-600 text-[10px]"
