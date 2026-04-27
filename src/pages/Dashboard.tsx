@@ -259,7 +259,32 @@ export default function Dashboard() {
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-surface-900">{t.dashboard.title}</h1>
+            <p className="text-sm text-surface-500">{t.dashboard.subtitle}</p>
+          </div>
+        </div>
+        <div className="card p-8 text-center">
+          <div className="w-14 h-14 bg-surface-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-7 h-7 text-surface-400" />
+          </div>
+          <h3 className="text-lg font-medium text-surface-800 mb-2">{t.dashboard.loadFailed}</h3>
+          <p className="text-sm text-surface-500 mb-4">{t.dashboard.noData}</p>
+          <button
+            className="btn-primary inline-flex items-center gap-2"
+            onClick={fetchDashboard}
+          >
+            <RefreshCw className="w-4 h-4" />
+            {t.dashboard.reload}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ==================== 空状态 Onboarding ====================
   if (data.project_count === 0) {

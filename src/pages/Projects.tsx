@@ -40,12 +40,11 @@ interface ProjectFormData {
 // This might need context-aware translation, but for now we'll keep names and prices static 
 // and handle descriptions in the UI if needed, or translate them here.
 const AVAILABLE_MODELS = (t: any) => [
-  { id: 'gpt-4o', name: 'GPT-4o', description: t.apiMarket.models['gpt-4o'].description, price: '$5/1M input' },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', description: t.apiMarket.models['gpt-4o-mini'].description, price: '$0.15/1M input' },
-  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: t.apiMarket.models['gpt-3.5-turbo'].description, price: '$1/1M input' },
-  { id: 'claude-3-opus', name: 'Claude 3 Opus', description: t.apiMarket.models['claude-3-opus'].description, price: '$15/1M input' },
-  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', description: t.apiMarket.models['claude-3.5-sonnet'].description, price: '$3/1M input' },
-  { id: 'claude-3-haiku', name: 'Claude 3 Haiku', description: t.apiMarket.models['claude-3-haiku'].description, price: '$0.25/1M input' },
+  { id: 'gpt-5-5', name: 'GPT-5.5', description: t.apiMarket.models['gpt-5-5']?.description || 'OpenAI 旗舰级 AGI 引擎', price: '$5/1M input' },
+  { id: 'claude-4-7', name: 'Claude 4.7', description: t.apiMarket.models['claude-4-7']?.description || 'Anthropic 量子级理解引擎', price: '$15/1M input' },
+  { id: 'deepseek-v4', name: 'DeepSeek V4', description: t.apiMarket.models['deepseek-v4']?.description || 'DeepSeek 新一代超轻量架构', price: '$0.5/1M input' },
+  { id: 'kimi-2-6', name: 'Kimi 2.6', description: t.apiMarket.models['kimi-2-6']?.description || 'Moonshot 极致长文本引擎', price: '$2/1M input' },
+  { id: 'glm-5-1', name: 'GLM 5.1', description: t.apiMarket.models['glm-5-1']?.description || '智谱 AI 强逻辑推理引擎', price: '$1/1M input' },
 ];
 
 const ROUTING_PROFILES = (t: any) => [
