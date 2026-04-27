@@ -15,6 +15,7 @@ import {
   BarChart3,
   Search,
   Globe,
+  Play,
 } from "lucide-react";
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -35,22 +36,30 @@ const Navbar = () => {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            <button 
+            <Link
+              to="/demo"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
+            >
+              <Play className="w-4 h-4" />
+              <span>{lang === 'zh' ? 'Demo' : 'Demo'}</span>
+            </Link>
+
+            <button
               onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
               className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
             >
               <Globe className="w-4 h-4" />
               <span className="uppercase text-xs tracking-wider">{lang === 'zh' ? 'EN' : '中文'}</span>
             </button>
-            
-            <Link 
+
+            <Link
               to="/contact"
               className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-emerald-600 hover:bg-slate-50 rounded-lg transition-all"
             >
               {t.nav.login}
             </Link>
-            
-            <Link 
+
+            <Link
               to="/login"
               className="ml-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5"
             >
@@ -72,30 +81,38 @@ const Navbar = () => {
       
       {/* Mobile Menu */}
       {isOpen && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden bg-white border-t border-slate-100 shadow-xl"
         >
           <div className="px-4 py-6 space-y-2">
             <div className="space-y-2">
-              <button 
+              <Link
+                to="/demo"
+                className="flex items-center gap-2 w-full px-4 py-3 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-xl transition-all"
+              >
+                <Play className="w-5 h-5" />
+                <span>Demo</span>
+              </Link>
+
+              <button
                 onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
                 className="flex items-center gap-2 w-full px-4 py-3 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-xl transition-all"
               >
                 <Globe className="w-5 h-5" />
                 <span>{lang === 'zh' ? 'Switch to English' : '切换到中文'}</span>
               </button>
-              
-              <Link 
-                to="/contact" 
+
+              <Link
+                to="/contact"
                 className="block px-4 py-3 text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50 rounded-xl transition-all"
               >
                 {t.nav.login}
               </Link>
-              
-              <Link 
-                to="/login" 
+
+              <Link
+                to="/login"
                 className="block w-full text-center bg-emerald-600 text-white py-3.5 rounded-xl font-semibold text-base mt-4 shadow-lg shadow-emerald-200"
               >
                 {t.nav.bookPilot}
