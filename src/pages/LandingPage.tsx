@@ -243,17 +243,23 @@ const Hero = () => {
         >
           {t.hero.newDescription}
         </motion.p>
-        <motion.div 
+        <motion.div
           className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <Link 
+          <Link
             to="/login"
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
           >
             {t.hero.newCta1} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            to="/demo"
+            className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-slate-100 flex items-center gap-2 group transition-all w-full sm:w-auto justify-center"
+          >
+            {lang === 'zh' ? 'BYOK 实时对比' : 'BYOK Live Demo'} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
       </div>
