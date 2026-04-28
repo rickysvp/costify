@@ -226,7 +226,13 @@ export default function ProjectDetail() {
       const res = await fetch(`${API_BASE}/api-keys/${key.id}/stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error(t.apiKeys.analyticsError);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setKeyStats({ total_requests: 0, total_tokens: 0, total_cost: 0, avg_latency: 0 });
+          return;
+        }
+        throw new Error(t.apiKeys.analyticsError);
+      }
       const data = await res.json();
       setKeyStats(data);
     } catch (err) {

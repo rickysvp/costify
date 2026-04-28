@@ -745,24 +745,24 @@ const Solutions = () => {
 
 const LogoCloud = () => {
   const logos = [
-    { name: 'OpenAI', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg' },
-    { name: 'Anthropic', url: 'https://upload.wikimedia.org/wikipedia/commons/5/51/Anthropic_logo.svg' },
-    { name: 'Google', url: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg' },
-    { name: 'Meta', url: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg' },
-    { name: 'Mistral', url: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Mistral_AI_logo.svg' },
-    { name: 'DeepSeek', url: 'https://upload.wikimedia.org/wikipedia/commons/2/21/DeepSeek_logo.svg' },
-    { name: 'Moonshot', url: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Moonshot_AI_logo.svg' },
-    { name: 'Zhipu AI', url: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/Zhipu_AI_logo.svg' },
+    { name: 'OpenAI', src: '/logos/openai.svg' },
+    { name: 'Anthropic', src: '/logos/anthropic.svg' },
+    { name: 'Google', src: '/logos/google.svg' },
+    { name: 'Meta', src: '/logos/meta.svg' },
+    { name: 'Mistral', src: '/logos/mistral.svg' },
+    { name: 'DeepSeek', src: '/logos/deepseek.svg' },
+    { name: 'Moonshot', src: '/logos/moonshot.svg' },
+    { name: 'Zhipu AI', src: '/logos/zhipu.svg' },
   ];
 
   return (
     <section className="py-24 border-t border-slate-100 bg-slate-50/50">
       <div className="max-w-6xl mx-auto px-4">
         <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest mb-12">Used across high-consumption generative AI workflows</p>
-        <div className="flex flex-wrap justify-center items-center gap-12 opacity-60 grayscale hover:grayscale-0 transition-all">
+        <div className="flex flex-wrap justify-center items-center gap-12 opacity-60 hover:opacity-100 transition-all">
           {logos.map(logo => (
             <div key={logo.name} className="flex items-center gap-2">
-               <img src={logo.url} alt={logo.name} className="h-6 md:h-8 object-contain" referrerPolicy="no-referrer" />
+               <img src={logo.src} alt={logo.name} className="h-6 md:h-8 object-contain" />
                <span className="font-bold text-slate-800 text-sm uppercase tracking-tight">{logo.name}</span>
             </div>
           ))}

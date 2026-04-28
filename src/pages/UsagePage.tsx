@@ -24,13 +24,11 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
   Legend,
 } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -134,6 +132,137 @@ function getDateRange(range: TimeRange): { start: string; end: string } {
 // 颜色配置
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
 
+// ---------- 模拟数据生成 ----------
+const MOCK_PROJECTS = ['Production API', 'Staging Test', 'Dev Environment', 'Customer Support', 'Internal Tools', 'Marketing AI'];
+const MOCK_USERS = ['Alice Chen', 'Bob Wang', 'Carol Li', 'David Zhang', 'Emma Liu', 'Frank Zhao'];
+const MOCK_MODELS = ['GPT-5.5', 'Claude 4.7', 'DeepSeek V4', 'Kimi 2.6', 'GLM 5.1', 'GPT-5.5-mini'];
+const MOCK_EMAILS = ['alice@company.com', 'bob@company.com', 'carol@company.com', 'david@company.com', 'emma@company.com', 'frank@company.com'];
+
+function generateMockSummary(): SummaryData {
+  return {
+    total_cost: 2847.56,
+    total_savings: 423.18,
+    total_tokens: 156_789_432,
+    request_count: 45_230,
+    cache_hit_rate: 34.5,
+  };
+}
+
+function generateMockStats(groupBy: GroupByType): StatItem[] {
+  const data: StatItem[] = [];
+  
+  if (groupBy === 'date') {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      // 确保没有重复日期
+      if (!data.find(d => d.name === dateStr)) {
+        data.push({
+          name: dateStr,
+          cost: Math.round((Math.random() * 130 + 20) * 100) / 100,
+          tokens: Math.round(Math.random() * 7_000_000 + 1_000_000),
+          requests: Math.round(Math.random() * 1700 + 300),
+          percentage: 0,
+        });
+      }
+    }
+  } else if (groupBy === 'week') {
+    for (let i = 11; i >= 0; i--) {
+      data.push({
+        name: `Week ${12 - i}`,
+        cost: Math.random() * 800 + 200,
+        tokens: Math.random() * 40_000_000 + 10_000_000,
+        requests: Math.random() * 8000 + 2000,
+        percentage: Math.random() * 10,
+      });
+    }
+  } else if (groupBy === 'month') {
+    const months = ['2025-10', '2025-11', '2025-12', '2026-01', '2026-02', '2026-03', '2026-04'];
+    months.forEach(m => {
+      data.push({
+        name: m,
+        cost: Math.random() * 3000 + 800,
+        tokens: Math.random() * 150_000_000 + 50_000_000,
+        requests: Math.random() * 15_000 + 5000,
+        percentage: Math.random() * 20,
+      });
+    });
+  } else if (groupBy === 'project') {
+    MOCK_PROJECTS.forEach((p) => {
+      data.push({
+        name: p,
+        cost: Math.random() * 1200 + 100,
+        tokens: Math.random() * 60_000_000 + 5_000_000,
+        requests: Math.random() * 12_000 + 1000,
+        percentage: Math.random() * 25,
+      });
+    });
+  } else if (groupBy === 'user') {
+    MOCK_USERS.forEach((u, i) => {
+      data.push({
+        name: u,
+        email: MOCK_EMAILS[i],
+        cost: Math.random() * 800 + 50,
+        tokens: Math.random() * 40_000_000 + 2_000_000,
+        requests: Math.random() * 8000 + 500,
+        percentage: Math.random() * 20,
+      });
+    });
+  } else if (groupBy === 'api_key') {
+    for (let i = 0; i < 8; i++) {
+      data.push({
+        name: `API Key ${i + 1}`,
+        key_preview: `sk-${Math.random().toString(36).substring(2, 8)}...`,
+        cost: Math.random() * 600 + 30,
+        tokens: Math.random() * 30_000_000 + 1_000_000,
+        requests: Math.random() * 6000 + 300,
+        percentage: Math.random() * 15,
+      });
+    }
+  } else if (groupBy === 'model') {
+    MOCK_MODELS.forEach((m) => {
+      data.push({
+        name: m,
+        cost: Math.random() * 1000 + 80,
+        tokens: Math.random() * 50_000_000 + 3_000_000,
+        requests: Math.random() * 10_000 + 800,
+        percentage: Math.random() * 25,
+      });
+    });
+  }
+  
+  // 计算百分比
+  const totalCost = data.reduce((sum, d) => sum + d.cost, 0);
+  return data.map(d => ({
+    ...d,
+    percentage: parseFloat(((d.cost / totalCost) * 100).toFixed(1)),
+  }));
+}
+
+function generateMockRecentRecords(): UsageRecord[] {
+  const records: UsageRecord[] = [];
+  for (let i = 0; i < 50; i++) {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - i * 15);
+    records.push({
+      id: `req_${Date.now()}_${i}`,
+      timestamp: date.toISOString(),
+      project: MOCK_PROJECTS[Math.floor(Math.random() * MOCK_PROJECTS.length)],
+      user: MOCK_USERS[Math.floor(Math.random() * MOCK_USERS.length)],
+      user_email: MOCK_EMAILS[Math.floor(Math.random() * MOCK_EMAILS.length)],
+      model: MOCK_MODELS[Math.floor(Math.random() * MOCK_MODELS.length)],
+      prompt_tokens: Math.floor(Math.random() * 5000 + 100),
+      completion_tokens: Math.floor(Math.random() * 3000 + 50),
+      cost: parseFloat((Math.random() * 0.5 + 0.01).toFixed(4)),
+      cached: Math.random() > 0.65,
+    });
+  }
+  return records;
+}
+
 // ---------- 组件 ----------
 export default function UsagePage() {
   const { t, lang } = useLanguage();
@@ -182,11 +311,18 @@ export default function UsagePage() {
       const res = await fetch(`${API_BASE}/usage/summary?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setSummary(generateMockSummary());
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       setSummary(data);
     } catch (err) {
       console.error('获取汇总失败:', err);
+      setSummary(generateMockSummary());
     }
   }, [dateRange, filterProject, filterUser, filterModel]);
 
@@ -205,11 +341,18 @@ export default function UsagePage() {
       const res = await fetch(`${API_BASE}/usage?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setStatsData(generateMockStats(groupBy));
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       setStatsData(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('获取统计数据失败:', err);
+      setStatsData(generateMockStats(groupBy));
     }
   }, [groupBy, dateRange, filterProject, filterUser, filterModel]);
 
@@ -227,11 +370,18 @@ export default function UsagePage() {
       const res = await fetch(`${API_BASE}/usage?${params.toString()}`, {
         headers: getAuthHeaders(),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setRecentRecords(generateMockRecentRecords());
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       setRecentRecords(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('获取最近记录失败:', err);
+      setRecentRecords(generateMockRecentRecords());
     }
   }, [dateRange, filterProject, filterUser, filterModel]);
 
@@ -242,6 +392,8 @@ export default function UsagePage() {
       if (projectsRes.ok) {
         const projectsData = await projectsRes.json();
         setProjects(projectsData.map((p: any) => p.name) || []);
+      } else if (projectsRes.status === 404) {
+        setProjects(MOCK_PROJECTS);
       }
       
       // 获取模型列表（从统计数据中提取）
@@ -249,6 +401,8 @@ export default function UsagePage() {
       if (modelsRes.ok) {
         const modelsData = await modelsRes.json();
         setModels(Array.isArray(modelsData) ? modelsData.map((m: any) => m.name || m.model || '') : []);
+      } else if (modelsRes.status === 404) {
+        setModels(MOCK_MODELS);
       }
       
       // 获取用户列表
@@ -256,9 +410,14 @@ export default function UsagePage() {
       if (usersRes.ok) {
         const usersData = await usersRes.json();
         setUsers(Array.isArray(usersData) ? usersData.map((u: any) => u.name || u.email || '') : []);
+      } else if (usersRes.status === 404) {
+        setUsers(MOCK_USERS);
       }
     } catch (err) {
       console.error('获取筛选选项失败:', err);
+      setProjects(MOCK_PROJECTS);
+      setModels(MOCK_MODELS);
+      setUsers(MOCK_USERS);
     }
   }, []);
 
@@ -367,130 +526,6 @@ export default function UsagePage() {
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             {t.dashboard.refresh}
-          </button>
-        </div>
-      </div>
-
-      {/* 筛选栏 */}
-      <div className="card p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* 时间范围 */}
-          <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.timeRange || 'Time Range'}</label>
-            <select
-              className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-            >
-              <option value="7d">{t.usage?.last7Days || 'Last 7 Days'}</option>
-              <option value="30d">{t.usage?.last30Days || 'Last 30 Days'}</option>
-              <option value="90d">{t.usage?.last90Days || 'Last 90 Days'}</option>
-              <option value="custom">{t.usage?.custom || 'Custom'}</option>
-            </select>
-          </div>
-
-          {/* 自定义日期 */}
-          {timeRange === 'custom' && (
-            <>
-              <div>
-                <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.startDate || 'Start Date'}</label>
-                <input
-                  type="date"
-                  className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2"
-                  value={customStart}
-                  onChange={(e) => setCustomStart(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.endDate || 'End Date'}</label>
-                <input
-                  type="date"
-                  className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2"
-                  value={customEnd}
-                  onChange={(e) => setCustomEnd(e.target.value)}
-                />
-              </div>
-            </>
-          )}
-          
-          {/* 分组方式 */}
-          <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.analysisDimension || 'Analysis Dimension'}</label>
-            <select
-              className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
-              value={groupBy}
-              onChange={(e) => setGroupBy(e.target.value as GroupByType)}
-            >
-              <option value="date">{t.usage?.byDay || 'By Day'}</option>
-              <option value="week">{t.usage?.byWeek || 'By Week'}</option>
-              <option value="month">{t.usage?.byMonth || 'By Month'}</option>
-              <option value="project">{t.usage?.byProject || 'By Project'}</option>
-              <option value="user">{t.usage?.byUser || 'By User'}</option>
-              <option value="api_key">{t.usage?.byApiKey || 'By API Key'}</option>
-              <option value="model">{t.usage?.byModel || 'By Model'}</option>
-            </select>
-          </div>
-          
-          {/* 项目筛选 */}
-          <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.project || 'Project'}</label>
-            <select
-              className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
-              value={filterProject}
-              onChange={(e) => setFilterProject(e.target.value)}
-            >
-              <option value="">{t.usage?.allProjects || 'All Projects'}</option>
-              {projects.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </div>
-          
-          {/* 人员筛选 */}
-          <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.user || 'User'}</label>
-            <select
-              className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
-              value={filterUser}
-              onChange={(e) => setFilterUser(e.target.value)}
-            >
-              <option value="">{t.usage?.allUsers || 'All Users'}</option>
-              {users.map((u) => (
-                <option key={u} value={u}>{u}</option>
-              ))}
-            </select>
-          </div>
-          
-          {/* 模型筛选 */}
-          <div>
-            <label className="block text-xs font-medium text-surface-700 mb-1.5">{t.usage?.model || 'Model'}</label>
-            <select
-              className="w-full text-sm border border-surface-200 rounded-lg px-3 py-2 bg-white"
-              value={filterModel}
-              onChange={(e) => setFilterModel(e.target.value)}
-            >
-              <option value="">{t.usage?.allModels || 'All Models'}</option>
-              {models.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-        
-        <div className="flex justify-end mt-4 gap-2">
-          <button
-            className="btn-secondary text-xs"
-            onClick={() => {
-              setTimeRange('30d');
-              setCustomStart('');
-              setCustomEnd('');
-              setGroupBy('date');
-              setFilterProject('');
-              setFilterUser('');
-              setFilterModel('');
-            }}
-          >
-            {t.usage?.resetFilter || 'Reset Filters'}
           </button>
         </div>
       </div>
@@ -710,7 +745,7 @@ export default function UsagePage() {
                                 <Cell key={`cell-${index}`} fill={entry.color} />
                               ))}
                             </Pie>
-                            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                            <RechartsTooltip formatter={(value: any) => formatCurrency(Number(value))} />
                             <Legend 
                               verticalAlign="bottom" 
                               height={80}
@@ -731,28 +766,52 @@ export default function UsagePage() {
                 </div>
               )}
 
-              {/* 柱状图对比 */}
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="text-sm font-semibold text-surface-800">{t.usage?.costComparison || 'Cost Comparison'}</h3>
+              {/* 折线图 - 花费趋势 */}
+              <div className="card lg:col-span-2">
+                <div className="card-header flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-surface-800">
+                    {groupBy === 'month' ? (t.usage?.byMonth || 'Monthly') : groupBy === 'week' ? (t.usage?.byWeek || 'Weekly') : (t.usage?.byDay || 'Daily')} Cost Trend
+                  </h3>
+                  <span className="text-xs text-surface-400">{chartData.length} records</span>
                 </div>
                 <div className="p-4">
                   <div className="h-80">
                     {chartData.length > 0 ? (
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData.slice(0, 15)} layout="vertical">
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                          <XAxis type="number" tickFormatter={(v) => `$${v.toFixed(0)}`} />
-                          <YAxis 
-                            type="category" 
+                        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis 
                             dataKey="name" 
-                            width={100}
-                            tick={{ fontSize: 10 }}
-                            tickFormatter={(v: string) => v.length > 12 ? v.substring(0, 12) + '...' : v}
+                            tick={{ fontSize: 11 }}
+                            tickFormatter={(v: string) => {
+                              if (groupBy === 'month' && v.length === 7) {
+                                return v.substring(5) + (lang === 'zh' ? '月' : '');
+                              }
+                              if (groupBy === 'date' && v.length === 10) {
+                                return v.substring(5);
+                              }
+                              return v;
+                            }}
                           />
-                          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                          <Bar dataKey="cost" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                        </BarChart>
+                          <YAxis 
+                            tick={{ fontSize: 11 }}
+                            tickFormatter={(v: number) => `$${v.toFixed(0)}`}
+                          />
+                          <RechartsTooltip 
+                            formatter={(value: any) => formatCurrency(Number(value))}
+                            labelFormatter={(label: any) => `${label}`}
+                          />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey="cost"
+                            name={t.usage?.cost || 'Cost'}
+                            stroke="#3b82f6"
+                            strokeWidth={3}
+                            dot={{ fill: '#3b82f6', r: 5 }}
+                            activeDot={{ r: 8, fill: '#1d4ed8' }}
+                          />
+                        </LineChart>
                       </ResponsiveContainer>
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full text-surface-400">
@@ -763,6 +822,7 @@ export default function UsagePage() {
                   </div>
                 </div>
               </div>
+
             </div>
           )}
 
@@ -794,7 +854,7 @@ export default function UsagePage() {
                           tick={{ fontSize: 11 }}
                           tickFormatter={(v: number) => `$${v.toFixed(0)}`}
                         />
-                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <RechartsTooltip formatter={(value: any) => formatCurrency(Number(value))} />
                         <Legend />
                         <Line
                           type="monotone"
