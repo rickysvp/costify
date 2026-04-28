@@ -52,6 +52,16 @@ const VERSIONS: Version[] = [
         docLink: 'https://github.com/rickysvp/costify/blob/main/docs/onboarding-flow.md',
         prototypeLink: '/docs',
       },
+      {
+        id: 'REQ-003',
+        title: '注册流程优化 - 邀请成员业务链条',
+        titleEn: 'Registration flow optimization - Member invitation chain',
+        status: 'planned',
+        priority: 'p0',
+        version: 'v1.0.1',
+        docLink: 'https://github.com/rickysvp/costify/blob/main/docs/registration-flow-optimization.md',
+        prototypeLink: '/members',
+      },
     ],
   },
   {
