@@ -26,6 +26,7 @@ import Login from './pages/Login';
 import Contact from './pages/Contact';
 import Demo from './pages/Demo';
 import InviteHandler from './pages/InviteHandler';
+import InviteRegister from './pages/InviteRegister';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="/changelog" element={<ProtectedRoute><Layout><Changelog /></Layout></ProtectedRoute>} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/invite" element={<InviteHandler />} />
+          <Route path="/invite/register" element={<InviteRegister />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

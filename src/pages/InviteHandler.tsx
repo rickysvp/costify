@@ -109,24 +109,72 @@ export default function InviteHandler() {
     );
   }
 
-  // 无效链接
+  // 无 token - 显示邀请功能说明页（原型展示）
   if (status === 'invalid') {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100 text-center max-w-sm w-full mx-4">
-          <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-7 h-7 text-red-600" />
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100 max-w-lg w-full">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-emerald-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-black mb-2">
+              {isEn ? 'Member Invitation' : '成员邀请'}
+            </h1>
+            <p className="text-neutral-500">
+              {isEn ? 'Invite team members to join your organization' : '邀请团队成员加入你的组织'}
+            </p>
           </div>
-          <h2 className="text-lg font-bold text-black mb-2">
-            {isEn ? 'Invalid Invitation' : '邀请链接无效'}
-          </h2>
-          <p className="text-sm text-neutral-500 mb-6">{errorMsg}</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="w-full py-2.5 bg-black text-white rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors"
-          >
-            {isEn ? 'Go to Login' : '前往登录'}
-          </button>
+
+          {/* 邀请流程说明 */}
+          <div className="space-y-4 mb-8">
+            <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-bold">1</div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">{isEn ? 'Send Invitation' : '发送邀请'}</h3>
+                <p className="text-sm text-slate-500">{isEn ? 'Enter email and select role in Members page' : '在成员管理页输入邮箱并选择角色'}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-bold">2</div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">{isEn ? 'Receive Email' : '接收邮件'}</h3>
+                <p className="text-sm text-slate-500">{isEn ? 'Invited member receives email with link' : '被邀请人收到包含链接的邀请邮件'}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-xl">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-bold">3</div>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">{isEn ? 'Join Organization' : '加入组织'}</h3>
+                <p className="text-sm text-slate-500">{isEn ? 'Click link to login/register and auto-join' : '点击链接登录/注册后自动加入'}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 演示按钮 */}
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                // 模拟带 token 的邀请链接
+                navigate('/invite?token=demo123');
+                window.location.reload();
+              }}
+              className="w-full py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors"
+            >
+              {isEn ? 'Simulate: Open Invitation Link' : '演示：打开邀请链接'}
+            </button>
+            <button
+              onClick={() => navigate('/members')}
+              className="w-full py-3 border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+            >
+              {isEn ? 'Go to Members Page' : '前往成员管理页'}
+            </button>
+          </div>
+
+          <p className="text-center text-xs text-slate-400 mt-6">
+            {isEn ? 'This is a prototype demonstration' : '此为原型演示'}
+          </p>
         </div>
       </div>
     );
