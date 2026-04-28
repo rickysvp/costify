@@ -1,15 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Globe, Mail, Building2 } from 'lucide-react';
 
 import { API_BASE } from '../config';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const { lang, setLang, t } = useLanguage();
+  const isEn = lang === 'en';
+
+  // 邀请相关参数
+  const inviteToken = searchParams.get('invite');
+  const inviteEmail = searchParams.get('email');
+  const inviteOrg = searchParams.get('org');
+
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,6 +25,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 如果有邀请邮箱，预填且锁定
+  useEffect(() => {
+    if (inviteEmail) {
+      setEmail(inviteEmail);
+    }
+  }, [inviteEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,8 +135,35 @@ export default function Login() {
           </div>
 
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-neutral-100">
-            <h2 className="text-2xl font-bold text-black mb-2">{isLogin ? t.login.title : (lang === 'zh' ? '创建账号' : 'Create Account')}</h2>
-            <p className="text-sm text-neutral-500 mb-6">{isLogin ? t.login.subtitle : (lang === 'zh' ? '开始管理您的 AI 资源' : 'Start managing your AI resources')}</p>
+            {/* 邀请提示 */}
+            {inviteToken && (
+              <div className="bg-neutral-50 rounded-lg p-4 mb-6 border border-neutral-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Building2 className="w-4 h-4 text-black" />
+                  <span className="text-sm font-medium text-black">
+                    {isEn ? 'You are joining' : '您正在加入'}
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  {isEn
+                    ? 'After login, you will automatically join the organization'
+                    : '登录后将自动加入该组织'}
+                </p>
+              </div>
+            )}
+
+            <h2 className="text-2xl font-bold text-black mb-2">
+              {isLogin
+                ? (inviteToken ? (isEn ? 'Welcome Back' : '欢迎回来') : t.login.title)
+                : (isEn ? 'Create Account' : '创建账号')}
+            </h2>
+            <p className="text-sm text-neutral-500 mb-6">
+              {isLogin
+                ? (inviteToken
+                  ? (isEn ? 'Login to join the organization' : '登录以加入组织')
+                  : t.login.subtitle)
+                : (isEn ? 'Start managing your AI resources' : '开始管理您的 AI 资源')}
+            </p>
 
             {error && (
               <div className="bg-neutral-100 border border-neutral-200 text-neutral-700 p-3 rounded-lg text-sm mb-4">{error}</div>
@@ -130,27 +172,38 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">{lang === 'zh' ? '姓名' : 'Name'}</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">{isEn ? 'Name' : '姓名'}</label>
                   <input 
                     type="text" 
                     value={name} 
                     onChange={e => setName(e.target.value)}
                     className="w-full text-sm bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
-                    placeholder={lang === 'zh' ? '请输入您的姓名' : 'Enter your name'}
+                    placeholder={isEn ? 'Enter your name' : '请输入您的姓名'}
                     required 
                   />
                 </div>
               )}
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t.login.email}</label>
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full text-sm bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
-                  placeholder="name@company.com"
-                  required 
-                />
+                <div className="relative">
+                  <input 
+                    type="email" 
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)}
+                    disabled={!!inviteEmail}
+                    className={`w-full text-sm bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all ${inviteEmail ? 'text-neutral-500 cursor-not-allowed' : ''}`}
+                    placeholder="name@company.com"
+                    required 
+                  />
+                  {inviteEmail && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Mail className="w-4 h-4 text-neutral-400" />
+                    </div>
+                  )}
+                </div>
+                {inviteEmail && (
+                  <p className="text-xs text-neutral-400 mt-1">{isEn ? 'Email is locked from invitation' : '邮箱由邀请锁定，不可修改'}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1.5">{t.login.password}</label>

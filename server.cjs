@@ -304,6 +304,43 @@ app.post('/api/members', authenticateToken, async (req, res) => {
   }
 });
 
+// 邀请成员
+app.post('/api/members/invite', authenticateToken, async (req, res) => {
+  try {
+    const { name, email, role, project_ids } = req.body;
+
+    // 检查邮箱是否已存在
+    const existing = await db.findMemberByEmail(email);
+    if (existing) return res.status(400).json({ error: 'Member already exists' });
+
+    // 生成临时密码
+    const tempPassword = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+
+    // 创建成员
+    const newMember = await db.createMember({
+      name,
+      email,
+      role: role || 'member',
+      org_id: req.user.org_id
+    });
+
+    // 如果有项目，关联项目
+    if (project_ids && project_ids.length > 0) {
+      for (const pid of project_ids) {
+        await db.addProjectMember(pid, newMember.id, 'member');
+      }
+    }
+
+    res.status(201).json({
+      ...newMember,
+      temporary_password: tempPassword,
+      message: 'Invitation sent successfully'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to invite member' });
+  }
+});
+
 // 项目成员
 app.get('/api/projects/:id/members', authenticateToken, async (req, res) => {
   try {

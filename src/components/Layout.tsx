@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Building2, BarChart3, Settings,
   ChevronDown, Bell, Menu,
   LogOut, User, Users, Key, AlertTriangle, Zap, BookOpen,
-  FileText, Store, Wallet, Globe, GitCommit, Play
+  FileText, Store, Wallet, Globe, GitCommit, Play,
+  Rocket, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -233,6 +235,78 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {/* 接入指南悬浮入口 - 仅在未完成时显示 */}
+      <AnimatePresence>
+        {location.pathname !== '/docs' && localStorage.getItem('anytokn_onboarding_completed') !== 'true' && (
+          <motion.div
+            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 100, scale: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            className="fixed bottom-8 right-8 z-50"
+          >
+            <button
+              onClick={() => navigate('/docs')}
+              className="group relative flex items-center gap-4 p-4 bg-slate-900 text-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:bg-black transition-all overflow-hidden"
+            >
+              {/* 背景脉冲动效 */}
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+                className="absolute inset-0 bg-emerald-500/20"
+              />
+              
+              {/* 进度圆环 */}
+              <div className="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+                <svg className="w-full h-full -rotate-90 absolute inset-0">
+                  <circle
+                    cx="24"
+                    cy="24"
+                    r="20"
+                    fill="transparent"
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="4"
+                  />
+                  <motion.circle
+                    cx="24"
+                    cy="24"
+                    r="20"
+                    fill="transparent"
+                    stroke="#10b981"
+                    strokeWidth="4"
+                    initial={{ strokeDashoffset: 125.6 }}
+                    animate={{ strokeDashoffset: 125.6 - (125.6 * (
+                      (localStorage.getItem('anytokn_has_api_key') === 'true' ? 1 : 0) + 
+                      (parseFloat(localStorage.getItem('anytokn_balance') || '0') > 0 ? 1 : 0) + 
+                      (localStorage.getItem('anytokn_onboarding_step') === '4' ? 2 : 0)
+                    ) / 4) }}
+                    strokeDasharray={125.6}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                  />
+                </svg>
+                <Rocket className="w-5 h-5 text-emerald-400" />
+              </div>
+
+              {/* 文案内容 */}
+              <div className="text-left pr-4">
+                <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-0.5">
+                  {lang === 'zh' ? '快速接入 AnyTokn' : 'Quick Start AnyTokn'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-bold">
+                    {lang === 'zh' ? '快速接入' : 'Quick Start'}
+                  </span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+              
+              {/* 光效装饰 */}
+              <div className="absolute top-0 left-0 w-full h-full pointer-events-none bg-gradient-to-tr from-white/10 to-transparent" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

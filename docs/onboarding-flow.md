@@ -1,14 +1,14 @@
 # AnyTokn Onboarding Flow 接入引导流程
 
 > 版本: v1.0.1  
-> 更新日期: 2026-04-24  
+> 更新日期: 2026-04-28  
 > 状态: 已完成
 
 ---
 
 ## 概述
 
-AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助新用户在 5 个步骤内完成首次 API 调用并查看成本数据。
+AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助新用户在 4 个步骤内完成首次 API 调用并查看成本数据。
 
 ---
 
@@ -18,6 +18,7 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 2. **实时反馈** - 每个步骤都有明确的状态标记和完成提示
 3. **灵活操作** - 支持手动标记完成，不强制依赖系统自动检测
 4. **多语言支持** - 完整的中英文国际化支持
+5. **成本可视化** - 直观展示用量和节省效果
 
 ---
 
@@ -29,51 +30,21 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 
 **内容**:
 - 欢迎语和流程概述
-- 5 个步骤的预览列表
+- 4 个步骤的预览列表
 - 两个操作按钮:
   - "开始接入" - 进入第一步
   - "查看集成指南" - 展开下方的工具配置说明
 
 ---
 
-### Step 1: 创建项目 (Create Project)
-
-**目标**: 引导用户创建第一个项目
-
-**交互设计**:
-```
-┌─────────────────────────────────────┐
-│  步骤 1: 创建你的第一个项目          │
-│  项目是 AnyTokn 中资源管理的基本单位  │
-├─────────────────────────────────────┤
-│                                     │
-│     [Building Icon]                 │
-│     你还没有创建任何项目              │
-│                                     │
-│     [ 去创建项目 ]                   │
-│                                     │
-│  ─────────────────────────────────  │
-│  已经创建好项目了？标记为完成         │
-│     [ 我已完成创建 ]                 │
-│                                     │
-└─────────────────────────────────────┘
-```
-
-**功能说明**:
-- 点击"去创建项目"跳转到 `/projects` 页面
-- 提供"我已完成创建"按钮，允许手动标记完成
-- 标记完成后显示项目名称和"继续获取 API Key"按钮
-
----
-
-### Step 2: 获取 API Key (Get API Key)
+### Step 1: 获取 API Key (Get API Key)
 
 **目标**: 引导用户生成 API Key
 
 **交互设计**:
 ```
 ┌─────────────────────────────────────┐
-│  步骤 2: 获取你的 API Key            │
+│  步骤 1: 获取你的 API Key            │
 │  API Key 是调用 AnyTokn 服务的凭证    │
 ├─────────────────────────────────────┤
 │                                     │
@@ -83,6 +54,11 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 │     [ 去生成 API Key ]               │
 │                                     │
 │  ─────────────────────────────────  │
+│  请粘贴你刚才生成的 API Key          │
+│  ┌─────────────────────────────┐    │
+│  │ sk-anytokn-...              │    │
+│  └─────────────────────────────┘    │
+│                                     │
 │  已经有 API Key 了？标记为完成        │
 │     [ 我已完成获取 ]                 │
 │                                     │
@@ -91,30 +67,31 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 
 **功能说明**:
 - 点击"去生成 API Key"跳转到 `/api-keys` 页面
+- 提供输入框让用户粘贴生成的 API Key
 - 提供"我已完成获取"按钮，允许手动标记完成
-- 标记完成后显示 API Key 示例和"继续准备测试余额"按钮
+- 标记完成后显示"继续充值余额"按钮
 
 ---
 
-### Step 3: 准备测试余额 (Prepare Balance)
+### Step 2: 充值余额 (Recharge Balance)
 
 **目标**: 引导用户充值测试余额
 
 **交互设计**:
 ```
 ┌─────────────────────────────────────┐
-│  步骤 3: 准备测试余额                │
-│  准备少量测试余额即可发起真实请求     │
+│  步骤 2: 充值余额                    │
+│  充值后即可发起真实请求              │
 ├─────────────────────────────────────┤
 │  当前余额: $0.00                    │
 │                                     │
 │  [⚠️ 余额为空。充值后可解锁测试]      │
 │                                     │
-│  [ 去充值 ]    [ 稍后再说 ]          │
+│  [ 充值 $50 ]    [ 稍后再说 ]        │
 │                                     │
 │  ─────────────────────────────────  │
 │  已经有余额了？标记为完成            │
-│     [ 我已完成准备 ]                 │
+│     [ 我已完成充值 ]                 │
 │                                     │
 └─────────────────────────────────────┘
 ```
@@ -122,51 +99,78 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 **功能说明**:
 - 显示当前余额
 - 余额为 0 时显示警告提示
-- 点击"去充值"跳转到 `/billing` 页面
-- 提供"我已完成准备"按钮，设置余额为 $50
+- 点击"充值 $50"直接增加余额（演示模式）
+- 提供"我已完成充值"按钮，设置余额为 $50
+- 充值成功后显示"继续测试请求"按钮
 
 ---
 
-### Step 4: 测试请求 (Test Request)
+### Step 3: 测试请求 (Test Request)
 
-**目标**: 帮助用户测试第一个 API 请求
+**目标**: 帮助用户测试第一个 API 请求，展示用量和节省
 
 **交互设计**:
 ```
 ┌─────────────────────────────────────┐
-│  步骤 4: 测试你的第一个请求          │
-│  复制代码运行，成功响应即表示接入正常  │
+│  步骤 3: 测试你的第一个请求          │
+│  输入 Prompt 或选择推荐，体验极速响应 │
 ├─────────────────────────────────────┤
 │                                     │
-│  Base URL: https://api.anytokn.com/v1│
-│                                     │
-│  [cURL] [JavaScript] [Python]       │
+│  你的问题                           │
 │  ┌─────────────────────────────┐    │
-│  │ curl ...                    │    │
-│  │   -H "Authorization: ..."   │    │
-│  │   -d '{...}'                │    │
+│  │ [输入框]                     │    │
 │  └─────────────────────────────┘    │
 │                                     │
-│  预期响应:                          │
-│  ┌─────────────────────────────┐    │
-│  │ { "choices": [...] }        │    │
-│  └─────────────────────────────┘    │
+│  或选择系统推荐：                    │
+│  ┌────────────┐  ┌────────────┐    │
+│  │ 📊 复杂分析 │  │ 🏗️ 系统设计 │    │
+│  │ Transformer │  │ 微服务架构  │    │
+│  │ 架构对比    │  │ 10万并发   │    │
+│  └────────────┘  └────────────┘    │
+│  ┌────────────┐  ┌────────────┐    │
+│  │ 📅 产品策略 │  │ 💰 成本分析 │    │
+│  │ 12月路线图  │  │ K8s迁移TCO │    │
+│  └────────────┘  └────────────┘    │
 │                                     │
-│  [✓ 我已跑通测试请求]                │
+│     [ 运行测试 ]                     │
+│                                     │
+│  ───────── 运行后显示 ─────────     │
+│                                     │
+│  ┌────────┐┌────────┐┌────────┐    │
+│  │ 输入   ││ 输出   ││ 总成本  │    │
+│  │ 856    ││ 1,247  ││ $0.042 │    │
+│  │ tokens ││ tokens ││        │    │
+│  └────────┘└────────┘└────────┘    │
+│                                     │
+│  使用 AnyTokn 节省                   │
+│  $0.018 (42.9%)                     │
+│  原始成本: $0.060  缓存命中: 35%    │
+│                                     │
+│     [ 查看成本分析 ]                 │
 │                                     │
 └─────────────────────────────────────┘
 ```
 
 **功能说明**:
-- 显示 Base URL: `https://api.anytokn.com/v1`
-- 提供 cURL、JavaScript、Python 三种代码示例
-- 代码中自动填入用户的 API Key
-- 显示预期响应示例
-- "我已跑通测试请求"按钮标记完成并进入最后一步
+- 提供 Prompt 输入框，支持自由输入
+- 4 个系统推荐的复杂测试用例（带分类标签）:
+  - 📊 **复杂分析** - Transformer 架构企业级对比
+  - 🏗️ **系统设计** - 10万+并发电商平台微服务
+  - 📅 **产品策略** - AI客服平台12个月路线图
+  - 💰 **成本分析** - K8s迁移5年TCO对比
+- 点击推荐 Prompt 自动填入输入框
+- "运行测试"按钮发起请求（带加载动画）
+- 成功后显示:
+  - 输入/输出 Token 数量
+  - 总成本
+  - AnyTokn 节省金额和百分比
+  - 原始成本对比
+  - 缓存命中率
+- "查看成本分析"按钮进入最后一步
 
 ---
 
-### Step 5: 查看结果 (View Results)
+### Step 4: 查看结果 (View Results)
 
 **目标**: 引导用户查看 Dashboard 和相关功能
 
@@ -189,6 +193,26 @@ AnyTokn 的 Onboarding 流程是一个任务驱动的接入引导系统，帮助
 - 显示完成祝贺
 - 三个快捷入口: Dashboard、Reports、Billing
 - "前往 Dashboard"主按钮
+- 完成后不再显示悬浮快速入口
+
+---
+
+## 悬浮快速入口
+
+当用户离开接入指南页面但尚未完成时，界面右下侧显示悬浮按钮:
+
+```
+┌─────────────────────────┐
+│  🚀 快速接入 AnyTokn     │
+│     快速接入  →          │
+└─────────────────────────┘
+```
+
+**显示条件**:
+- 不在 `/docs` 页面
+- 未完成接入指南 (`localStorage.getItem('anytokn_onboarding_completed') !== 'true'`)
+
+**点击行为**: 跳转回 `/docs` 页面
 
 ---
 
@@ -245,10 +269,12 @@ print(response.choices[0].message.content)
 const [currentStep, setCurrentStep] = useState(0);
 
 // 完成状态
-const [hasProject, setHasProject] = useState(false);
 const [hasApiKey, setHasApiKey] = useState(false);
 const [balance, setBalance] = useState(0);
 const [testCompleted, setTestCompleted] = useState(false);
+
+// 测试 Prompt
+const [testPrompt, setTestPrompt] = useState('');
 ```
 
 ### 步骤定义
@@ -256,25 +282,22 @@ const [testCompleted, setTestCompleted] = useState(false);
 ```typescript
 const steps = [
   { id: 'start', title: '开始接入', titleEn: 'Get Started' },
-  { id: 'project', title: '创建项目', titleEn: 'Create Project' },
   { id: 'apikey', title: '获取 API Key', titleEn: 'Get API Key' },
-  { id: 'balance', title: '准备测试余额', titleEn: 'Prepare Balance' },
+  { id: 'balance', title: '充值余额', titleEn: 'Recharge Balance' },
   { id: 'test', title: '测试请求', titleEn: 'Test Request' },
   { id: 'result', title: '查看结果', titleEn: 'View Results' },
 ];
 ```
 
-### 状态计算
+### 完成标记
 
 ```typescript
-const steps: OnboardingStep[] = [
-  { id: 'start', status: currentStep === 0 ? 'current' : 'done' },
-  { id: 'project', status: hasProject ? 'done' : currentStep === 1 ? 'current' : 'todo' },
-  { id: 'apikey', status: hasApiKey ? 'done' : currentStep === 2 ? 'current' : 'todo' },
-  { id: 'balance', status: balance > 0 ? 'done' : currentStep === 3 ? 'current' : 'todo' },
-  { id: 'test', status: testCompleted ? 'done' : currentStep === 4 ? 'current' : 'todo' },
-  { id: 'result', status: currentStep === 5 ? 'current' : 'todo' },
-];
+// 当用户到达最后一步时，标记接入指南已完成
+useEffect(() => {
+  if (currentStep === 4) {
+    localStorage.setItem('anytokn_onboarding_completed', 'true');
+  }
+}, [currentStep]);
 ```
 
 ---
@@ -297,6 +320,7 @@ const isEn = lang === 'en';
 
 | 版本 | 日期 | 更新内容 |
 |------|------|----------|
+| v1.0.1 | 2026-04-28 | 优化接入流程：移除创建项目步骤、改为充值余额、增加复杂 Prompt 测试、展示用量和节省数据、添加悬浮快速入口 |
 | v1.0.1 | 2026-04-24 | 重新设计 Onboarding 流程，改为任务驱动模式 |
 | v1.0.0 | 2026-04-20 | 基础文档页面 |
 
@@ -304,6 +328,7 @@ const isEn = lang === 'en';
 
 ## 相关链接
 
+- [注册流程优化 - 邀请成员业务链条](./registration-flow-optimization.md)
 - [消息通知文档](./notification-messages.md)
 - [版本迭代记录](../src/pages/Changelog.tsx)
 - [原型页面](../src/pages/Docs.tsx)
