@@ -27,7 +27,6 @@ import Contact from './pages/Contact';
 import Demo from './pages/Demo';
 import InviteHandler from './pages/InviteHandler';
 import InviteRegister from './pages/InviteRegister';
-import Onboarding from './pages/Onboarding';
 
 function App() {
   return (
@@ -48,7 +47,6 @@ function App() {
           <Route path="/billing" element={<ProtectedRoute requireAdmin><Layout><Billing /></Layout></ProtectedRoute>} />
           <Route path="/alerts" element={<ProtectedRoute><Layout><Alerts /></Layout></ProtectedRoute>} />
           <Route path="/docs" element={<ProtectedRoute><Layout><Docs /></Layout></ProtectedRoute>} />
-          <Route path="/onboarding" element={<ProtectedRoute><Layout><Onboarding /></Layout></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Layout><Reports /></Layout></ProtectedRoute>} />
           <Route path="/reports/:id" element={<ProtectedRoute><Layout><ReportDetail /></Layout></ProtectedRoute>} />

@@ -238,7 +238,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       {/* 接入指南悬浮入口 - 仅在未完成时显示 */}
       <AnimatePresence>
-        {location.pathname !== '/onboarding' && localStorage.getItem('anytokn_onboarding_completed') !== 'true' && (
+        {location.pathname !== '/docs' && localStorage.getItem('anytokn_onboarding_completed') !== 'true' && (
           <motion.div
             initial={{ opacity: 0, y: 100, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -247,7 +247,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             className="fixed bottom-8 right-8 z-50"
           >
             <button
-              onClick={() => navigate('/onboarding')}
+              onClick={() => navigate('/docs')}
               className="group relative flex items-center gap-4 p-4 bg-slate-900 text-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:bg-black transition-all overflow-hidden"
             >
               {/* 背景脉冲动效 */}
