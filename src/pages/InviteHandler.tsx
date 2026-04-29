@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Loader2, AlertTriangle, CheckCircle, Mail, Building2 } from 'lucide-react';
-
-import { API_BASE } from '../config';
+import { Loader2, CheckCircle, Mail, Building2 } from 'lucide-react';
 
 interface InviteInfo {
   valid: boolean;
@@ -24,7 +22,7 @@ export default function InviteHandler() {
 
   const [status, setStatus] = useState<'loading' | 'valid' | 'invalid' | 'accepted'>('loading');
   const [inviteInfo, setInviteInfo] = useState<InviteInfo | null>(null);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (!token) {

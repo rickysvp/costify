@@ -268,21 +268,21 @@ export default function UsagePage() {
   const { t, lang } = useLanguage();
 
   // 筛选状态
-  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
-  const [customStart, setCustomStart] = useState('');
-  const [customEnd, setCustomEnd] = useState('');
-  const [groupBy, setGroupBy] = useState<GroupByType>('date');
-  const [filterProject, setFilterProject] = useState('');
-  const [filterUser, setFilterUser] = useState('');
-  const [filterModel, setFilterModel] = useState('');
+  const [timeRange] = useState<TimeRange>('30d');
+  const [customStart] = useState('');
+  const [customEnd] = useState('');
+  const [groupBy] = useState<GroupByType>('date');
+  const [filterProject] = useState('');
+  const [filterUser] = useState('');
+  const [filterModel] = useState('');
 
   // 数据状态
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [statsData, setStatsData] = useState<StatItem[]>([]);
   const [recentRecords, setRecentRecords] = useState<UsageRecord[]>([]);
-  const [projects, setProjects] = useState<string[]>([]);
-  const [users, setUsers] = useState<string[]>([]);
-  const [models, setModels] = useState<string[]>([]);
+  const [, setProjects] = useState<string[]>([]);
+  const [, setUsers] = useState<string[]>([]);
+  const [, setModels] = useState<string[]>([]);
 
   // UI 状态
   const [isLoading, setIsLoading] = useState(true);

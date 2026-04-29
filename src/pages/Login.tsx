@@ -16,7 +16,6 @@ export default function Login() {
   // 邀请相关参数
   const inviteToken = searchParams.get('invite');
   const inviteEmail = searchParams.get('email');
-  const inviteOrg = searchParams.get('org');
 
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');

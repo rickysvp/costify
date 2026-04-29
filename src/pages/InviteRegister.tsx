@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Eye, EyeOff, ArrowRight, Mail, Building2, CheckCircle, Loader2 } from 'lucide-react';

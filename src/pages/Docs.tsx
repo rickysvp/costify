@@ -13,7 +13,6 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -35,8 +34,6 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
     const lines = code.split('\n');
     
     return lines.map((line, lineIndex) => {
-      // Highlight base_url value
-      let processedLine = line;
       
       // Match base_url patterns
       if (line.includes('base_url') || line.includes('baseURL') || line.includes('Base URL')) {
@@ -175,7 +172,7 @@ export default function Docs() {
   const navigate = useNavigate();
   const isEn = lang === 'en';
 
-  const [apiKeyValue, setApiKeyValue] = useState(() => 
+  const [apiKeyValue] = useState(() => 
     localStorage.getItem('anytokn_api_key_value') || 'sk-your-api-key'
   );
 
