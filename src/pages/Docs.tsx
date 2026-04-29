@@ -896,6 +896,7 @@ export default function Docs() {
                   localStorage.removeItem('anytokn_has_api_key');
                   localStorage.removeItem('anytokn_balance');
                   localStorage.removeItem('anytokn_api_key_value');
+                  localStorage.removeItem('anytokn_onboarding_completed');
                   window.location.reload();
                 }}
                 className="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition-colors uppercase tracking-widest"
